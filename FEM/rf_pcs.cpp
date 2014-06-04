@@ -2396,6 +2396,11 @@ void CRFProcess::Config(void)
 		type = 3;
 		ConfigHeatTransport();
 	}
+	if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+	{
+		type = 3; 
+		ConfigHeatTransport_BHE(); 
+	}
 	//	if (_pcs_type_name.compare("MASS_TRANSPORT") == 0) {
 	if (this->getProcessType() == FiniteElement::MASS_TRANSPORT)
 	{
@@ -2977,6 +2982,41 @@ void CRFProcess::ConfigHeatTransport()
 		pcs_primary_function_unit[1] = "K";
 		pcs_number_of_secondary_nvals = 0;
 	}
+}
+
+/**************************************************************************
+FEMLib-Method:
+Task: configure the PCS HeatTransport_BHE
+Programing:
+06/2014 HS Implementation
+last modified:
+**************************************************************************/
+void CRFProcess::ConfigHeatTransport_BHE()
+{
+	// depending which type of BHE, 
+	// the number of primary variables will be different
+	// TODO: 
+	// if 2U type of BHE
+	pcs_number_of_primary_nvals = 9; 
+	pcs_primary_function_name[0] = "TEMPERATURE_SOIL";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_IN_1";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_IN_2";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_OUT_1";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_OUT_2";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_G_1";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_G_2";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_G_3";
+	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[0] = "TEMPERATURE_G_4";
+	pcs_primary_function_unit[0] = "dC";
+
 }
 
 

@@ -630,6 +630,7 @@ public:
 	void ConfigNonIsothermalFlowRichards();
 	void ConfigMassTransport();
 	void ConfigHeatTransport();
+	void ConfigHeatTransport_BHE(); 
 	void ConfigDeformation();
 	void ConfigMultiphaseFlow();
 	void ConfigGasFlow();
