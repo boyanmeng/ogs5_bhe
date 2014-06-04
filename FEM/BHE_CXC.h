@@ -22,7 +22,10 @@ namespace BHE  // namespace of borehole heat exchanger
 		BHE_CXC() : BHEAbstract(BHE::BHE_TYPE_CXC)
 		{};
 
-
+		/**
+		  * return the number of unknowns needed for CXC BHE
+		  */
+		std::size_t get_n_unknowns() { return 3; }
 
 	private:
 

@@ -30,6 +30,7 @@ namespace BHE  // namespace of borehole heat exchanger
 
 		/**
 		  * return the number of unknowns needed for this BHE
+		  * abstract function, need to be realized. 
 		  */
 		virtual std::size_t get_n_unknowns() = 0;
 

@@ -22,7 +22,10 @@ namespace BHE  // namespace of borehole heat exchanger
 		BHE_1U() : BHEAbstract(BHE::BHE_TYPE_1U)
 		{};
 
-
+		/**
+		  * return the number of unknowns needed for 1U BHE
+		  */
+		std::size_t get_n_unknowns() { return 4; }
 
 	private:
 
