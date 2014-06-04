@@ -5,6 +5,11 @@ set( SOURCES
     StepperBulischStoer.h
 	BoundaryCondition.h
 	break.h
+	BHEAbstract.h
+	BHE_1U.h
+	BHE_2U.h
+	BHE_CXC.h
+	BHE_CXA.h
 	conversion_rate.h
 	display.h
 	eos.h
@@ -61,6 +66,10 @@ set( SOURCES
 	Stiff_Bulirsch-Stoer.cpp
 	BoundaryCondition.cpp
 	break.cpp
+	BHE_1U.cpp
+	BHE_2U.cpp
+	BHE_CXC.cpp
+	BHE_CXA.cpp
 	conversion_rate.cpp
 	display.cpp
 	eos.cpp
