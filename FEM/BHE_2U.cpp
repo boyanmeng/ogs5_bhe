@@ -5,11 +5,3 @@
 *
 */
 
-#include "BHE_2U.h"
-
-namespace BHE  // namespace of borehole heat exchanger
-{
-
-
-
-}  // end of namespace
