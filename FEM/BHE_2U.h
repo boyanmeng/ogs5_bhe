@@ -9,6 +9,7 @@
 #define BHE_2U_H
 
 #include "BHEAbstract.h"
+#include "makros.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -50,6 +51,12 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p; 
 			lambda_g = my_lambda_g; 
 			omega = my_omega; 
+
+			S_i  = PI * 2.0 * r_outer;
+			S_o  = PI * 2.0 * r_outer; 
+			S_g1 = 0.5 * D; 
+			S_g2 = D;
+			S_gs = 0.25 * PI * D; 
 
 			// initialization calculation
 			initialize(); 
@@ -120,7 +127,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * thermal resistances 
 		  */
-		double _R_fig_i1, _R_fig_i2, _R_fog_o1, _R_fog_o2; 
+		double _R_fig, _R_fog; 
 
 		/**
 		  * thermal resistances due to advective flow of refrigerant in the pipes
@@ -153,6 +160,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		double _R_gg_1, _R_gg_2;
 
 		/**
+		  * heat transfer coefficients
+		  */
+		double _PHI_fig, _PHI_fog, _PHI_gg_1, _PHI_gg_2, _PHI_gs;
+
+		/**
 		  * Reynolds number
 		  */
 		double _Re;
@@ -181,6 +193,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * pipe distance
 		  */
 		double omega; 
+
+		/**
+		  * specific exchange surfaces S
+		  */
+		double S_i, S_o, S_g1, S_g2, S_gs;
 	};
 
 

@@ -85,8 +85,8 @@ void BHE_1U::calc_thermal_resistances()
 	_R_g = std::acosh((D*D + d0*d0 - s*s) / (2 * D*d0)) / (2 * PI * lambda_g * lambda_g) * (1.601 - 0.888 * omega / D );
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
-	_R_fig_i1 = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
-	_R_fog_o1 = _R_adv_o1 + _R_con_a_o1 + _R_con_b;
+	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
+	_R_fog = _R_adv_o1 + _R_con_a_o1 + _R_con_b;
 
 	// thermal resistance due to grout-soil exchange
 	_R_gs = (1 - chi)*_R_g;
@@ -158,7 +158,10 @@ void BHE_1U::calc_Pr()
 */
 void BHE_1U::calc_heat_transfer_coefficients()
 {
-	// TODO
+	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
+	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
+	_PHI_gg = 1.0 / _R_gg * 1.0 / S_g1;
+	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
 }
 
 /**

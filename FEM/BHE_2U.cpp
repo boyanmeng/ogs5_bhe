@@ -55,7 +55,7 @@ void BHE_2U::initialize()
 	calc_Pr(); 
 	calc_Nu(); 
 	calc_thermal_resistances(); 
-
+	calc_heat_transfer_coefficients();
 }
 
 /**
@@ -85,10 +85,8 @@ void BHE_2U::calc_thermal_resistances()
 	_R_g = std::acosh( (D*D + d0*d0 - s*s) / (2*D*d0) ) / (2 * PI * lambda_g * lambda_g) * (3.098 - 4.432 * s / D + 2.364 * s * s / D / D);
 	_R_con_b = chi * _R_g; 
 	// Eq. 29 and 30
-	_R_fig_i1 = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
-	_R_fog_o1 = _R_adv_o1 + _R_con_a_o1 + _R_con_b;
-	_R_fig_i2 = _R_adv_i2 + _R_con_a_i2 + _R_con_b;
-	_R_fog_o2 = _R_adv_o2 + _R_con_a_o2 + _R_con_b;
+	_R_fig = _R_adv_i1 + _R_adv_i2 + _R_con_a_i1 + _R_con_a_i2 + _R_con_b;
+	_R_fog = _R_adv_o1 + _R_adv_o2 + _R_con_a_o1 + _R_con_a_o2 + _R_con_b;
 
 	// thermal resistance due to grout-soil exchange
 	_R_gs = (1-chi)*_R_g; 	
@@ -164,7 +162,11 @@ void BHE_2U::calc_Pr()
   */
 void BHE_2U::calc_heat_transfer_coefficients()
 {
-	// TODO
+	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
+	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
+	_PHI_gg_1 = 1.0 / _R_gg_1 * 1.0 / S_g1;
+	_PHI_gg_2 = 1.0 / _R_gg_2 * 1.0 / S_g2;
+	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
 }
 
 /**
