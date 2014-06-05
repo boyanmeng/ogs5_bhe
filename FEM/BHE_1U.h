@@ -25,6 +25,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
 			   double my_r_inner = 0.016          /* inner radius of the pipline */,
 			   double my_r_outer = 0.016          /* outer radius of the pipline */,
+			   double my_b_in = 0.0029             /* pipe-in wall thickness*/,
+			   double my_b_out = 0.0029            /* pipe-out wall thickness*/,
 			   double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
 			   double my_rho_r = 988.1            /* density of the refrigerant */,
 			   double my_heat_cap_r = 4.18        /* specific heat capacity of the refrigerant */,
@@ -32,7 +34,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g = 2.3           /* thermal conductivity of the grout */,
 			   double my_omega = 0.06             /* pipe distance */)
-			: BHEAbstract(BHE::BHE_TYPE_2U)
+			: BHEAbstract(BHE::BHE_TYPE_1U)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
@@ -42,6 +44,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			Q_r = my_Qr;
 			r_inner = my_r_inner;
 			r_outer = my_r_outer;
+			b_in = my_b_in; 
+			b_out = my_b_out; 
 			mu_r = my_mu_r;
 			rho_r = my_rho_r;
 			heat_cap_r = my_heat_cap_r;

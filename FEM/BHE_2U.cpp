@@ -146,7 +146,7 @@ void BHE_2U::calc_Re()
 	u_norm = _u.norm();
 	d = 2.0 * r_inner; // inner diameter of the pipeline
 
-	_Re = u_norm * d / (mu_r * rho_r) ; 
+	_Re = u_norm * d / (mu_r / rho_r) ; 
 }
 
 /**
