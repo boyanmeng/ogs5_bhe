@@ -153,6 +153,18 @@ namespace BHE  // namespace of borehole heat exchanger
 		double r_outer;
 
 		/**
+		  * pipe-in wall thickness
+		  * unit is m
+		  */
+		double b_in;
+
+		/**
+		  * pipe-out wall thickness
+		  * unit is m
+		  */
+		double b_out;
+
+		/**
 		  * dynamics viscosity of the refrigerant
 		  * unit is kg m-1 sec-1
 		  */
