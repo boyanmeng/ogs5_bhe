@@ -95,8 +95,8 @@ void BHE_2U::calc_thermal_resistances()
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar_1, R_ar_2; 
-	R_ar_1 = std::acosh( (s*s - d0*d0) / d0 / d0 ) / (2.0 * PI * lambda_g * lambda_g); 
-	R_ar_2 = std::acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g * lambda_g);
+	R_ar_1 = std::acosh( (s*s - d0*d0) / d0 / d0 ) / (2.0 * PI * lambda_g ); 
+	R_ar_2 = std::acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
 	_R_gg_1 = 2.0 * _R_gs * ( R_ar_1 - 2.0 * chi * _R_g ) / ( 2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g ) ;
 	_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 
