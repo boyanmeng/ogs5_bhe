@@ -93,11 +93,6 @@ namespace BHE  // namespace of borehole heat exchanger
 		double get_thermal_resistance(std::size_t idx);
 
 		/**
-		  * initialization calcultion,
-		  */
-		void initialize();
-
-		/**
 		  * calculate thermal resistance
 		  */
 		void calc_thermal_resistances();

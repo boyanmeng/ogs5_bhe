@@ -96,7 +96,15 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * initialization calcultion,
 		  * need to be overwritten.
 		  */
-		virtual void initialize() = 0;
+		virtual void initialize()
+		{
+			calc_u();
+			calc_Re();
+			calc_Pr();
+			calc_Nu();
+			calc_thermal_resistances();
+			calc_heat_transfer_coefficients();
+		};
 
 		/**
 		  * thermal resistance calculation, 

@@ -43,21 +43,6 @@ double BHE_1U::get_thermal_resistance(std::size_t idx = 0)
 	return 0.0;
 }
 
-
-/**
-* initialization calcultion,
-* need to be overwritten.
-*/
-void BHE_1U::initialize()
-{
-	calc_u();
-	calc_Re();
-	calc_Pr();
-	calc_Nu();
-	calc_thermal_resistances();
-
-}
-
 /**
 * calculate thermal resistance
 */
