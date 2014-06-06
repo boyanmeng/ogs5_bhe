@@ -9,6 +9,7 @@
 #define BHE_CXC_H
 
 #include "BHEAbstract.h"
+#include "makros.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -17,17 +18,170 @@ namespace BHE  // namespace of borehole heat exchanger
 	{
 	public:
 		/**
-		  * constructor
-		  */
-		BHE_CXC() : BHEAbstract(BHE::BHE_TYPE_CXC)
-		{};
+		* constructor
+		*/
+		BHE_CXC(double my_L = 100                  /* length/depth of the BHE */,
+			double my_D = 0.013                /* diameter of the BHE */,
+			double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
+			double my_r_inner = 0.024          /* radius of the inner pipline */,
+			double my_r_outer = 0.05           /* radius of the outer pipline */,
+			double my_b_in = 0.003             /* pipe-in wall thickness*/,
+			double my_b_out = 0.004            /* pipe-out wall thickness*/,
+			double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
+			double my_rho_r = 988.1            /* density of the refrigerant */,
+			double my_heat_cap_r = 4.18        /* specific heat capacity of the refrigerant */,
+			double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
+			double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
+			double my_lambda_g = 2.3           /* thermal conductivity of the grout */)
+			: BHEAbstract(BHE::BHE_TYPE_CXA)
+		{
+			_u = Eigen::Vector2d::Zero();
+			_Nu = Eigen::Vector2d::Zero();
+
+			L = my_L;
+			D = my_D;
+			Q_r = my_Qr;
+			r_inner = my_r_inner;
+			r_outer = my_r_outer;
+			b_in = my_b_in;
+			b_out = my_b_out;
+			mu_r = my_mu_r;
+			rho_r = my_rho_r;
+			heat_cap_r = my_heat_cap_r;
+			lambda_r = my_lambda_r;
+			lambda_p = my_lambda_p;
+			lambda_g = my_lambda_g;
+
+			// Table 1 in Diersch_2011_CG
+			S_o = PI * 2.0 * r_outer;
+			S_io = PI * 2.0 * r_inner;
+			S_gs = PI * D;
+
+			// initialization calculation
+			initialize();
+		};
 
 		/**
-		  * return the number of unknowns needed for CXC BHE
-		  */
+		* return the number of unknowns needed for CXA BHE
+		*/
 		std::size_t get_n_unknowns() { return 3; }
 
+		/**
+		* return the thermal resistance for the inlet pipline
+		* idx is the index, when 2U case,
+		* 0 - the first u-tube
+		* 1 - the second u-tube
+		*/
+		double get_thermal_resistance_fig(std::size_t idx);
+
+		/**
+		* return the thermal resistance for the outlet pipline
+		* idx is the index, when 2U case,
+		* 0 - the first u-tube
+		* 1 - the second u-tube
+		*/
+		double get_thermal_resistance_fog(std::size_t idx);
+
+		/**
+		* return the thermal resistance
+		*/
+		double get_thermal_resistance(std::size_t idx);
+
+		/**
+		* initialization calcultion,
+		*/
+		void initialize();
+
+		/**
+		* calculate thermal resistance
+		*/
+		void calc_thermal_resistances();
+
+		/**
+		* Nusselt number calculation
+		*/
+		void calc_Nu();
+
+		/**
+		* Renolds number calculation
+		*/
+		void calc_Re();
+
+		/**
+		* Prandtl number calculation
+		*/
+		void calc_Pr();
+
+		/**
+		* flow velocity inside the pipeline
+		*/
+		void calc_u();
+
+		/**
+		* calculate heat transfer coefficient
+		*/
+		void calc_heat_transfer_coefficients();
+
 	private:
+		/**
+		* thermal resistances
+		*/
+		double _R_ff, _R_fog;
+
+		/**
+		* thermal resistances due to advective flow of refrigerant in the pipes
+		*/
+		double _R_adv_i1, _R_adv_a_o1, _R_adv_b_o1;
+
+		/**
+		* thermal resistances due to the pipe wall material
+		*/
+		double _R_con_i1, _R_con_o1;
+
+		/**
+		* thermal resistances due to the grout transition
+		*/
+		double _R_con_b;
+
+		/**
+		* thermal resistances of the grout
+		*/
+		double _R_g;
+
+		/**
+		* thermal resistances of the grout soil exchange
+		*/
+		double _R_gs;
+
+		/**
+		* heat transfer coefficients
+		*/
+		double _PHI_fog, _PHI_ff, _PHI_gs;
+
+		/**
+		* Reynolds number
+		*/
+		double _Re_o1, _Re_i1;
+
+		/**
+		* Prandtl number
+		*/
+		double _Pr;
+
+		/**
+		* Nusselt number
+		*/
+		Eigen::Vector2d _Nu;
+
+		/**
+		* flow velocity inside the pipeline
+		*/
+		Eigen::Vector2d _u;
+
+		/**
+		* specific exchange surfaces S
+		*/
+		double S_o, S_io, S_gs;
 
 	};
 
