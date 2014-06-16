@@ -3000,22 +3000,24 @@ void CRFProcess::ConfigHeatTransport_BHE()
 	pcs_number_of_primary_nvals = 9; 
 	pcs_primary_function_name[0] = "TEMPERATURE_SOIL";
 	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_IN_1";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_IN_2";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_OUT_1";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_OUT_2";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_G_1";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_G_2";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_G_3";
-	pcs_primary_function_unit[0] = "dC";
-	pcs_primary_function_name[0] = "TEMPERATURE_G_4";
-	pcs_primary_function_unit[0] = "dC";
+	pcs_primary_function_name[1] = "TEMPERATURE_IN_1";
+	pcs_primary_function_unit[1] = "dC";
+	pcs_primary_function_name[2] = "TEMPERATURE_IN_2";
+	pcs_primary_function_unit[2] = "dC";
+	pcs_primary_function_name[3] = "TEMPERATURE_OUT_1";
+	pcs_primary_function_unit[3] = "dC";
+	pcs_primary_function_name[4] = "TEMPERATURE_OUT_2";
+	pcs_primary_function_unit[4] = "dC";
+	pcs_primary_function_name[5] = "TEMPERATURE_G_1";
+	pcs_primary_function_unit[5] = "dC";
+	pcs_primary_function_name[6] = "TEMPERATURE_G_2";
+	pcs_primary_function_unit[6] = "dC";
+	pcs_primary_function_name[7] = "TEMPERATURE_G_3";
+	pcs_primary_function_unit[7] = "dC";
+	pcs_primary_function_name[8] = "TEMPERATURE_G_4";
+	pcs_primary_function_unit[8] = "dC";
+
+    pcs_number_of_secondary_nvals = 0;
 
 }
 
