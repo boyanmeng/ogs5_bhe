@@ -35,6 +35,12 @@ extern double gravity_constant;
 // MSHLib
 //#include "msh_lib.h"
 #include "pcs_dm.h"  //WX
+#include "readNonBlankLineFromInputStream.h"
+#include "BHE_1U.h"
+#include "BHE_2U.h"
+#include "BHE_CXC.h"
+#include "BHE_CXA.h"
+
 using namespace std;
 
 // MAT-MP data base lists
@@ -1907,6 +1913,189 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
          in.clear();
          continue;
       }
+
+      if (line_string.find("$BOREHOLE_HEAT_EXCHANGER") != std::string::npos)
+      {
+          std::string str_tmp; 
+          BHE::BHE_TYPE bhe_type;
+          BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type; 
+          double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
+          double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness; 
+          double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
+          std::size_t bhe_fluid_type_idx; 
+          
+          
+          do
+          {
+              in.str(GetLineFromFile1(mmp_file));
+              in >> line_string; //sub_line
+              in.clear(); 
+
+              // set parameter of Borehole Heat exchanger
+              if (line_string.find("BHE_TYPE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> str_tmp;
+                  if (str_tmp.compare("BHE_TYPE_1U") == 0)
+                      bhe_type = BHE::BHE_TYPE_1U;
+                  else if (str_tmp.compare("BHE_TYPE_2U") == 0)
+                      bhe_type = BHE::BHE_TYPE_2U;
+                  else if (str_tmp.compare("BHE_TYPE_CXC") == 0)
+                      bhe_type = BHE::BHE_TYPE_CXC;
+                  else if (str_tmp.compare("BHE_TYPE_CXA") == 0)
+                      bhe_type = BHE::BHE_TYPE_CXA;
+                  in.clear();
+                  continue; 
+              }
+
+              if (line_string.find("BHE_LENGTH") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_length;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_DIAMETER") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_diameter;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_REFRIGERANT_FLOW_RATE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_refrigerant_flow_rate;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_INNER_RADIUS_PIPE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_inner_radius_pipe;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_OUTER_RADIUS_PIPE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_outer_radius_pipe;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_PIPE_IN_WALL_THICKNESS") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_pipe_in_wall_thickness;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_PIPE_OUT_WALL_THICKNESS") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_pipe_out_wall_thickness;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_FLUID_TYPE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_fluid_type_idx;
+                  in.clear();
+                  continue; 
+              }
+              if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_therm_conductivity_pipe_wall;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_THERMAL_CONDUCTIVITY_GROUT") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_therm_conductivity_grout;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_PIPE_DISTANCE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> bhe_pipe_distance;
+                  in.clear();
+                  continue;
+              }
+              if (line_string.find("BHE_2U_DISCHARGE_TYPE") != std::string::npos)
+              {
+                  in.str(GetLineFromFile1(mmp_file));
+                  in >> str_tmp; 
+                  if (str_tmp.compare("BHE_DISCHARGE_TYPE_PARALLEL") == 0)
+                      bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_PARALLEL;
+                  else if (str_tmp.compare("BHE_DISCHARGE_TYPE_SERIAL") == 0)
+                      bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_SERIAL;
+                  in.clear();
+                  continue;
+              }
+
+          } while (line_string.find("#") == std::string::npos); 
+
+          double bhe_refrigerant_viscosity(0.000547);
+          double bhe_refrigerant_density(1000);
+          double bhe_refrigerant_heat_capacity(4.18);
+          double bhe_regrigerant_heat_conductivity(0.6405); 
+
+          if (mfp_vector[bhe_fluid_type_idx])
+          {
+              bhe_refrigerant_viscosity = mfp_vector[bhe_fluid_type_idx]->Viscosity(); 
+              bhe_refrigerant_density = mfp_vector[bhe_fluid_type_idx]->Density(); 
+              bhe_refrigerant_heat_capacity = mfp_vector[bhe_fluid_type_idx]->getSpecificHeatCapacity(); 
+              bhe_regrigerant_heat_conductivity = mfp_vector[bhe_fluid_type_idx]->HeatConductivity(); 
+          }
+
+          // now initialize the BHE class.
+          switch (bhe_type)
+          {
+          case BHE::BHE_TYPE_1U :
+              BHE::BHE_1U * m_bhe_1u;
+              m_bhe_1u = new BHE::BHE_1U(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, 
+                                                  bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, 
+                                                  bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
+                                                  bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall,
+                                                  bhe_therm_conductivity_grout, bhe_pipe_distance);
+              vec_BHEs.push_back(m_bhe_1u);
+              break;
+          case BHE::BHE_TYPE_2U:
+              BHE::BHE_2U * m_bhe_2u;
+              m_bhe_2u = new BHE::BHE_2U(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
+                                                    bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness,
+                                                    bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
+                                                    bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall,
+                                                    bhe_therm_conductivity_grout, bhe_pipe_distance, bhe_2u_discharge_type);
+              vec_BHEs.push_back(m_bhe_2u);
+              break;
+          case BHE::BHE_TYPE_CXC:
+              BHE::BHE_CXC * m_bhe_cxc;
+              m_bhe_cxc = new BHE::BHE_CXC(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
+                                                      bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, 
+                                                      bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
+                                                      bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout);
+              vec_BHEs.push_back(m_bhe_cxc);
+              break;
+          case BHE::BHE_TYPE_CXA:
+              BHE::BHE_CXA * m_bhe_cxa;
+              m_bhe_cxa = new BHE::BHE_CXA(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
+                                                      bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness,
+                                                      bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
+                                                      bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout);
+              vec_BHEs.push_back(m_bhe_cxa);
+              break;
+          default:
+              break;
+          }
+          // add it to the vector data structure
+
+      }
+     
 
    }
 	return position;
