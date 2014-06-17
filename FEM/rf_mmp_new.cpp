@@ -147,6 +147,8 @@ CMediumProperties::CMediumProperties() :
    _fric_phase = FiniteElement::SOLID;
 	storage_effstress_model = 0;
 	permeability_effstress_model = 0;
+
+    is_BHE = false; 
 }
 
 /**************************************************************************
@@ -1916,134 +1918,120 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 
       if (line_string.find("$BOREHOLE_HEAT_EXCHANGER") != std::string::npos)
       {
-          std::string str_tmp; 
-          BHE::BHE_TYPE bhe_type;
-          BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type; 
-          double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
-          double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness; 
-          double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
-          std::size_t bhe_fluid_type_idx; 
+          is_BHE = true;
+      }
           
+      // get parameters of Borehole Heat exchanger
+        if (line_string.find("BHE_TYPE") != std::string::npos)
+        {
+            std::string str_tmp;
+            in.str(GetLineFromFile1(mmp_file));
+            in >> str_tmp;
+            if (str_tmp.compare("BHE_TYPE_1U") == 0)
+                bhe_type = BHE::BHE_TYPE_1U;
+            else if (str_tmp.compare("BHE_TYPE_2U") == 0)
+                bhe_type = BHE::BHE_TYPE_2U;
+            else if (str_tmp.compare("BHE_TYPE_CXC") == 0)
+                bhe_type = BHE::BHE_TYPE_CXC;
+            else if (str_tmp.compare("BHE_TYPE_CXA") == 0)
+                bhe_type = BHE::BHE_TYPE_CXA;
+            in.clear();
+            continue; 
+        }
+
+        if (line_string.find("BHE_LENGTH") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_length;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_DIAMETER") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_diameter;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_REFRIGERANT_FLOW_RATE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_refrigerant_flow_rate;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_INNER_RADIUS_PIPE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_inner_radius_pipe;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_OUTER_RADIUS_PIPE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_outer_radius_pipe;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_PIPE_IN_WALL_THICKNESS") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_pipe_in_wall_thickness;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_PIPE_OUT_WALL_THICKNESS") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_pipe_out_wall_thickness;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_FLUID_TYPE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_fluid_type_idx;
+            in.clear();
+            continue; 
+        }
+        if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_therm_conductivity_pipe_wall;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_THERMAL_CONDUCTIVITY_GROUT") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_therm_conductivity_grout;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_PIPE_DISTANCE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_pipe_distance;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_2U_DISCHARGE_TYPE") != std::string::npos)
+        {
+            std::string str_tmp;
+            in.str(GetLineFromFile1(mmp_file));
+            in >> str_tmp; 
+            if (str_tmp.compare("BHE_DISCHARGE_TYPE_PARALLEL") == 0)
+                bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_PARALLEL;
+            else if (str_tmp.compare("BHE_DISCHARGE_TYPE_SERIAL") == 0)
+                bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_SERIAL;
+            in.clear();
+            continue;
+        }
+       
+
           
-          do
-          {
-              in.str(GetLineFromFile1(mmp_file));
-              in >> line_string; //sub_line
-              in.clear(); 
-
-              // set parameter of Borehole Heat exchanger
-              if (line_string.find("BHE_TYPE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> str_tmp;
-                  if (str_tmp.compare("BHE_TYPE_1U") == 0)
-                      bhe_type = BHE::BHE_TYPE_1U;
-                  else if (str_tmp.compare("BHE_TYPE_2U") == 0)
-                      bhe_type = BHE::BHE_TYPE_2U;
-                  else if (str_tmp.compare("BHE_TYPE_CXC") == 0)
-                      bhe_type = BHE::BHE_TYPE_CXC;
-                  else if (str_tmp.compare("BHE_TYPE_CXA") == 0)
-                      bhe_type = BHE::BHE_TYPE_CXA;
-                  in.clear();
-                  continue; 
-              }
-
-              if (line_string.find("BHE_LENGTH") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_length;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_DIAMETER") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_diameter;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_REFRIGERANT_FLOW_RATE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_refrigerant_flow_rate;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_INNER_RADIUS_PIPE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_inner_radius_pipe;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_OUTER_RADIUS_PIPE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_outer_radius_pipe;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_PIPE_IN_WALL_THICKNESS") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_pipe_in_wall_thickness;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_PIPE_OUT_WALL_THICKNESS") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_pipe_out_wall_thickness;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_FLUID_TYPE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_fluid_type_idx;
-                  in.clear();
-                  continue; 
-              }
-              if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_therm_conductivity_pipe_wall;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_THERMAL_CONDUCTIVITY_GROUT") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_therm_conductivity_grout;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_PIPE_DISTANCE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> bhe_pipe_distance;
-                  in.clear();
-                  continue;
-              }
-              if (line_string.find("BHE_2U_DISCHARGE_TYPE") != std::string::npos)
-              {
-                  in.str(GetLineFromFile1(mmp_file));
-                  in >> str_tmp; 
-                  if (str_tmp.compare("BHE_DISCHARGE_TYPE_PARALLEL") == 0)
-                      bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_PARALLEL;
-                  else if (str_tmp.compare("BHE_DISCHARGE_TYPE_SERIAL") == 0)
-                      bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_SERIAL;
-                  in.clear();
-                  continue;
-              }
-
-          } while (line_string.find("#") == std::string::npos); 
-
-          double bhe_refrigerant_viscosity(0.000547);
-          double bhe_refrigerant_density(1000);
-          double bhe_refrigerant_heat_capacity(4180);
-          double bhe_regrigerant_heat_conductivity(0.6405); 
-
+              /*
           if (mfp_vector[bhe_fluid_type_idx])
           {
               bhe_refrigerant_viscosity = mfp_vector[bhe_fluid_type_idx]->Viscosity(); 
@@ -2092,10 +2080,7 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
           default:
               break;
           }
-          // add it to the vector data structure
-
-      }
-     
+          */    
 
    }
 	return position;
