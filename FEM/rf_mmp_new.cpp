@@ -2041,7 +2041,7 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 
           double bhe_refrigerant_viscosity(0.000547);
           double bhe_refrigerant_density(1000);
-          double bhe_refrigerant_heat_capacity(4.18);
+          double bhe_refrigerant_heat_capacity(4180);
           double bhe_regrigerant_heat_conductivity(0.6405); 
 
           if (mfp_vector[bhe_fluid_type_idx])
