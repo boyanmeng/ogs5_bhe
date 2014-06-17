@@ -19,6 +19,7 @@
 #include "rf_num_new.h"
 #include "rf_tim_new.h"
 #include "conversion_rate.h"          // HS, 10.2011
+#include "BHEAbstract.h"              // HS, 06.2014
 #include "SparseMatrixDOK.h"
 //#include "Stiff_Bulirsch-Stoer.h"   // HS, 10.2011
 #include "StepperBulischStoer.h"   // HS, 10.2011
@@ -1058,6 +1059,9 @@ extern void CopyTimestepNODValuesSVTPhF();        //CB 13/08
 //#ifndef NEW_EQS                                   //WW. 07.11.2008
 extern void PCSCreateNew();                       //OK
 #endif
+
+extern std::vector<BHE::BHEAbstract*> vec_BHEs;   //HS2014
+
 extern bool PCSCheck();                           //OK
 // New solvers WW
 // Create sparse graph for each mesh    //1.11.2007 WW

@@ -184,6 +184,8 @@ int pcs_number_flow = -1;						// JT2012
 int pcs_number_heat = -1;						// JT2012
 vector<int>pcs_number_mass;						// JT2012
 
+std::vector<BHE::BHEAbstract*> vec_BHEs;        // HS2014
+
 namespace process
 {class CRFProcessDeformation;
 }
@@ -763,6 +765,17 @@ void CRFProcess::Create()
 		PCS_Solver.push_back(eqs);
 		size_unknowns = eqs->dim;
 	}
+    else if ( getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE )
+    {
+        size_t nodes_BHE(0); 
+        // TODO: get the number of nodes attaching to BHE. 
+        // for (size_t k=0 ; k < vec_BHE.size(); k++ )
+        // nodes_BHE += vec_BHE[k]->get_msh_nodes() ; 
+        eqs = CreateLinearSolver(m_num->ls_storage_method, m_msh->GetNodesNumber(false) + (DOF-1)*nodes_BHE );
+        InitializeLinearSolver(eqs, m_num);
+        PCS_Solver.push_back(eqs);
+        size_unknowns = eqs->dim;
+    }
 	else
 	{
 		// If there is a solver existing. WW
