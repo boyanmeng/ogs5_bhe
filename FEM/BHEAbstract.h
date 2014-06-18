@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include "Eigen/Eigen"
+#include "../GEO/Polyline.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -142,6 +143,18 @@ namespace BHE  // namespace of borehole heat exchanger
 		  */
 		virtual void calc_heat_transfer_coefficients() = 0;
 
+        /**
+          * get the polyline geometry 
+          * that is representing this BHE. 
+          */
+        const GEOLIB::Polyline* get_geo_ply() { return _geo_ply; }
+
+        /**
+          * set the polyline geometry
+          * that is representing this BHE.
+          */
+        void set_geo_ply(const GEOLIB::Polyline* ply) { _geo_ply = ply; }
+
 		/**
 		  * total refrigerant flow discharge of BHE
 		  * unit is m^3/sec 
@@ -225,6 +238,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * the type of the BHE
 		  */
 		const BHE_TYPE type;
+
+        /**
+          * the polyline geometry representing the BHE
+          */
+        const GEOLIB::Polyline* _geo_ply;
 	};
 
 }  // end of namespace

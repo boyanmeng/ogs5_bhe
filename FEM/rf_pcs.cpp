@@ -127,6 +127,7 @@ REACT_BRNS* m_vec_BRNS;
 #include "BHE_2U.h"
 #include "BHE_CXA.h"
 #include "BHE_CXC.h"
+#include "../GEO/geo_ply.h"
 
 using namespace std;
 using namespace MeshLib;
@@ -190,7 +191,9 @@ int pcs_number_flow = -1;						// JT2012
 int pcs_number_heat = -1;						// JT2012
 vector<int>pcs_number_mass;						// JT2012
 
-std::vector<BHE::BHEAbstract*> vec_BHEs;        // HS2014
+std::vector<BHE::BHEAbstract*> vec_BHEs;              // HS2014
+std::vector<std::vector<std::size_t>> vec_BHE_nodes;  // HS2014
+std::vector<std::vector<std::size_t>> vec_BHE_elems;  // HS2014
 
 namespace process
 {class CRFProcessDeformation;
@@ -3040,7 +3043,6 @@ void CRFProcess::ConfigHeatTransport_BHE()
 
     // initialize the BHE data structure
     ConfigBHEs(); 
-    // TODO: count how many nodes are sitting on the borehole heat exchanger
 }
 
 /**************************************************************************
@@ -3052,8 +3054,9 @@ last modified:
 **************************************************************************/
 void CRFProcess::ConfigBHEs()
 {
+    std::size_t i; 
     // loop over all MMPs
-    for (std::size_t i = 0; i < mmp_vector.size(); i++)
+    for (i = 0; i < mmp_vector.size(); i++)
     {
         if (mmp_vector[i]->is_BHE)
         {
@@ -3097,10 +3100,37 @@ void CRFProcess::ConfigBHEs()
                 break;
             default:
                 break;
-            }
+            } // end of switch
 
-        }
+            // set the geo polyline of this BHE
+            if (mmp_vector[i]->geo_name.size() > 0)
+            {
+                const GEOLIB::Polyline* ply; 
+                ply = this->m_msh->getGEOObjects()->getPolylineVecObj(*(m_msh->getProjectName()))->getElementByName(mmp_vector[i]->geo_name); 
+                vec_BHEs.back()->set_geo_ply(ply);
+            }
+        } // end of if
+    } // end of for
+    
+    // TODO: count how many nodes are sitting on the borehole heat exchanger
+    n_nodes_BHE = 0; 
+    // loop over all of the BHEs
+    for (i = 0; i < vec_BHEs.size(); i++)
+    {
+        // get the polyline assigned to this BHE 
+        const GEOLIB::Polyline* ply_BHE = vec_BHEs[i]->get_geo_ply(); 
+        // data structure to store the node index
+        std::vector<std::size_t> vec_mesh_nodes; 
+        std::vector<std::size_t> vec_mesh_elems;
+        // get the connecting nodes and elems index
+        this->m_msh->GetNODOnPLY(ply_BHE, vec_mesh_nodes);
+        this->m_msh->GetELEOnPLY(ply_BHE, vec_mesh_elems, true);
+        // store the connecting node index vector
+        vec_BHE_nodes.push_back(vec_mesh_nodes); 
+        vec_BHE_elems.push_back(vec_mesh_elems); 
+        n_nodes_BHE += vec_mesh_nodes.size();
     }
+    // counting the number of nodes on this BHE
 }
 
 

@@ -769,6 +769,8 @@ public:
 	int temporary_num_dof_errors;
 	int cpl_num_dof_errors;						// JT2012
 	bool first_coupling_iteration;				// JT2012
+
+    std::size_t n_nodes_BHE;                    // HS2014: number of nodes for the borehole heat exchanger
 	//
 	// Specials
 	void PCSMoveNOD();
