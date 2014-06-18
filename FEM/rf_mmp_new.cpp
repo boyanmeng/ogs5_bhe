@@ -1993,6 +1993,15 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.str(GetLineFromFile1(mmp_file));
             in >> bhe_fluid_type_idx;
             in.clear();
+            // get fluid properties
+            if (mfp_vector[bhe_fluid_type_idx])
+            {
+                bhe_refrigerant_viscosity = mfp_vector[bhe_fluid_type_idx]->Viscosity();
+                bhe_refrigerant_density = mfp_vector[bhe_fluid_type_idx]->Density();
+                bhe_refrigerant_heat_capacity = mfp_vector[bhe_fluid_type_idx]->getSpecificHeatCapacity();
+                bhe_regrigerant_heat_conductivity = mfp_vector[bhe_fluid_type_idx]->HeatConductivity();
+            }
+
             continue; 
         }
         if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
@@ -2030,57 +2039,9 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
         }
        
 
-          
-              /*
-          if (mfp_vector[bhe_fluid_type_idx])
-          {
-              bhe_refrigerant_viscosity = mfp_vector[bhe_fluid_type_idx]->Viscosity(); 
-              bhe_refrigerant_density = mfp_vector[bhe_fluid_type_idx]->Density(); 
-              bhe_refrigerant_heat_capacity = mfp_vector[bhe_fluid_type_idx]->getSpecificHeatCapacity(); 
-              bhe_regrigerant_heat_conductivity = mfp_vector[bhe_fluid_type_idx]->HeatConductivity(); 
-          }
+         
 
-          // now initialize the BHE class.
-          switch (bhe_type)
-          {
-          case BHE::BHE_TYPE_1U :
-              BHE::BHE_1U * m_bhe_1u;
-              m_bhe_1u = new BHE::BHE_1U(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, 
-                                                  bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, 
-                                                  bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
-                                                  bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall,
-                                                  bhe_therm_conductivity_grout, bhe_pipe_distance);
-              vec_BHEs.push_back(m_bhe_1u);
-              break;
-          case BHE::BHE_TYPE_2U:
-              BHE::BHE_2U * m_bhe_2u;
-              m_bhe_2u = new BHE::BHE_2U(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
-                                                    bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness,
-                                                    bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
-                                                    bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall,
-                                                    bhe_therm_conductivity_grout, bhe_pipe_distance, bhe_2u_discharge_type);
-              vec_BHEs.push_back(m_bhe_2u);
-              break;
-          case BHE::BHE_TYPE_CXC:
-              BHE::BHE_CXC * m_bhe_cxc;
-              m_bhe_cxc = new BHE::BHE_CXC(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
-                                                      bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, 
-                                                      bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
-                                                      bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout);
-              vec_BHEs.push_back(m_bhe_cxc);
-              break;
-          case BHE::BHE_TYPE_CXA:
-              BHE::BHE_CXA * m_bhe_cxa;
-              m_bhe_cxa = new BHE::BHE_CXA(bhe_length, bhe_diameter, bhe_refrigerant_flow_rate,
-                                                      bhe_inner_radius_pipe, bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness,
-                                                      bhe_pipe_out_wall_thickness, bhe_refrigerant_viscosity, bhe_refrigerant_density,
-                                                      bhe_refrigerant_heat_capacity, bhe_regrigerant_heat_conductivity, bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout);
-              vec_BHEs.push_back(m_bhe_cxa);
-              break;
-          default:
-              break;
-          }
-          */    
+ 
 
    }
 	return position;

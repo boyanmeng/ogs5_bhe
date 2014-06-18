@@ -632,6 +632,7 @@ public:
 	void ConfigMassTransport();
 	void ConfigHeatTransport();
 	void ConfigHeatTransport_BHE(); 
+    void ConfigBHEs(); 
 	void ConfigDeformation();
 	void ConfigMultiphaseFlow();
 	void ConfigGasFlow();

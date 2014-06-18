@@ -122,6 +122,12 @@ REACT_BRNS* m_vec_BRNS;
 
 #include "fct_mpi.h"
 
+// Borehole Heat Exchangers
+#include "BHE_1U.h"
+#include "BHE_2U.h"
+#include "BHE_CXA.h"
+#include "BHE_CXC.h"
+
 using namespace std;
 using namespace MeshLib;
 using namespace Math_Group;
@@ -3032,6 +3038,69 @@ void CRFProcess::ConfigHeatTransport_BHE()
 
     pcs_number_of_secondary_nvals = 0;
 
+    // initialize the BHE data structure
+    ConfigBHEs(); 
+    // TODO: count how many nodes are sitting on the borehole heat exchanger
+}
+
+/**************************************************************************
+FEMLib-Method:
+Task: configure the Borehole Heat Exchangers (BHEs)
+Programing:
+06/2014 HS Implementation
+last modified:
+**************************************************************************/
+void CRFProcess::ConfigBHEs()
+{
+    // loop over all MMPs
+    for (std::size_t i = 0; i < mmp_vector.size(); i++)
+    {
+        if (mmp_vector[i]->is_BHE)
+        {
+            // this is a BHE
+            // now initialize the BHE class.
+            switch (mmp_vector[i]->bhe_type)
+            {
+            case BHE::BHE_TYPE_1U:
+                BHE::BHE_1U * m_bhe_1u;
+                m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                                           mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
+                                           mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
+                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, 
+                                           mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_pipe_distance);
+                vec_BHEs.push_back(m_bhe_1u);
+                break;
+            case BHE::BHE_TYPE_2U:
+                BHE::BHE_2U * m_bhe_2u;
+                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                                           mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
+                                           mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density,
+                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall,
+                                           mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_2u_discharge_type);
+                vec_BHEs.push_back(m_bhe_2u);
+                break;
+            case BHE::BHE_TYPE_CXC:
+                BHE::BHE_CXC * m_bhe_cxc;
+                m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                                             mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness, 
+                                             mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
+                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
+                vec_BHEs.push_back(m_bhe_cxc);
+                break;
+            case BHE::BHE_TYPE_CXA:
+                BHE::BHE_CXA * m_bhe_cxa;
+                m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                                             mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
+                                             mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
+                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
+                vec_BHEs.push_back(m_bhe_cxa);
+                break;
+            default:
+                break;
+            }
+
+        }
+    }
 }
 
 
