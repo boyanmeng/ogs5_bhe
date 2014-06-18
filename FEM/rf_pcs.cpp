@@ -936,7 +936,10 @@ void CRFProcess::Create()
 	double* nod_values = NULL;
 	double* ele_values = NULL;            // PCH
 
-	number_of_nvals = 2 * DOF + pcs_number_of_secondary_nvals;
+    if (_pcs_type == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+        number_of_nvals = 2 * 1 + pcs_number_of_secondary_nvals;  // only counting T_soil
+    else
+        number_of_nvals = 2 * DOF + pcs_number_of_secondary_nvals;
 	for (int i = 0; i < pcs_number_of_primary_nvals; i++)
 	{
 		// new time
@@ -955,7 +958,20 @@ void CRFProcess::Create()
            for (int i = 0; i < m_msh_nod_vector_size; i++)
               nod_values[i] = 0.0;
            nod_val_vector.push_back(nod_values);
+           nod_values = NULL;
 	}
+    if (_pcs_type == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+    {
+        for (std::size_t i = 0; i < vec_BHE_nodes.size(); i++)
+        {
+            std::size_t n_BHE_nodes = vec_BHE_nodes[i].size(); 
+            nod_values = new double[2 * n_BHE_nodes];
+            for (int i = 0; i < (2 * n_BHE_nodes); i++)
+                nod_values[i] = 0.0;
+            nod_val_vector.push_back(nod_values);
+            nod_values = NULL; 
+        }
+    }
 	// Create element values - PCH
 	int number_of_evals = 2 * pcs_number_of_evals; //PCH, increase memory
 	if (number_of_evals > 0)              // WW added this "if" condition
@@ -3073,7 +3089,7 @@ void CRFProcess::ConfigBHEs()
                 break;
             case BHE::BHE_TYPE_2U:
                 BHE::BHE_2U * m_bhe_2u;
-                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                            mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density,
                                            mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall,
