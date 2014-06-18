@@ -246,7 +246,10 @@ CFiniteElementStd:: CFiniteElementStd(CRFProcess* Pcs, const int C_Sys_Flad, con
 		break;
 	case 'H':                             // heat transport
 		PcsType = H;
-		idx0 = pcs->GetNodeValueIndex("TEMPERATURE1");
+        if (pcs->getProcessType() == HEAT_TRANSPORT)
+            idx0 = pcs->GetNodeValueIndex("TEMPERATURE1");
+        else if (pcs->getProcessType() == HEAT_TRANSPORT_BHE)
+            idx0 = pcs->GetNodeValueIndex("TEMPERATURE_SOIL"); 
 		idx1 = idx0 + 1;
 		break;
 	case 'M':                             // Mass transport
