@@ -776,11 +776,9 @@ void CRFProcess::Create()
 	}
     else if ( getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE )
     {
-        size_t nodes_BHE(0); 
-        // TODO: get the number of nodes attaching to BHE. 
-        // for (size_t k=0 ; k < vec_BHE.size(); k++ )
-        // nodes_BHE += vec_BHE[k]->get_msh_nodes() ; 
-        eqs = CreateLinearSolver(m_num->ls_storage_method, m_msh->GetNodesNumber(false) + (DOF-1)*nodes_BHE );
+        // the number of dof including the BHE should have been calculated
+        assert(this->n_dofs_BHE > 0); 
+        eqs = CreateLinearSolver(m_num->ls_storage_method, m_msh->GetNodesNumber(false) + n_dofs_BHE);
         InitializeLinearSolver(eqs, m_num);
         PCS_Solver.push_back(eqs);
         size_unknowns = eqs->dim;
@@ -3112,8 +3110,9 @@ void CRFProcess::ConfigBHEs()
         } // end of if
     } // end of for
     
-    // TODO: count how many nodes are sitting on the borehole heat exchanger
+    // count how many nodes are sitting on the borehole heat exchanger
     n_nodes_BHE = 0; 
+    n_dofs_BHE = 0; 
     // loop over all of the BHEs
     for (i = 0; i < vec_BHEs.size(); i++)
     {
@@ -3128,9 +3127,12 @@ void CRFProcess::ConfigBHEs()
         // store the connecting node index vector
         vec_BHE_nodes.push_back(vec_mesh_nodes); 
         vec_BHE_elems.push_back(vec_mesh_elems); 
+        // counting the number of nodes on this BHE
         n_nodes_BHE += vec_mesh_nodes.size();
+        // counting dofs
+        n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
     }
-    // counting the number of nodes on this BHE
+    
 }
 
 

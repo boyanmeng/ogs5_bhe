@@ -771,6 +771,7 @@ public:
 	bool first_coupling_iteration;				// JT2012
 
     std::size_t n_nodes_BHE;                    // HS2014: number of nodes for the borehole heat exchanger
+    std::size_t n_dofs_BHE;                     // HS2014: degree of freedoms for the borehole heat exchanger
 	//
 	// Specials
 	void PCSMoveNOD();
