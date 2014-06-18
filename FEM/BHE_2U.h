@@ -121,6 +121,13 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * calculate heat transfer coefficient
 		  */
 		void calc_heat_transfer_coefficients();
+
+        /**
+          * required by eigen library, 
+          * to make sure the dynamically allocated class has 
+          * aligned "operator new"
+          */
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		
 	private:
 		/**
