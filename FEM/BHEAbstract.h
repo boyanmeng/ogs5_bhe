@@ -50,8 +50,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-		BHEAbstract(BHE_TYPE my_type) 
-			: type(my_type)
+		BHEAbstract(BHE_TYPE my_type, const std::string name) 
+            : type(my_type), _name(name)
 		{};
 
 		/**
@@ -69,6 +69,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * return the type of the BHE
 		  */
 		BHE_TYPE get_type() { return type; };
+
+        /**
+          * return the name of the BHE
+          */
+        const std::string get_name() { return _name;  };
 
 		/**
 		  * return the thermal resistance for the inlet pipline
@@ -243,6 +248,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * the polyline geometry representing the BHE
           */
         const GEOLIB::Polyline* _geo_ply;
+
+        /**
+          * name of the borehole heat exchanger
+          */
+        const std::string _name;
 	};
 
 }  // end of namespace
