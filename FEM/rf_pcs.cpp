@@ -937,19 +937,98 @@ void CRFProcess::Create()
 	double* ele_values = NULL;            // PCH
 
     if (_pcs_type == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+    {
+        std::string tmp_name_str; 
         number_of_nvals = 2 * 1 + pcs_number_of_secondary_nvals;  // only counting T_soil
+        // two times T_soil
+        nod_val_name_vector.push_back(pcs_primary_function_name[0]);
+        nod_val_name_vector.push_back(pcs_primary_function_name[0]);
+        // now looping over each BHE
+        for (std::size_t i = 0; i < vec_BHEs.size(); i++)
+        {
+            // depending on which type of BHE it is, number of primary variables are different
+            switch (vec_BHEs[i]->get_type())
+            {
+                case BHE::BHE_TYPE_1U: // 1U type has 4 unknowns
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();;
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[6] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                break;
+                case BHE::BHE_TYPE_2U: // 2U type has 8 unknowns
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[2] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[4] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[6] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[7] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[8] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                break; 
+                case BHE::BHE_TYPE_CXC: // CXC type has 3 unknowns
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                break;
+                case BHE::BHE_TYPE_CXA: // CXA type has 3 unknowns
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                break;
+            }
+        } // end of for BHE vector
+
+    }
     else
+    {
         number_of_nvals = 2 * DOF + pcs_number_of_secondary_nvals;
-	for (int i = 0; i < pcs_number_of_primary_nvals; i++)
-	{
-		// new time
-		nod_val_name_vector.push_back(pcs_primary_function_name[i]);
-		// old time //need this MB!
-		nod_val_name_vector.push_back(pcs_primary_function_name[i]);
-	}
-	for (int i = 0; i < pcs_number_of_secondary_nvals; i++)
-		// new time
-		nod_val_name_vector.push_back(pcs_secondary_function_name[i]);
+        for (int i = 0; i < pcs_number_of_primary_nvals; i++)
+        {
+            // new time
+            nod_val_name_vector.push_back(pcs_primary_function_name[i]);
+            // old time //need this MB!
+            nod_val_name_vector.push_back(pcs_primary_function_name[i]);
+        }
+        for (int i = 0; i < pcs_number_of_secondary_nvals; i++)
+            // new time
+            nod_val_name_vector.push_back(pcs_secondary_function_name[i]);
+    }  // end of else
 
 	long m_msh_nod_vector_size = m_msh->NodesNumber_Quadratic;
 	for (long j = 0; j < number_of_nvals; j++) // Swap number_of_nvals and mesh size. WW 19.12.2012
@@ -964,16 +1043,19 @@ void CRFProcess::Create()
     {
         for (std::size_t i = 0; i < vec_BHE_nodes.size(); i++)
         {
-            std::size_t n_BHE_nodes = vec_BHE_nodes[i].size(); 
-            nod_values = new double[2 * n_BHE_nodes];
-            for (int i = 0; i < (2 * n_BHE_nodes); i++)
-                nod_values[i] = 0.0;
-            nod_val_vector.push_back(nod_values);
-            nod_values = NULL; 
-        }
+            for (std::size_t j = 0; j < ( 2 * vec_BHEs[i]->get_n_unknowns()) ; j++)
+            {
+                std::size_t n_BHE_nodes = vec_BHE_nodes[i].size();
+                nod_values = new double[2 * n_BHE_nodes];
+                for (int k = 0; k < n_BHE_nodes; k++)
+                    nod_values[k] = 0.0;
+                nod_val_vector.push_back(nod_values);
+                nod_values = NULL;
+            }  // end of for j; 
+        }  // end of for i; 
     }
 	// Create element values - PCH
-	int number_of_evals = 2 * pcs_number_of_evals; //PCH, increase memory
+ 	int number_of_evals = 2 * pcs_number_of_evals; //PCH, increase memory
 	if (number_of_evals > 0)              // WW added this "if" condition
 	{
 		for (int i = 0; i < pcs_number_of_evals; i++)
@@ -3080,7 +3162,7 @@ void CRFProcess::ConfigBHEs()
             {
             case BHE::BHE_TYPE_1U:
                 BHE::BHE_1U * m_bhe_1u;
-                m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                            mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
                                            mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, 
@@ -3089,7 +3171,7 @@ void CRFProcess::ConfigBHEs()
                 break;
             case BHE::BHE_TYPE_2U:
                 BHE::BHE_2U * m_bhe_2u;
-                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
+                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                            mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density,
                                            mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall,
@@ -3098,7 +3180,7 @@ void CRFProcess::ConfigBHEs()
                 break;
             case BHE::BHE_TYPE_CXC:
                 BHE::BHE_CXC * m_bhe_cxc;
-                m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness, 
                                              mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
                                              mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
@@ -3106,7 +3188,7 @@ void CRFProcess::ConfigBHEs()
                 break;
             case BHE::BHE_TYPE_CXA:
                 BHE::BHE_CXA * m_bhe_cxa;
-                m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
+                m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                              mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
                                              mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
@@ -4790,13 +4872,135 @@ double CRFProcess::Execute()
 #if defined(USE_PETSC) // || defined(other parallel libs)//03.3012. WW
 	   InitializeRHS_with_u0();
 #else
-		for (int ii = 0; ii < pcs_number_of_primary_nvals; ii++)
-		{
-			nidx1 = GetNodeValueIndex(pcs_primary_function_name[ii]) + 1;
-	       long const ish = ii * g_nnodes;
-			for (j = 0; j < g_nnodes; j++) //WW
-				eqs_x[j + ish] = GetNodeValue(m_msh->Eqs2Global_NodeIndex[j], nidx1);
-		}
+        if (this->getProcessType() == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+        {
+            // first soil temperature
+            nidx1 = GetNodeValueIndex(pcs_primary_function_name[0]) + 1;
+            for (j = 0; j < g_nnodes; j++) //WW
+                eqs_x[j] = GetNodeValue(m_msh->Eqs2Global_NodeIndex[j], nidx1);
+            // loop over each BHEs
+            std::size_t node_shift(g_nnodes);
+            for (j = 0; j < vec_BHEs.size(); j++)
+            {                    
+                std::size_t n_unknowns = vec_BHEs[j]->get_n_unknowns(); 
+                // get the values of each BHEs
+                for (k = 0; k < vec_BHE_nodes[j].size(); k++)
+                {
+                    // depending on which type of BHE, we have different unknowns
+                    std::string str_tmp; 
+                    switch (vec_BHEs[j]->get_type())
+                    {
+                    case BHE::BHE_TYPE_1U:
+                        str_tmp = "TEMPERATURE_IN_1_"; 
+                        str_tmp.append(vec_BHEs[j]->get_name()); 
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns ] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_2_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 3] = GetNodeValue(k, nidx1);
+
+                        break; 
+                    case BHE::BHE_TYPE_2U:
+                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_IN_2_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_OUT_2_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 3] = GetNodeValue(k, nidx1);
+                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 4] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_2_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 5] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_3_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 6] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_4_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 7] = GetNodeValue(k, nidx1);
+                        break;
+                    case BHE::BHE_TYPE_CXC:
+                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
+
+                        break;
+                    case BHE::BHE_TYPE_CXA:
+                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
+
+                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp.append(vec_BHEs[j]->get_name());
+                        nidx1 = GetNodeValueIndex(str_tmp) + 1;
+                        eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
+                        break;
+                    } // end of switch case
+                    
+                }  // end of for k
+                node_shift += n_unknowns * vec_BHE_nodes[j].size();
+            }  // end of for j
+        }
+        else
+        {
+            for (int ii = 0; ii < pcs_number_of_primary_nvals; ii++)
+            {
+                nidx1 = GetNodeValueIndex(pcs_primary_function_name[ii]) + 1;
+                long const ish = ii * g_nnodes;
+                for (j = 0; j < g_nnodes; j++) //WW
+                    eqs_x[j + ish] = GetNodeValue(m_msh->Eqs2Global_NodeIndex[j], nidx1);
+            }  // end of for
+        }  // end of else
 #endif
 	}
 
@@ -8864,31 +9068,57 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 					}
 				}
 			}
-		else                      // otherwise PrimaryVariable check is still performed.
+        else if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+        {
+            std::stringstream name_tmp;
+            int nidx(-1); 
 
-			for (int i = 0; i < pcs_number_of_primary_nvals; i++)
-			{
-				int nidx = GetNodeValueIndex(pcs_primary_function_name[i]);
-				FiniteElement::PrimaryVariable pv_i (FiniteElement::convertPrimaryVariable(
-				                              pcs_primary_function_name[i]));
-				for (size_t j = 0; j < ic_vector.size(); j++)
-				{
-					m_ic = ic_vector[j];
-					m_ic->m_msh = m_msh; //OK/MX
 
-					if (m_ic->getProcessType() != this->getProcessType())
-						continue;
+            for (size_t j = 0; j < ic_vector.size(); j++)
+            {
+                m_ic = ic_vector[j];
+                m_ic->m_msh = m_msh; //OK/MX
 
-					m_ic->setProcess(this);
-					if (m_ic->getProcessPrimaryVariable() == pv_i)
-					{
-						m_ic->Set(nidx);
-						m_ic->Set(nidx + 1);
-					} // end of if
-				} // end of for j
-			}             // end of for i
+                if (m_ic->getProcessType() != this->getProcessType())
+                    continue;
 
-		// end of if-else
+                m_ic->setProcess(this);
+
+                name_tmp.clear();
+                name_tmp << FiniteElement::convertPrimaryVariableToString(m_ic->getProcessPrimaryVariable()) << "_" << m_ic->getGeoName();
+                nidx = GetNodeValueIndex(name_tmp.str());
+
+                if (nidx > -1)
+                {
+                    m_ic->Set(nidx);
+                    m_ic->Set(nidx + 1);
+                } // end of if
+            } // end of for j       
+        }
+        else                      // otherwise PrimaryVariable check is still performed.
+        {
+            for (int i = 0; i < pcs_number_of_primary_nvals; i++)
+            {
+                int nidx = GetNodeValueIndex(pcs_primary_function_name[i]);
+                FiniteElement::PrimaryVariable pv_i(FiniteElement::convertPrimaryVariable(
+                    pcs_primary_function_name[i]));
+                for (size_t j = 0; j < ic_vector.size(); j++)
+                {
+                    m_ic = ic_vector[j];
+                    m_ic->m_msh = m_msh; //OK/MX
+
+                    if (m_ic->getProcessType() != this->getProcessType())
+                        continue;
+
+                    m_ic->setProcess(this);
+                    if (m_ic->getProcessPrimaryVariable() == pv_i)
+                    {
+                        m_ic->Set(nidx);
+                        m_ic->Set(nidx + 1);
+                    } // end of if
+                } // end of for j
+            } // end of for i
+        }// end of if-else
 	}
 
 /**************************************************************************
