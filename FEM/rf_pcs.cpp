@@ -9070,30 +9070,38 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 			}
         else if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
         {
-            std::stringstream name_tmp;
-            int nidx(-1); 
-
-
-            for (size_t j = 0; j < ic_vector.size(); j++)
+            for (int i = 0; i < pcs_number_of_primary_nvals; i++)
             {
-                m_ic = ic_vector[j];
-                m_ic->m_msh = m_msh; //OK/MX
-
-                if (m_ic->getProcessType() != this->getProcessType())
-                    continue;
-
-                m_ic->setProcess(this);
-
-                name_tmp.clear();
-                name_tmp << FiniteElement::convertPrimaryVariableToString(m_ic->getProcessPrimaryVariable()) << "_" << m_ic->getGeoName();
-                nidx = GetNodeValueIndex(name_tmp.str());
-
-                if (nidx > -1)
+                std::stringstream name_tmp;
+                std::string name; 
+                int nidx;
+                if (i == 0) // this is soil temperature
+                    nidx = GetNodeValueIndex(pcs_primary_function_name[i]);
+                else
                 {
-                    m_ic->Set(nidx);
-                    m_ic->Set(nidx + 1);
-                } // end of if
-            } // end of for j       
+                    name_tmp.clear(); 
+                    name_tmp << pcs_primary_function_name[i] << "_" << m_ic->getGeoName(); 
+                    name = name_tmp.str(); 
+                    nidx = GetNodeValueIndex(name);
+                }
+                FiniteElement::PrimaryVariable pv_i(FiniteElement::convertPrimaryVariable(
+                    pcs_primary_function_name[i]));
+                for (size_t j = 0; j < ic_vector.size(); j++)
+                {
+                    m_ic = ic_vector[j];
+                    m_ic->m_msh = m_msh; //OK/MX
+
+                    if (m_ic->getProcessType() != this->getProcessType())
+                        continue;
+
+                    m_ic->setProcess(this);
+                    if (m_ic->getProcessPrimaryVariable() == pv_i)
+                    {
+                        m_ic->Set(nidx);
+                        m_ic->Set(nidx + 1);
+                    } // end of if
+                } // end of for j
+            } // end of for i        
         }
         else                      // otherwise PrimaryVariable check is still performed.
         {
