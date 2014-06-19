@@ -20,20 +20,21 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		* constructor
 		*/
-		BHE_CXC(double my_L = 100                  /* length/depth of the BHE */,
-			double my_D = 0.013                /* diameter of the BHE */,
-			double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
-			double my_r_inner = 0.024          /* radius of the inner pipline */,
-			double my_r_outer = 0.05           /* radius of the outer pipline */,
-			double my_b_in = 0.003             /* pipe-in wall thickness*/,
-			double my_b_out = 0.004            /* pipe-out wall thickness*/,
-			double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
-			double my_rho_r = 988.1            /* density of the refrigerant */,
-            double my_heat_cap_r = 4180        /* specific heat capacity of the refrigerant */,
-			double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
-			double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
-			double my_lambda_g = 2.3           /* thermal conductivity of the grout */)
-			: BHEAbstract(BHE::BHE_TYPE_CXA)
+        BHE_CXC(const std::string name             /* name of the BHE */,
+                double my_L = 100                  /* length/depth of the BHE */,
+	    		double my_D = 0.013                /* diameter of the BHE */,
+		    	double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
+			    double my_r_inner = 0.024          /* radius of the inner pipline */,
+			    double my_r_outer = 0.05           /* radius of the outer pipline */,
+			    double my_b_in = 0.003             /* pipe-in wall thickness*/,
+			    double my_b_out = 0.004            /* pipe-out wall thickness*/,
+			    double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
+			    double my_rho_r = 988.1            /* density of the refrigerant */,
+                double my_heat_cap_r = 4180        /* specific heat capacity of the refrigerant */,
+			    double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
+			    double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
+			    double my_lambda_g = 2.3           /* thermal conductivity of the grout */)
+			: BHEAbstract(BHE::BHE_TYPE_CXA, name)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();

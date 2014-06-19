@@ -20,7 +20,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		* constructor
 		*/
-		BHE_1U(double my_L = 100                  /* length/depth of the BHE */,
+        BHE_1U(const std::string name             /* name of the BHE */,
+               double my_L = 100                  /* length/depth of the BHE */,
 			   double my_D = 0.013                /* diameter of the BHE */,
 			   double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
 			   double my_r_inner = 0.016          /* inner radius of the pipline */,
@@ -34,7 +35,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g = 2.3           /* thermal conductivity of the grout */,
 			   double my_omega = 0.06             /* pipe distance */)
-			: BHEAbstract(BHE::BHE_TYPE_1U)
+			: BHEAbstract(BHE::BHE_TYPE_1U, name)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
