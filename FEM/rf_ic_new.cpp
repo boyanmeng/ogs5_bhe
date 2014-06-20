@@ -628,6 +628,7 @@ void CInitialCondition::SetPolyline(int nidx)
         if (getGeoObj())
         {
             std::vector<long> nodes_vector;
+            std::vector<long> nodes_vector_BHE; 
             m_msh->GetNODOnPLY(static_cast<const GEOLIB::Polyline*>(getGeoObj()), nodes_vector);
             for (size_t i = 0; i < nodes_vector.size(); i++)
             if (this->getProcess()->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
@@ -654,15 +655,15 @@ void CInitialCondition::SetPolyline(int nidx)
                         break;
                     } // end of if
 
-                    for (std::size_t j = 0; j < vec_BHE_nodes[idx_BHE].size(); j++ )
-                    if (vec_BHE_nodes[idx_BHE][j] == nodes_vector[i])
+                    nodes_vector_BHE.clear(); 
+                    for (std::size_t j = 0; j < vec_BHE_nodes[idx_BHE].size(); j++)
                     {
-                        local_node_index = j;
-                        break; 
+                        nodes_vector_BHE.push_back(j); 
                     }
 
+                    for (std::size_t k = 0; k < nodes_vector_BHE.size(); k++)
+                        this->getProcess()->SetNodeValue(nodes_vector_BHE[k], nidx, geo_node_value);
 
-                    this->getProcess()->SetNodeValue(local_node_index, nidx, geo_node_value);
 
                 } // end of else
             }  // end of if
