@@ -214,3 +214,17 @@ double BHE_CXA::get_mass_coeff(std::size_t idx_unknown)
 
     return mass_coeff;
 }
+
+double BHE_CXA::get_laplace_coeff(std::size_t idx_unknown)
+{
+    double laplace_coeff(0);
+    // TODO
+    return laplace_coeff;
+}
+
+double BHE_CXA::get_advection_coeff(std::size_t idx_unknown)
+{
+    double advection_coeff(0);
+    // TODO
+    return advection_coeff;
+}

@@ -132,6 +132,18 @@ namespace BHE  // namespace of borehole heat exchanger
         double get_mass_coeff(std::size_t idx_unknown);
 
         /**
+          * return the coeff of laplace matrix,
+          * depending on the index of unknown.
+          */
+        double get_laplace_coeff(std::size_t idx_unknown);
+
+        /**
+          * return the coeff of advection matrix,
+          * depending on the index of unknown.
+          */
+        double get_advection_coeff(std::size_t idx_unknown);
+
+        /**
         * required by eigen library,
         * to make sure the dynamically allocated class has
         * aligned "operator new"

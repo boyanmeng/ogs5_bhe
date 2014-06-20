@@ -155,6 +155,18 @@ namespace BHE  // namespace of borehole heat exchanger
         virtual double get_mass_coeff(std::size_t idx_unknown) = 0; 
 
         /**
+          * return the coeff of laplace matrix,
+          * depending on the index of unknown.
+          */
+        virtual double get_laplace_coeff(std::size_t idx_unknown) = 0;
+
+        /**
+          * return the coeff of advection matrix,
+          * depending on the index of unknown.
+          */
+        virtual double get_advection_coeff(std::size_t idx_unknown) = 0;
+
+        /**
           * get the polyline geometry 
           * that is representing this BHE. 
           */
