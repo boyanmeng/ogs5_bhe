@@ -161,3 +161,28 @@ void BHE_1U::calc_u()
 	_u(0) = tmp_u;
 	_u(1) = tmp_u;
 }
+
+double BHE_1U::get_mass_coeff(std::size_t idx_unknown)
+{
+    double mass_coeff = 0.0; 
+
+    switch (idx_unknown)
+    {
+    case 0:  // i1
+        mass_coeff = rho_r * heat_cap_r; 
+        break;
+    case 1:  // o1
+        mass_coeff = rho_r * heat_cap_r;
+        break;
+    case 2:  // g1
+        mass_coeff = rho_g * heat_cap_g;
+        break;
+    case 3:  // g2
+        mass_coeff = rho_g * heat_cap_g;
+        break;
+    default:
+        break;
+    }
+
+    return mass_coeff; 
+}

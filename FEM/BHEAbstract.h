@@ -149,6 +149,12 @@ namespace BHE  // namespace of borehole heat exchanger
 		virtual void calc_heat_transfer_coefficients() = 0;
 
         /**
+          * return the coeff of mass matrix, 
+          * depending on the index of unknown. 
+          */
+        virtual double get_mass_coeff(std::size_t idx_unknown) = 0; 
+
+        /**
           * get the polyline geometry 
           * that is representing this BHE. 
           */
@@ -202,11 +208,23 @@ namespace BHE  // namespace of borehole heat exchanger
 		  */
 		double rho_r;
 
+        /**
+          * density of the grout
+          * unit is kg m-3
+          */
+        double rho_g;
+
 		/**
 		  * specific heat capacity of the refrigerant
 		  * unit is m^2 sec^-2 K^-1
 		  */
 		double heat_cap_r;
+
+        /**
+          * specific heat capacity of the grout
+          * unit is m^2 sec^-2 K^-1
+          */
+        double heat_cap_g;
 
 		/**
 		  * thermal conductivity of the refrigerant

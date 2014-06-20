@@ -31,6 +31,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			    double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
 			    double my_rho_r = 988.1            /* density of the refrigerant */,
                 double my_heat_cap_r = 4180        /* specific heat capacity of the refrigerant */,
+                double my_rho_g = 2190             /* density of the grout */,
+                double my_heat_cap_g = 1000        /* specific heat capacity of the grout */,
 			    double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
 			    double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
 			    double my_lambda_g = 2.3           /* thermal conductivity of the grout */)
@@ -49,6 +51,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			mu_r = my_mu_r;
 			rho_r = my_rho_r;
 			heat_cap_r = my_heat_cap_r;
+            rho_g = my_rho_g; 
+            heat_cap_g = my_heat_cap_g; 
 			lambda_r = my_lambda_r;
 			lambda_p = my_lambda_p;
 			lambda_g = my_lambda_g;
@@ -117,6 +121,12 @@ namespace BHE  // namespace of borehole heat exchanger
 		* calculate heat transfer coefficient
 		*/
 		void calc_heat_transfer_coefficients();
+
+        /**
+          * return the coeff of mass matrix,
+          * depending on the index of unknown.
+          */
+        double get_mass_coeff(std::size_t idx_unknown); 
 
         /**
         * required by eigen library,

@@ -192,3 +192,25 @@ void BHE_CXA::calc_u()
 	_u(0) = u_in;
 	_u(1) = u_out;
 }
+
+double BHE_CXA::get_mass_coeff(std::size_t idx_unknown)
+{
+    double mass_coeff = 0.0;
+
+    switch (idx_unknown)
+    {
+    case 0:  // i1
+        mass_coeff = rho_r * heat_cap_r;
+        break;
+    case 1:  // i2
+        mass_coeff = rho_r * heat_cap_r;
+        break;
+    case 2:  // o1
+        mass_coeff = rho_g * heat_cap_g;
+        break;
+    default:
+        break;
+    }
+
+    return mass_coeff;
+}
