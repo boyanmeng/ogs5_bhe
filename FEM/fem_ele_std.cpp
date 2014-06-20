@@ -3997,7 +3997,7 @@ Programming:
 **************************************************************************/
 void CFiniteElementStd::CalcMass_BHE(BHE::BHEAbstract * m_BHE)
 {
-    int i, j;                             //OK411 k;
+    int i, j;
     // ---- Gauss integral
     int gp_r = 0, gp_s = 0, gp_t = 0;
     double fkt;
@@ -5288,6 +5288,73 @@ void CFiniteElementStd::CalcContent()
 }
 
 /***************************************************************************
+GeoSys - Funktion:
+CFiniteElementStd:: CalcLaplace_BHE
+Aufgabe:
+Compute Laplace matrix, i.e. int (gradN.mat.gradN). Linear interpolation
+for the Borehole Heat Exchanger
+
+Programming:
+06/2014   HS
+**************************************************************************/
+void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE)
+{
+    int i, j;
+    // ---- Gauss integral
+    int gp_r = 0, gp_s = 0, gp_t = 0;
+    double fkt;
+    // Material
+    double mat_fac[8];
+    mat_fac[0] = mat_fac[1] = mat_fac[2] = mat_fac[3] = mat_fac[4] = mat_fac[5] = mat_fac[6] = mat_fac[7] = 0.0;
+
+    double alpha[3], summand[8];
+    double vel[3];                        //NW
+
+    const std::size_t n_dim = this->ele_dim;
+    std::size_t shift(0);
+
+    int upwind_method = pcs->m_num->ele_upwind_method;
+    MNulleVec(alpha, 3);
+    MNulleVec(summand, 8);
+
+    ElementValue* gp_ele = ele_gp_value[Index]; //NW
+
+    //----------------------------------------------------------------------
+    //======================================================================
+    // Loop over Gauss points
+    for (gp = 0; gp < nGaussPoints; gp++)
+    {
+        //---------------------------------------------------------
+        //  Get local coordinates and weights
+        //  Compute Jacobian matrix and its determinate
+        //---------------------------------------------------------
+        fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
+        // Compute geometry
+        ComputeShapefct(1);       // Linear interpolation function
+        if (pcs->m_num->ele_supg_method > 0) //NW
+            ComputeGradShapefct(1);  // Linear interpolation function
+
+        // looping over all unknowns. 
+        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_unknowns(); idx_bhe_unknowns++)
+        {
+            // get coefficient of Laplace matrix from corresponding BHE. 
+            mat_fac[idx_bhe_unknowns] = m_BHE->get_laplace_coeff(idx_bhe_unknowns);
+            // calculate shift. 
+            shift = nnodes * idx_bhe_unknowns;
+            // calculate mass matrix for current unknown
+            for (i = 0; i < nnodes; i++)
+            for (j = 0; j < nnodes; j++)
+            {
+                (*Laplace)(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+            }
+        }
+
+    }   // end of for loop gauss points
+
+    // Laplace->Write();
+
+}
+/***************************************************************************
    GeoSys - Funktion:
            CFiniteElementStd:: CalcLaplace
    Aufgabe:
@@ -5594,6 +5661,61 @@ double CFiniteElementStd::CalcCoefDualTransfer()
 		break;
 	}
 	return val;
+}
+
+void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE)
+{
+    int i, j;
+    // ---- Gauss integral
+    int gp_r = 0, gp_s = 0, gp_t = 0;
+    double fkt;
+    // Material
+    double mat_fac[8];
+    mat_fac[0] = mat_fac[1] = mat_fac[2] = mat_fac[3] = mat_fac[4] = mat_fac[5] = mat_fac[6] = mat_fac[7] = 0.0;
+
+    double alpha[3], summand[8];
+    double vel[3];                        //NW
+
+    const std::size_t n_dim = this->ele_dim;
+    std::size_t shift(0);
+
+    int upwind_method = pcs->m_num->ele_upwind_method;
+    MNulleVec(alpha, 3);
+    MNulleVec(summand, 8);
+
+    ElementValue* gp_ele = ele_gp_value[Index]; //NW
+
+    //----------------------------------------------------------------------
+    //======================================================================
+    // Loop over Gauss points
+    for (gp = 0; gp < nGaussPoints; gp++)
+    {
+        //---------------------------------------------------------
+        //  Get local coordinates and weights
+        //  Compute Jacobian matrix and its determinate
+        //---------------------------------------------------------
+        fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
+        // Compute geometry
+        ComputeShapefct(1);       // Linear interpolation function
+        if (pcs->m_num->ele_supg_method > 0) //NW
+            ComputeGradShapefct(1);  // Linear interpolation function
+
+        // looping over all unknowns. 
+        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_unknowns(); idx_bhe_unknowns++)
+        {
+            // get coefficient of Laplace matrix from corresponding BHE. 
+            mat_fac[idx_bhe_unknowns] = m_BHE->get_advection_coeff(idx_bhe_unknowns);
+            // calculate shift. 
+            shift = nnodes * idx_bhe_unknowns;
+            // calculate mass matrix for current unknown
+            for (i = 0; i < nnodes; i++)
+            for (j = 0; j < nnodes; j++)
+            {
+                (*Advection)(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+            }
+        }
+
+    }   // end of for loop gauss points
 }
 
 //SB4200
@@ -8862,15 +8984,16 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
             CalcMass_BHE(m_bhe);
         }
         // TODO: Laplace matrix for BHE.......................................................
-        CalcLaplace();
+        CalcLaplace_BHE(m_bhe);
         // TODO: Advection matrix for BHE.....................................................
-        CalcAdvection();
+        CalcAdvection_BHE(m_bhe);
         // TODO: Calc Storage Matrix for BHE
-        CalcStorage();
+        // CalcStorage();
         // TODO: Calc Content Matrix for for BHE
-        CalcContent();
+        // CalcContent();
 
         // put it to the correct posistion of LHS and RHS
+        // TODO
 
     } // end of for idx_BHE
 

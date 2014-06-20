@@ -91,6 +91,7 @@ public:
 	// 3. Laplace matrix
 	void CalcLaplace();
 	void CalcLaplaceMCF();//AKS
+    void CalcLaplace_BHE(BHE::BHEAbstract * m_BHE);                  // HS
 	// 4. Gravity term
 	void CalcGravity();
 	// 5. Strain coupling matrix
@@ -101,6 +102,7 @@ public:
 	void CalcAdvection();
 	void CalcAdvectionMCF();
 	void CalcAdvectionTNEQ();
+    void CalcAdvection_BHE(BHE::BHEAbstract * m_BHE);                  // HS
 	// 8. Storage matrix
 	void CalcStorage();
 	// 9. Content matrix
