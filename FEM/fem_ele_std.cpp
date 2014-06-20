@@ -8720,6 +8720,87 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation()
 	   }
 	 */
 }
+
+
+/**************************************************************************
+FEMLib-Method:
+Task: Assemble local matrices of mixed hyperbolic and parabolic equation for
+the Borehole Heat Exchangers to the global system
+Programing:
+06/2014 HS Implementation
+**************************************************************************/
+void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
+{
+    int i, j;
+    double pcs_time_step, dt_inverse;
+    ElementMatrix* EleMat = NULL;         //SB-3
+    // NUM
+    double theta = pcs->m_num->ls_theta;  //OK
+#if defined(NEW_EQS)
+    CSparseMatrix* A = NULL;              //WW
+    if (m_dom)
+        A = m_dom->eqs->A;
+    else
+        A = pcs->eqs_new->A;
+#endif
+
+    // JT2012: Get the time step of this process! Now dt can be independently controlled
+    pcs_time_step = pcs->Tim->time_step_length;
+    dt_inverse = 1.0 / pcs_time_step; // (also, no need to check minimum. It is handeled in Tim.
+    //
+    //----------------------------------------------------------------------
+    unit[0] = unit[1] = unit[2] = 0.0;
+    // Non-linearities
+    //  double non_linear_function_iter = 1.0; //OK MediaProp->NonlinearFlowFunction(Index,unit,theta);
+    //  double non_linear_function_t0   = 1.0; //OK MediaProp->NonlinearFlowFunction(Index,unit,0.0);
+    double fac_mass, fac_laplace, fac_advection, fac_storage, fac_content;
+    //if(((aktueller_zeitschritt==1)||(pcs->tim_type_name.compare("TRANSIENT")==0))){   //SB-3
+    //SB-3
+
+    // Initialize.
+    (*Mass) = 0.0;
+    (*Laplace) = 0.0;
+    (*Advection) = 0.0;
+    (*Storage) = 0.0;
+    (*Content) = 0.0;
+    //----------------------------------------------------------------------
+    // GEO
+    // double geo_fac = MediaProp->geo_area;
+    //----------------------------------------------------------------------
+    // Calculate matrices
+    // Mass matrix..........................................................
+    //NW
+    if (this->pcs->tim_type_name.compare("STEADY") != 0)
+    {
+        if (pcs->m_num->ele_mass_lumping)
+            CalcLumpedMass();
+        else
+            CalcMass();
+    }
+    // Laplace matrix.......................................................
+    CalcLaplace();
+    // Advection matrix.....................................................
+    CalcAdvection();
+    // Calc Storage Matrix for decay
+    CalcStorage();
+    // Calc Content Matrix for  saturation changes
+    CalcContent();
+
+    // Store matrices to memory for steady state element matrices     //SB-3
+    if (pcs->Memory_Type > 0)
+    {
+        EleMat = pcs->Ele_Matrices[Index];
+        EleMat->SetMass_notsym(Mass);
+        EleMat->SetLaplace(Laplace);
+        EleMat->SetAdvection(Advection);
+        EleMat->SetStorage(Storage);
+        EleMat->SetContent(Content);
+    }
+
+
+
+}
+
 /**************************************************************************
    FEMLib-Method:
    Task: Assemble local matrices of parabolic equation to the global system
@@ -9423,13 +9504,22 @@ void CFiniteElementStd::Assembly()
 		heat_phase_change = false; // ?2WW
 		//  if(SolidProp->GetCapacityModel()==2) // Boiling model
 		//    CalNodalEnthalpy();
-		//CMCD4213
-		AssembleMixedHyperbolicParabolicEquation();
-		if(FluidProp->density_model == 14 && MediaProp->heat_diffusion_model == 1 &&
-		   cpl_pcs )
-			Assemble_RHS_HEAT_TRANSPORT();  // This include when need pressure terms n dp/dt + nv.Nabla p//AKS
-		if(MediaProp->evaporation == 647)
-			Assemble_RHS_HEAT_TRANSPORT2();  //AKS
+
+        if ( this->pcs->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && ele_dim == 1 ) 
+        {
+            // this is a BHE element
+            AssembleMixedHyperbolicParabolicEquation_BHE(); 
+        }
+        else
+        {
+            //CMCD4213
+            AssembleMixedHyperbolicParabolicEquation();
+            if (FluidProp->density_model == 14 && MediaProp->heat_diffusion_model == 1 &&
+                    cpl_pcs)
+                    Assemble_RHS_HEAT_TRANSPORT();  // This include when need pressure terms n dp/dt + nv.Nabla p//AKS
+            if (MediaProp->evaporation == 647)
+                Assemble_RHS_HEAT_TRANSPORT2();  //AKS
+        }
 
 #if defined(USE_PETSC) // || defined(other parallel libs)//03~04.3012. WW
 		add2GlobalMatrixII();

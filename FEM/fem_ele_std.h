@@ -343,6 +343,7 @@ private:
 	// Assembly of parabolic equation
 	void AssembleParabolicEquation();     //OK4104
 	void AssembleMixedHyperbolicParabolicEquation();
+    void AssembleMixedHyperbolicParabolicEquation_BHE();  // HS 06.2014
 	void AssembleParabolicEquationNewton();
 	// JOD
 	void AssembleParabolicEquationNewtonJacobian(double** jacob,
