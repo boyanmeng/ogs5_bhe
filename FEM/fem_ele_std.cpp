@@ -3984,6 +3984,75 @@ double CFiniteElementStd::CalCoefStrainCouping(const int phase)
 	return val;
 }
 
+
+/***************************************************************************
+GeoSys - Funktion:
+CFiniteElementStd:: CalcMass_BHE
+Aufgabe:
+Compute mass matrix, i.e. int (N.mat.N). Linear interpolation
+for the borehole heat exchangers
+
+Programming:
+06/2014 HS
+**************************************************************************/
+void CFiniteElementStd::CalcMass_BHE(BHE::BHEAbstract * m_BHE)
+{
+    int i, j;                             //OK411 k;
+    // ---- Gauss integral
+    int gp_r = 0, gp_s = 0, gp_t = 0;
+    double fkt;
+    // Material
+    double mat_fac[8];
+    mat_fac[0] = mat_fac[1] = mat_fac[2] = mat_fac[3] = mat_fac[4] = mat_fac[5] = mat_fac[6] = mat_fac[7] = 0.0; 
+
+    double alpha[3], summand[8];
+    double vel[3];                        //NW
+
+    const std::size_t n_dim = this->ele_dim; 
+    std::size_t shift(0); 
+
+    int upwind_method = pcs->m_num->ele_upwind_method;
+    MNulleVec(alpha, 3);
+    MNulleVec(summand, 8);
+
+    ElementValue* gp_ele = ele_gp_value[Index]; //NW
+
+    //----------------------------------------------------------------------
+    //======================================================================
+    // Loop over Gauss points
+    for (gp = 0; gp < nGaussPoints; gp++)
+    {
+        //---------------------------------------------------------
+        //  Get local coordinates and weights
+        //  Compute Jacobian matrix and its determinate
+        //---------------------------------------------------------
+        fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
+        // Compute geometry
+        ComputeShapefct(1);       // Linear interpolation function
+        if (pcs->m_num->ele_supg_method > 0) //NW
+            ComputeGradShapefct(1);  // Linear interpolation function
+
+        // looping over all unknowns. 
+        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_unknowns(); idx_bhe_unknowns++)
+        {
+            // get coefficient of mass from corresponding BHE. 
+            mat_fac[idx_bhe_unknowns] = m_BHE->get_mass_coeff(idx_bhe_unknowns);
+            // calculate shift. 
+            shift = nnodes * idx_bhe_unknowns; 
+            // calculate mass matrix for current unknown
+            for (i = 0; i < nnodes; i++)
+            for (j = 0; j < nnodes; j++)
+            {
+                (*Mass)(shift + i, shift + j) += mat_fac[idx_bhe_unknowns] * fkt * shapefct[i] * shapefct[j];
+            }
+        }
+
+    }   // end of for loop gauss points
+
+    // Test Output
+    //Mass->Write();
+}
+
 /***************************************************************************
    GeoSys - Funktion:
            CFiniteElementStd:: CalcMass
@@ -8744,59 +8813,66 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         A = pcs->eqs_new->A;
 #endif
 
+    // find out which BHE it is
+    BHE::BHEAbstract* m_bhe; 
+    std::size_t idx_mmp = this->GetMeshElement()->GetPatchIndex(); 
+    if (mmp_vector[idx_mmp] && mmp_vector[idx_mmp]->is_BHE)
+    {
+        // this is a BHE
+        // loop over all BHEs
+        for ( std::size_t idx = 0; idx < vec_BHEs.size(); idx++ )
+        if (mmp_vector[idx_mmp]->geo_name == vec_BHEs[idx]->get_name())
+        {
+            m_bhe = vec_BHEs[idx];
+            break;
+        }
+    }
+    else
+    {
+        std::cout << "Error: In Assemble BHEs, the corresponding Media Property data structure was not found. \n";    
+    }
+
     // JT2012: Get the time step of this process! Now dt can be independently controlled
     pcs_time_step = pcs->Tim->time_step_length;
     dt_inverse = 1.0 / pcs_time_step; // (also, no need to check minimum. It is handeled in Tim.
     //
     //----------------------------------------------------------------------
     unit[0] = unit[1] = unit[2] = 0.0;
-    // Non-linearities
-    //  double non_linear_function_iter = 1.0; //OK MediaProp->NonlinearFlowFunction(Index,unit,theta);
-    //  double non_linear_function_t0   = 1.0; //OK MediaProp->NonlinearFlowFunction(Index,unit,0.0);
     double fac_mass, fac_laplace, fac_advection, fac_storage, fac_content;
-    //if(((aktueller_zeitschritt==1)||(pcs->tim_type_name.compare("TRANSIENT")==0))){   //SB-3
-    //SB-3
-
-    // Initialize.
-    (*Mass) = 0.0;
-    (*Laplace) = 0.0;
-    (*Advection) = 0.0;
-    (*Storage) = 0.0;
-    (*Content) = 0.0;
-    //----------------------------------------------------------------------
-    // GEO
-    // double geo_fac = MediaProp->geo_area;
-    //----------------------------------------------------------------------
-    // Calculate matrices
-    // Mass matrix..........................................................
-    //NW
-    if (this->pcs->tim_type_name.compare("STEADY") != 0)
+    
+    // there are several BHEs
+    for (std::size_t idx_BHE = 0; idx_BHE < vec_BHEs.size(); idx_BHE++)
     {
-        if (pcs->m_num->ele_mass_lumping)
-            CalcLumpedMass();
-        else
-            CalcMass();
-    }
-    // Laplace matrix.......................................................
-    CalcLaplace();
-    // Advection matrix.....................................................
-    CalcAdvection();
-    // Calc Storage Matrix for decay
-    CalcStorage();
-    // Calc Content Matrix for  saturation changes
-    CalcContent();
 
-    // Store matrices to memory for steady state element matrices     //SB-3
-    if (pcs->Memory_Type > 0)
-    {
-        EleMat = pcs->Ele_Matrices[Index];
-        EleMat->SetMass_notsym(Mass);
-        EleMat->SetLaplace(Laplace);
-        EleMat->SetAdvection(Advection);
-        EleMat->SetStorage(Storage);
-        EleMat->SetContent(Content);
-    }
+        // Initialize.
+        (*Mass) = 0.0;
+        (*Laplace) = 0.0;
+        (*Advection) = 0.0;
+        (*Storage) = 0.0;
+        (*Content) = 0.0;
 
+        //----------------------------------------------------------------------
+        // Calculate matrices
+        // Mass matrix..........................................................
+        if (this->pcs->tim_type_name.compare("STEADY") != 0)
+        {
+            // if (pcs->m_num->ele_mass_lumping)
+            //    CalcLumpedMass();
+            // else
+            CalcMass_BHE(m_bhe);
+        }
+        // TODO: Laplace matrix for BHE.......................................................
+        CalcLaplace();
+        // TODO: Advection matrix for BHE.....................................................
+        CalcAdvection();
+        // TODO: Calc Storage Matrix for BHE
+        CalcStorage();
+        // TODO: Calc Content Matrix for for BHE
+        CalcContent();
+
+        // put it to the correct posistion of LHS and RHS
+
+    } // end of for idx_BHE
 
 
 }

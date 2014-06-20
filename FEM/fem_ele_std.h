@@ -17,6 +17,7 @@
 #include "rf_mfp_new.h"
 //#include "rf_msp_new.h"
 #include "rf_out_new.h"                           //OK
+#include "BHEAbstract.h"  // HS
 
 #include "Eigen/Eigen"
 
@@ -79,8 +80,9 @@ public:
 	void CalcMass();
 	void CalcMass2();
 	void CalcMassMCF();                   //AKS/NB
-         void CalcMassTNEQ();                      //AKS/NB
+    void CalcMassTNEQ();                      //AKS/NB
 	void CalcMassPSGLOBAL();              // PCH
+    void CalcMass_BHE(BHE::BHEAbstract * m_BHE);                  // HS
 	// 2. Lumped mass matrix
 	void CalcLumpedMass();
 	void CalcLumpedMass2();
