@@ -2025,6 +2025,20 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
+        if (line_string.find("BHE_GROUT_DENSITY") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_grout_density;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_GROUT_HEAT_CAPACITY") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_grout_heat_capacity;
+            in.clear();
+            continue;
+        }
         if (line_string.find("BHE_2U_DISCHARGE_TYPE") != std::string::npos)
         {
             std::string str_tmp;

@@ -3165,8 +3165,9 @@ void CRFProcess::ConfigBHEs()
                 m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate, 
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                            mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
-                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, 
-                                           mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_pipe_distance);
+                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_heat_capacity, 
+                                           mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
+                                           mmp_vector[i]->bhe_pipe_distance);
                 vec_BHEs.push_back(m_bhe_1u);
                 break;
             case BHE::BHE_TYPE_2U:
@@ -3174,8 +3175,9 @@ void CRFProcess::ConfigBHEs()
                 m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                            mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density,
-                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall,
-                                           mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_2u_discharge_type);
+                                           mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_heat_capacity, 
+                                           mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
+                                           mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
                 break;
             case BHE::BHE_TYPE_CXC:
@@ -3183,7 +3185,8 @@ void CRFProcess::ConfigBHEs()
                 m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness, 
                                              mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
-                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
+                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_heat_capacity, 
+                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
                 vec_BHEs.push_back(m_bhe_cxc);
                 break;
             case BHE::BHE_TYPE_CXA:
@@ -3191,7 +3194,8 @@ void CRFProcess::ConfigBHEs()
                 m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
                                              mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, 
-                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
+                                             mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_heat_capacity, 
+                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout);
                 vec_BHEs.push_back(m_bhe_cxa);
                 break;
             default:
