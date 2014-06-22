@@ -312,7 +312,9 @@ public:
     double bhe_refrigerant_viscosity;
     double bhe_refrigerant_density;
     double bhe_refrigerant_heat_capacity;
+	double bhe_refrigerant_alpha_L; 
     double bhe_grout_density;
+	double bhe_grout_porosity;
     double bhe_grout_heat_capacity;
     double bhe_regrigerant_heat_conductivity;
 

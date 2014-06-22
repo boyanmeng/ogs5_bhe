@@ -220,6 +220,12 @@ namespace BHE  // namespace of borehole heat exchanger
 		  */
 		double rho_r;
 
+		/**
+		  * longitudinal dispersivity of the
+		  * referigerant flow in the pipeline
+		  */
+		double alpha_L;
+
         /**
           * density of the grout
           * unit is kg m-3

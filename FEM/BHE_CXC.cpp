@@ -226,11 +226,11 @@ double BHE_CXC::get_laplace_coeff(std::size_t idx_unknown)
 	{
 	case 0:
 		// pipe i1, Eq. 26
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * _u.norm();
+		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
 		break;
 	case 1:
 		// pipe o1, Eq. 27
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * _u.norm();
+		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
 		break;
 	case 2:
 		// pipe g1, Eq. 28

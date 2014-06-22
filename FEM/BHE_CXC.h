@@ -30,6 +30,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			    double my_b_out = 0.004            /* pipe-out wall thickness*/,
 			    double my_mu_r = 0.00054741        /* dynamic viscosity of the refrigerant */,
 			    double my_rho_r = 988.1            /* density of the refrigerant */,
+				double my_alpha_L = 1.0e-4         /* longitudinal dispersivity of the refrigerant in the pipeline */,
                 double my_heat_cap_r = 4180        /* specific heat capacity of the refrigerant */,
                 double my_rho_g = 2190             /* density of the grout */,
 				double my_porosity_g = 0.5         /* porosity of the grout */,
@@ -51,9 +52,11 @@ namespace BHE  // namespace of borehole heat exchanger
 			b_out = my_b_out;
 			mu_r = my_mu_r;
 			rho_r = my_rho_r;
+			alpha_L = my_alpha_L;
 			heat_cap_r = my_heat_cap_r;
             rho_g = my_rho_g; 
             heat_cap_g = my_heat_cap_g; 
+			porosity_g = my_porosity_g;
 			lambda_r = my_lambda_r;
 			lambda_p = my_lambda_p;
 			lambda_g = my_lambda_g;

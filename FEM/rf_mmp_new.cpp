@@ -2004,6 +2004,13 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 
             continue; 
         }
+		if (line_string.find("BHE_FLUID_LONGITUDIAL_DISPERSION_LENGTH") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_refrigerant_alpha_L;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));
@@ -2032,6 +2039,13 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
+		if (line_string.find("BHE_GROUT_POROSITY") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_grout_porosity;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_GROUT_HEAT_CAPACITY") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));
