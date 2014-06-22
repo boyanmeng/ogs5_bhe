@@ -267,6 +267,44 @@ double BHE_2U::get_laplace_coeff(std::size_t idx_unknown)
 double BHE_2U::get_advection_coeff(std::size_t idx_unknown)
 {
     double advection_coeff(0);
-    // TODO
+	switch (idx_unknown)
+	{
+	case 0:
+		// pipe i1, Eq. 10
+		advection_coeff = rho_r * heat_cap_r * _u(0);
+		break;
+	case 1:
+		// pipe o1, Eq. 11
+		advection_coeff = rho_r * heat_cap_r * _u(0);
+		break;
+	case 2:
+		// pipe i2, Eq. 12
+		advection_coeff = rho_r * heat_cap_r * _u(0);
+		break;
+	case 3:
+		// pipe o2, Eq. 13
+		advection_coeff = rho_r * heat_cap_r * _u(0);
+		break;
+	case 4:
+		// pipe g1, Eq. 14
+		advection_coeff = 0.0;
+		break;
+	case 5:
+		// pipe g2, Eq. 15
+		advection_coeff = 0.0;
+		break;
+	case 6:
+		// pipe g3, Eq. 16
+		advection_coeff = 0.0;
+		break;
+	case 7:
+		// pipe g4, Eq. 17
+		advection_coeff = 0.0;
+		break;
+	default:
+		std::cout << "Error !!! The index passed to get_advection_coeff for BHE is not correct. \n";
+		exit(1);
+		break;
+	}
     return advection_coeff;
 }
