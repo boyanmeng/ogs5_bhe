@@ -227,6 +227,12 @@ namespace BHE  // namespace of borehole heat exchanger
         double rho_g;
 
 		/**
+		  * porosity of the grout
+		  * unit is [-]
+		  */
+		double porosity_g;
+
+		/**
 		  * specific heat capacity of the refrigerant
 		  * unit is m^2 sec^-2 K^-1
 		  */
@@ -283,6 +289,7 @@ namespace BHE  // namespace of borehole heat exchanger
           * name of the borehole heat exchanger
           */
         const std::string _name;
+
 	};
 
 }  // end of namespace
