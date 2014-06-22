@@ -5710,9 +5710,8 @@ void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE)
             // calculate mass matrix for current unknown
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
-            {
-                (*Advection)(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
-            }
+				(*Advection)(i, j) += fkt * shapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+
         }
 
     }   // end of for loop gauss points
