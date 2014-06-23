@@ -5345,6 +5345,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             }
         }  // end of for loop gauss points
 
+        // The following assembly action is according to Diersch (2013) FEFLOW book
+        // please refer to M.127 and M.128 on page 955 and 956
         switch (m_BHE->get_type())
         {
         case BHE::BHE_TYPE_1U:
@@ -5372,8 +5374,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += 2.0 * loc_R;  // K_og
                 break;
             case 3:  // R s
-                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.segment(3 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(3 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
 
                 L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R;  // K_ig
                 L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R;  // K_og
@@ -5431,10 +5433,10 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
                 break;
             case 4:  // R s
-                R_pi_s_matrix.segment(4 * n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.segment(5 * n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.segment(6 * n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.segment(7 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(4 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(5 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(6 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(7 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
 
                 L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
                 L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += loc_R; // K_ig
@@ -5461,7 +5463,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
                 break;
             case 3:  // R s
-                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
 
                 L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
                 break;
@@ -5485,7 +5487,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
                 break;
             case 3:  // R s
-                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
 
                 L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_og
                 break;
