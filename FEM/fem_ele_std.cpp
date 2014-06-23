@@ -9192,29 +9192,29 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // Laplace matrix for BHE.......................................................
     CalcLaplace_BHE(m_bhe, matBHE_L);
 
-    std::cout << "matBHE_L after laplace: \n";
-    std::cout << matBHE_L;
+    //std::cout << "matBHE_L after laplace: \n";
+    //std::cout << matBHE_L;
 
     // Advection matrix for BHE.....................................................
     CalcAdvection_BHE(m_bhe, matBHE_L);
 
-    std::cout << "matBHE_L after advection: \n";
-    std::cout << matBHE_L;
+    //std::cout << "matBHE_L after advection: \n";
+    //std::cout << matBHE_L;
 
     // calculate Cauchy type of boundary condition matrix.....................................
     CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_L, matBHE_R, matBHE_R_pi_s);
 
-    // debugging................................
-    std::cout << "matBHE_P: \n";
-    std::cout << matBHE_P;
-    std::cout << "matBHE_L: \n"; 
-    std::cout << matBHE_L; 
-    std::cout << "matBHE_R: \n";
-    std::cout << matBHE_R;
-    std::cout << "matBHE_R_pi_s: \n";
-    std::cout << matBHE_R_pi_s;
-    exit(1); 
-    // end of debugging.........................
+    //// debugging................................
+    //std::cout << "matBHE_P: \n";
+    //std::cout << matBHE_P;
+    //std::cout << "matBHE_L: \n"; 
+    //std::cout << matBHE_L; 
+    //std::cout << "matBHE_R: \n";
+    //std::cout << matBHE_R;
+    //std::cout << "matBHE_R_pi_s: \n";
+    //std::cout << matBHE_R_pi_s;
+    //exit(1); 
+    //// end of debugging.........................
 
     // put it to the correct posistion of LHS and RHS
     // TODO
