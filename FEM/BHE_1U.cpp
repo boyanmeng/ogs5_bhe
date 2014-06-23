@@ -64,10 +64,12 @@ void BHE_1U::calc_thermal_resistances()
 	double s; // diagonal distances of pipes
 	d0 = 2.0 * r_inner;
 	s = omega * std::sqrt(2);
+    // Eq. 49
+    _R_con_a_i1 = _R_con_a_o1 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 	// Eq. 51
 	chi = std::log(std::sqrt(D*D + 2 * d0*d0) / 2 / d0) / std::log(D / std::sqrt(2) / d0);
 	// Eq. 52
-	_R_g = std::acosh((D*D + d0*d0 - s*s) / (2 * D*d0)) / (2 * PI * lambda_g * lambda_g) * (1.601 - 0.888 * omega / D );
+    _R_g = std::acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
 	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
