@@ -5312,7 +5312,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
 
     ElementValue* gp_ele = ele_gp_value[Index]; 
 
-    Eigen::MatrixXd loc_R = Eigen::MatrixXd::Zero(n_dim, n_dim);
+    Eigen::MatrixXd loc_R = Eigen::MatrixXd::Zero(nnodes, nnodes);
 
     //----------------------------------------------------------------------
     //======================================================================
@@ -5341,7 +5341,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
             {
-                loc_R(i, j) += fkt * mat[idx_bhe_unknowns] * shapefct[i] * shapefct[j];
+                loc_R(i, j) += fkt * mat_fac[idx_bhe_unknowns] * shapefct[i] * shapefct[j];
             }
         }  // end of for loop gauss points
 
@@ -5353,32 +5353,32 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R i1
-                R_matrix.block(0, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(0, 0, nnodes, nnodes) += loc_R; // K_i1
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_ig
                 break;
             case 1:  // R o1
-                R_matrix.block(n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(3 * n_dim, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(nnodes, 3 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(3 * nnodes, nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
-                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(nnodes, nnodes, nnodes, nnodes) += loc_R; // K_o1
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             case 2:  // R g1
-                R_matrix.block(2 * n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(3 * n_dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(2 * nnodes, 3 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(3 * nnodes, 2 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += 2.0 * loc_R;  // K_ig
-                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += 2.0 * loc_R;  // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 2.0 * loc_R;  // K_ig
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 2.0 * loc_R;  // K_og
                 break;
             case 3:  // R s
-                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.block(3 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
+                R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R;  // K_ig
-                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R;  // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R;  // K_ig
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += loc_R;  // K_og
                 break;
             }
             break;
@@ -5386,62 +5386,62 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R i1 i2
-                R_matrix.block(0, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(4 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(5 * n_dim, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(0, 4 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(4 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(nnodes, 5 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(5 * nnodes, nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
-                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_i2
-                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(0, 0, nnodes, nnodes) += loc_R; // K_i1
+                L_matrix.block(nnodes, nnodes, nnodes, nnodes) += loc_R; // K_i2
+                L_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += loc_R; // K_ig
                 break;
             case 1:  // R o1 o2
-                R_matrix.block(2 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(6 * n_dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(3 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(7 * n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(2 * nnodes, 6 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(6 * nnodes, 2 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(3 * nnodes, 7 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(7 * nnodes, 3 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_o1
-                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R; // K_o2
-                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
-                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_o1
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += loc_R; // K_o2
+                L_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += loc_R; // K_og
+                L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             case 2:  // R g1
-                R_matrix.block(4 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(6 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(4 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(7 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(5 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(6 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(5 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(7 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(4 * nnodes, 6 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(6 * nnodes, 4 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(4 * nnodes, 7 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(7 * nnodes, 4 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(5 * nnodes, 6 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(6 * nnodes, 5 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(5 * nnodes, 7 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(7 * nnodes, 5 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_ig
-                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_ig
-                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_og
-                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_og
+                L_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += 2.0 * loc_R; // K_ig
+                L_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += 2.0 * loc_R; // K_ig
+                L_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += 2.0 * loc_R; // K_og
+                L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += 2.0 * loc_R; // K_og
                 break;
             case 3:  // R g2
-                R_matrix.block(4 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(5 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(6 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(7 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(4 * nnodes, 5 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(5 * nnodes, 4 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(6 * nnodes, 7 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(7 * nnodes, 6 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
-                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += loc_R; // K_ig
-                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
-                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += loc_R; // K_ig
+                L_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += loc_R; // K_ig
+                L_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += loc_R; // K_og
+                L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             case 4:  // R s
-                R_pi_s_matrix.block(4 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.block(5 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.block(6 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
-                R_pi_s_matrix.block(7 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
+                R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
+                R_pi_s_matrix.block(6 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
+                R_pi_s_matrix.block(7 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
-                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += loc_R; // K_ig
-                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
-                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += loc_R; // K_ig
+                L_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += loc_R; // K_ig
+                L_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += loc_R; // K_og
+                L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             }
             break;
@@ -5449,23 +5449,23 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R i1
-                R_matrix.block(0, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(0, 0, nnodes, nnodes) += loc_R; // K_i1
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_ig
                 break;
             case 1:  // R io
-                R_matrix.block(0, n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(0, nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
-                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                L_matrix.block(0, 0, nnodes, nnodes) += loc_R; // K_i1
+                L_matrix.block(nnodes, nnodes, nnodes, nnodes) += loc_R; // K_o1
                 break;
             case 3:  // R s
-                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_ig
                 break;
             }
             break;
@@ -5473,23 +5473,23 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R o1
-                R_matrix.block(dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(2 * n_dim, dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(dim, 2 * nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(2 * nnodes, dim, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(nnodes, nnodes, nnodes, nnodes) += loc_R; // K_o1
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             case 1:  // R io
-                R_matrix.block(0, n_dim, n_dim, n_dim) = -1.0 * loc_R;
-                R_matrix.block(n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(0, nnodes, nnodes, nnodes) = -1.0 * loc_R;
+                R_matrix.block(nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
-                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                L_matrix.block(0, 0, nnodes, nnodes) += loc_R; // K_i1
+                L_matrix.block(nnodes, nnodes, nnodes, nnodes) += loc_R; // K_o1
                 break;
             case 3:  // R s
-                R_pi_s_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) = -1.0 * loc_R;
 
-                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += loc_R; // K_og
                 break;
             }
             break;
@@ -5558,7 +5558,7 @@ void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixX
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
             {
-                laplace_matrix(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+                laplace_matrix(shift + i, shift + j) += fkt * dshapefct[i] * mat_fac[idx_bhe_unknowns] * dshapefct[j];
             }
         }
 
@@ -5923,7 +5923,7 @@ void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE, Eigen::Matri
             // calculate mass matrix for current unknown
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
-                advection_matrix(i, j) += fkt * shapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+                advection_matrix(shift + i, shift + j) += fkt * shapefct[i] * mat_fac[idx_bhe_unknowns] * dshapefct[j];
 
         }
 
@@ -9170,12 +9170,12 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     pcs_time_step = pcs->Tim->time_step_length;
     dt_inverse = 1.0 / pcs_time_step; // (also, no need to check minimum. It is handeled in Tim.
 
-    const std::size_t loc_mat_size(ele_dim * m_bhe->get_n_unknowns() );
+    const std::size_t loc_mat_size(nnodes * m_bhe->get_n_unknowns() );
     // Initialize, clear the content of local matrix
     matBHE_P = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
     matBHE_L = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
     matBHE_W = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
-    matBHE_R_pi_s = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+    matBHE_R_pi_s = Eigen::MatrixXd::Zero(loc_mat_size, nnodes);  // see M.128
 
     matBHE_R = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
 
@@ -9191,14 +9191,35 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     }
     // Laplace matrix for BHE.......................................................
     CalcLaplace_BHE(m_bhe, matBHE_L);
+
+    std::cout << "matBHE_L after laplace: \n";
+    std::cout << matBHE_L;
+
     // Advection matrix for BHE.....................................................
     CalcAdvection_BHE(m_bhe, matBHE_L);
+
+    std::cout << "matBHE_L after advection: \n";
+    std::cout << matBHE_L;
+
     // calculate Cauchy type of boundary condition matrix.....................................
     CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_L, matBHE_R, matBHE_R_pi_s);
 
+    // debugging................................
+    std::cout << "matBHE_P: \n";
+    std::cout << matBHE_P;
+    std::cout << "matBHE_L: \n"; 
+    std::cout << matBHE_L; 
+    std::cout << "matBHE_R: \n";
+    std::cout << matBHE_R;
+    std::cout << "matBHE_R_pi_s: \n";
+    std::cout << matBHE_R_pi_s;
+    exit(1); 
+    // end of debugging.........................
 
     // put it to the correct posistion of LHS and RHS
     // TODO
+
+
 
 
 
