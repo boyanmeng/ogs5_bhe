@@ -80,6 +80,12 @@ namespace BHE  // namespace of borehole heat exchanger
 		  */
 		std::size_t get_n_unknowns() { return 8; }
 
+        /**
+          * return the number of boundary heat exchange terms for this BHE
+          * abstract function, need to be realized.
+          */
+        std::size_t get_n_heat_exchange_terms() { return 5; }
+
 		/**
 		  * return the thermal resistance for the inlet pipline
 		  * idx is the index, when 2U case,
