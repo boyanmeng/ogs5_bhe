@@ -3995,7 +3995,7 @@ for the borehole heat exchangers
 Programming:
 06/2014 HS
 **************************************************************************/
-void CFiniteElementStd::CalcMass_BHE(BHE::BHEAbstract * m_BHE)
+void CFiniteElementStd::CalcMass_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & mass_matrix)
 {
     int i, j;
     // ---- Gauss integral
@@ -4043,7 +4043,7 @@ void CFiniteElementStd::CalcMass_BHE(BHE::BHEAbstract * m_BHE)
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
             {
-                (*Mass)(shift + i, shift + j) += mat_fac[idx_bhe_unknowns] * fkt * shapefct[i] * shapefct[j];
+                mass_matrix(shift + i, shift + j) += mat_fac[idx_bhe_unknowns] * fkt * shapefct[i] * shapefct[j];
             }
         }
 
@@ -5289,6 +5289,217 @@ void CFiniteElementStd::CalcContent()
 
 /***************************************************************************
 GeoSys - Funktion:
+CFiniteElementStd:: CalcBoundaryHeatExchange_BHE
+Aufgabe:
+Compute boundary heat exchange matrices, i.e. int (mat.N.N). Linear interpolation
+for the Borehole Heat Exchanger
+
+Programming:
+06/2014   HS
+**************************************************************************/
+
+void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix)
+{
+    int i, j;
+    // ---- Gauss integral
+    int gp_r = 0, gp_s = 0, gp_t = 0;
+    double fkt;
+    // Material
+    double mat_fac[8];
+    mat_fac[0] = mat_fac[1] = mat_fac[2] = mat_fac[3] = mat_fac[4] = mat_fac[5] = mat_fac[6] = mat_fac[7] = 0.0;
+
+    const std::size_t n_dim = this->ele_dim;
+
+    ElementValue* gp_ele = ele_gp_value[Index]; 
+
+    Eigen::MatrixXd loc_R = Eigen::MatrixXd::Zero(n_dim, n_dim);
+
+    //----------------------------------------------------------------------
+    //======================================================================
+    // looping over all unknowns. 
+    for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_heat_exchange_terms(); idx_bhe_unknowns++)
+    {
+        loc_R.setZero(); 
+        // Loop over Gauss points
+        for (gp = 0; gp < nGaussPoints; gp++)
+        {
+            //---------------------------------------------------------
+            //  Get local coordinates and weights
+            //  Compute Jacobian matrix and its determinate
+            //---------------------------------------------------------
+            fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
+            // Compute geometry
+            ComputeShapefct(1);       // Linear interpolation function
+            if (pcs->m_num->ele_supg_method > 0) //NW
+                ComputeGradShapefct(1);  // Linear interpolation function
+
+
+            // get coefficient of Laplace matrix from corresponding BHE. 
+            mat_fac[idx_bhe_unknowns] = m_BHE->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
+
+            // calculate mass matrix for current unknown
+            for (i = 0; i < nnodes; i++)
+            for (j = 0; j < nnodes; j++)
+            {
+                loc_R(i, j) += fkt * mat[idx_bhe_unknowns] * shapefct[i] * shapefct[j];
+            }
+        }  // end of for loop gauss points
+
+        switch (m_BHE->get_type())
+        {
+        case BHE::BHE_TYPE_1U:
+            switch (idx_bhe_unknowns)
+            {
+            case 0:  // R i1
+                R_matrix.block(0, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                break;
+            case 1:  // R o1
+                R_matrix.block(n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(3 * n_dim, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            case 2:  // R g1
+                R_matrix.block(2 * n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(3 * n_dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += 2.0 * loc_R;  // K_ig
+                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += 2.0 * loc_R;  // K_og
+                break;
+            case 3:  // R s
+                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.segment(3 * n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R;  // K_ig
+                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R;  // K_og
+                break;
+            }
+            break;
+        case BHE::BHE_TYPE_2U:
+            switch (idx_bhe_unknowns)
+            {
+            case 0:  // R i1 i2
+                R_matrix.block(0, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(4 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(5 * n_dim, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
+                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_i2
+                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                break;
+            case 1:  // R o1 o2
+                R_matrix.block(2 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(6 * n_dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(3 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(7 * n_dim, 3 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_o1
+                L_matrix.block(3 * n_dim, 3 * n_dim, n_dim, n_dim) += loc_R; // K_o2
+                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            case 2:  // R g1
+                R_matrix.block(4 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(6 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(4 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(7 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(5 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(6 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(5 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(7 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_ig
+                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_ig
+                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_og
+                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += 2.0 * loc_R; // K_og
+                break;
+            case 3:  // R g2
+                R_matrix.block(4 * n_dim, 5 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(5 * n_dim, 4 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(6 * n_dim, 7 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(7 * n_dim, 6 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            case 4:  // R s
+                R_pi_s_matrix.segment(4 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.segment(5 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.segment(6 * n_dim, n_dim) = -1.0 * loc_R;
+                R_pi_s_matrix.segment(7 * n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(4 * n_dim, 4 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(5 * n_dim, 5 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                L_matrix.block(6 * n_dim, 6 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                L_matrix.block(7 * n_dim, 7 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            }
+            break;
+        case BHE::BHE_TYPE_CXA:
+            switch (idx_bhe_unknowns)
+            {
+            case 0:  // R i1
+                R_matrix.block(0, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(2 * n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                break;
+            case 1:  // R io
+                R_matrix.block(0, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
+                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                break;
+            case 3:  // R s
+                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_ig
+                break;
+            }
+            break;
+        case BHE::BHE_TYPE_CXC:
+            switch (idx_bhe_unknowns)
+            {
+            case 0:  // R o1
+                R_matrix.block(dim, 2 * n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(2 * n_dim, dim, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            case 1:  // R io
+                R_matrix.block(0, n_dim, n_dim, n_dim) = -1.0 * loc_R;
+                R_matrix.block(n_dim, 0, n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(0, 0, n_dim, n_dim) += loc_R; // K_i1
+                L_matrix.block(n_dim, n_dim, n_dim, n_dim) += loc_R; // K_o1
+                break;
+            case 3:  // R s
+                R_pi_s_matrix.segment(2 * n_dim, n_dim) = -1.0 * loc_R;
+
+                L_matrix.block(2 * n_dim, 2 * n_dim, n_dim, n_dim) += loc_R; // K_og
+                break;
+            }
+            break;
+        }
+    }   
+
+    // Laplace->Write();
+
+}
+
+/***************************************************************************
+GeoSys - Funktion:
 CFiniteElementStd:: CalcLaplace_BHE
 Aufgabe:
 Compute Laplace matrix, i.e. int (gradN.mat.gradN). Linear interpolation
@@ -5297,7 +5508,7 @@ for the Borehole Heat Exchanger
 Programming:
 06/2014   HS
 **************************************************************************/
-void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE)
+void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & laplace_matrix)
 {
     int i, j;
     // ---- Gauss integral
@@ -5345,7 +5556,7 @@ void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE)
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
             {
-                (*Laplace)(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+                laplace_matrix(shift + i, shift + j) += fkt * dshapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
             }
         }
 
@@ -5663,7 +5874,7 @@ double CFiniteElementStd::CalcCoefDualTransfer()
 	return val;
 }
 
-void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE)
+void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & advection_matrix)
 {
     int i, j;
     // ---- Gauss integral
@@ -5710,7 +5921,7 @@ void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE)
             // calculate mass matrix for current unknown
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
-				(*Advection)(i, j) += fkt * shapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
+                advection_matrix(i, j) += fkt * shapefct[i] * mat[idx_bhe_unknowns] * dshapefct[j];
 
         }
 
@@ -8956,45 +9167,37 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // JT2012: Get the time step of this process! Now dt can be independently controlled
     pcs_time_step = pcs->Tim->time_step_length;
     dt_inverse = 1.0 / pcs_time_step; // (also, no need to check minimum. It is handeled in Tim.
-    //
+
+    const std::size_t loc_mat_size(ele_dim * m_bhe->get_n_unknowns() );
+    // Initialize, clear the content of local matrix
+    matBHE_P = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+    matBHE_L = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+    matBHE_W = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+    matBHE_R_pi_s = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+
+    matBHE_R = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
+
     //----------------------------------------------------------------------
-    unit[0] = unit[1] = unit[2] = 0.0;
-    double fac_mass, fac_laplace, fac_advection, fac_storage, fac_content;
-    
-    // there are several BHEs
-    for (std::size_t idx_BHE = 0; idx_BHE < vec_BHEs.size(); idx_BHE++)
+    // Calculate matrices
+    // Mass matrix..........................................................
+    if (this->pcs->tim_type_name.compare("STEADY") != 0)
     {
+        // if (pcs->m_num->ele_mass_lumping)
+        //    CalcLumpedMass();
+        // else
+        CalcMass_BHE(m_bhe, matBHE_P);
+    }
+    // Laplace matrix for BHE.......................................................
+    CalcLaplace_BHE(m_bhe, matBHE_L);
+    // Advection matrix for BHE.....................................................
+    CalcAdvection_BHE(m_bhe, matBHE_L);
+    // calculate Cauchy type of boundary condition matrix.....................................
+    CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_L, matBHE_R, matBHE_R_pi_s);
 
-        // Initialize.
-        (*Mass) = 0.0;
-        (*Laplace) = 0.0;
-        (*Advection) = 0.0;
-        (*Storage) = 0.0;
-        (*Content) = 0.0;
 
-        //----------------------------------------------------------------------
-        // Calculate matrices
-        // Mass matrix..........................................................
-        if (this->pcs->tim_type_name.compare("STEADY") != 0)
-        {
-            // if (pcs->m_num->ele_mass_lumping)
-            //    CalcLumpedMass();
-            // else
-            CalcMass_BHE(m_bhe);
-        }
-        // TODO: Laplace matrix for BHE.......................................................
-        CalcLaplace_BHE(m_bhe);
-        // TODO: Advection matrix for BHE.....................................................
-        CalcAdvection_BHE(m_bhe);
-        // TODO: Calc Storage Matrix for BHE
-        // CalcStorage();
-        // TODO: Calc Content Matrix for for BHE
-        // CalcContent();
+    // put it to the correct posistion of LHS and RHS
+    // TODO
 
-        // put it to the correct posistion of LHS and RHS
-        // TODO
-
-    } // end of for idx_BHE
 
 
 }
