@@ -65,6 +65,12 @@ namespace BHE  // namespace of borehole heat exchanger
 		  */
 		virtual std::size_t get_n_unknowns() = 0;
 
+        /**
+          * return the number of boundary heat exchange terms for this BHE
+          * abstract function, need to be realized.
+          */
+        virtual std::size_t get_n_heat_exchange_terms() = 0;
+
 		/**
 		  * return the type of the BHE
 		  */
@@ -165,6 +171,12 @@ namespace BHE  // namespace of borehole heat exchanger
           * depending on the index of unknown.
           */
         virtual double get_advection_coeff(std::size_t idx_unknown) = 0;
+
+        /**
+          * return the coeff of boundary heat exchange matrix,
+          * depending on the index of unknown.
+          */
+        virtual double get_boundary_heat_exchange_coeff(std::size_t idx_unknown) = 0;
 
         /**
           * get the polyline geometry 

@@ -269,3 +269,35 @@ double BHE_CXC::get_advection_coeff(std::size_t idx_unknown)
 	}
     return advection_coeff;
 }
+
+double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
+{
+    // Here we calculates the boundary heat exchange coefficients 
+    // in the governing equations of BHE. 
+    // These governing equations can be found in 
+    // 1) Diersch (2013) FEFLOW book on page 958, M.3, or
+    // 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 90-97. 
+
+    double exchange_coeff(0);
+
+    switch (idx_unknown)
+    {
+    case 0:
+        // R i1 and i2 Eq. 90-91
+        exchange_coeff = _PHI_fog;
+        break;
+    case 1:
+        // R o1 and o2 Eq. 92-93
+        exchange_coeff = _PHI_ff;
+        break;
+    case 2:
+        // R g1
+        exchange_coeff = _PHI_gs;
+        break;
+    default:
+        std::cout << "Error !!! The index passed to get_boundary_heat_exchange_coeff for BHE is not correct. \n";
+        exit(1);
+        break;
+    }
+    return exchange_coeff;
+}
