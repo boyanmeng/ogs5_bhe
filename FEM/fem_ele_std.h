@@ -280,6 +280,10 @@ private:
     Eigen::MatrixXd matBHE_R_pi_s;        // BHE stiffness matrix, see Diersch (2013) FEFLOW book page 956 M.128
 
     Eigen::MatrixXd matBHE_R;             // BHE boundary heat exchange matrix, see Diersch (2013) FEFLOW book page 955 M.126
+    Eigen::MatrixXd matBHE_loc_R;           
+    
+    Eigen::MatrixXd mat_local_LHS;        // BHE local left hand side matrix for one element
+    Eigen::VectorXd vec_local_RHS;        // BHE local right hand side vector for one element
 	//-------------------------------------------------------
 	void SetHighOrderNodes();             // 25.2.2007 WW
 	// Primary as water head
