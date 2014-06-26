@@ -13418,6 +13418,7 @@ CRFProcess* PCSGetMass(size_t component_number)
 		CFEMesh* a_msh = NULL;
 		SparseTable* sp = NULL;
 		SparseTable* spH = NULL;
+        SparseTable* sp_BHE = NULL; 
 		Linear_EQS* eqs = NULL;
         Linear_EQS* eqs_dof = NULL; //WW 02.2023. Pardiso
 		Linear_EQS* eqsH = NULL;
@@ -13498,11 +13499,20 @@ CRFProcess* PCSGetMass(size_t component_number)
 			EQS_Vector.push_back(eqs);
 			EQS_Vector.push_back(eqs);
 #else
-			a_msh->CreateSparseTable();
-			// sparse pattern with linear elements exists
-			sp = a_msh->GetSparseTable();
-			// sparse pattern with quadratic elements exists
-			spH = a_msh->GetSparseTable(true);
+            if (vec_BHEs.size() > 0) // HEAT_TRANSPORT_BHE process
+            {
+                a_msh->CreateSparseTable_BHE(m_pcs); 
+                sp = a_msh->GetSparseTable(); 
+            }
+            else
+            {
+                a_msh->CreateSparseTable();
+                // sparse pattern with linear elements exists
+                sp = a_msh->GetSparseTable();
+                // sparse pattern with quadratic elements exists
+                spH = a_msh->GetSparseTable(true);
+            }
+
 			//
 			eqs = NULL;
 			eqsH = NULL;

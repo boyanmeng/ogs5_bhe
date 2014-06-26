@@ -3276,6 +3276,27 @@ void CFEMesh::CreateSparseTable()
 	//ofstream Dum("sparse.txt", ios::out);
 	//sparse_graph_H->Write(Dum);
 }
+
+void CFEMesh::CreateSparseTable_BHE(CRFProcess* m_pcs)
+{
+    Math_Group::StorageType stype;
+    stype = Math_Group::JDS;
+    for (int i = 0; i < (int)num_vector.size(); i++)
+    if (num_vector[i]->ls_storage_method == 100)
+    {
+        stype = Math_Group::CRS;
+        break;
+    }
+
+    sparse_graph = new SparseTable(vec_BHEs, vec_BHE_nodes, vec_BHE_elems, this, stype);
+
+    //  sparse_graph->Write();
+    //  sparse_graph_H->Write();
+    //
+    //ofstream Dum("sparse.txt", ios::out);
+    //sparse_graph_H->Write(Dum);
+
+}
 #endif        //#ifndef NEW_EQS  // 05.03.2010 WW
 
 //---------------------------------------------------------------------------

@@ -991,6 +991,186 @@ SparseTable::SparseTable(CPARDomain &m_dom, bool quadratic, bool symm) :
 			lbuff0++;
 		}
 }
+
+/*\!
+********************************************************************
+Create sparse matrix table for the process HEAT_TRANSPORT_BHE
+06/2014 HS
+********************************************************************
+*/
+SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs, 
+                         std::vector<std::vector<std::size_t>> & m_vec_nodes,
+                         std::vector<std::vector<std::size_t>> & m_vec_elems, 
+                         MeshLib::CFEMesh* a_mesh, StorageType stype)
+: symmetry(false), storage_type(stype)
+{
+    long i = 0, j = 0, ii = 0, jj = 0;
+    long lbuff0 = 0, lbuff1 = 0;
+    long** larraybuffer;
+    larraybuffer = NULL;
+    long n_soil_nodes(0); 
+    //
+    
+    // count the number of BHE nodes
+    std::size_t n_BHE_dofs(0); 
+    for (i = 0; i < m_vec_BHEs.size(); i++)
+        n_BHE_dofs += m_vec_BHEs[i]->get_n_unknowns() * m_vec_nodes[i].size();
+    // In HEAT_TRANSPORT_BHE process, number of rows = number of nodes + dof of BHE
+    rows = a_mesh->GetNodesNumber(false) + n_BHE_dofs;
+    n_soil_nodes = a_mesh->GetNodesNumber(false); 
+    size_entry_column = 0;
+    diag_entry = new long[rows];
+
+    if (storage_type == JDS)
+    {
+        row_index_mapping_n2o = new long[rows];
+        row_index_mapping_o2n = new long[rows];
+    }
+    else if (storage_type == CRS)
+    {
+        row_index_mapping_n2o = NULL;
+        row_index_mapping_o2n = NULL;
+    }
+
+    /// CRS storage
+    if (storage_type == CRS)
+    {
+        /// num_column_entries saves vector ptr of CRS
+        num_column_entries = new long[rows + 1];
+
+        std::vector<long> A_index;
+        long col_index;
+
+        for (i = 0; i < rows; i++)
+        {
+            num_column_entries[i] = (long)A_index.size();
+
+            for (j = 0; j < (long)a_mesh->nod_vector[i]->getConnectedNodes().size(); j++)
+            {
+                col_index = a_mesh->nod_vector[i]->getConnectedNodes()[j];
+
+                /// If linear element is used
+                if (col_index >= rows)
+                    continue;
+
+                if (i == col_index)
+                    diag_entry[i] = (long)A_index.size();
+                A_index.push_back(col_index);
+            }
+        }
+
+        size_entry_column = (long)A_index.size();
+        num_column_entries[rows] = size_entry_column;
+
+        entry_column = new long[size_entry_column];
+        for (i = 0; i < size_entry_column; i++)
+            entry_column[i] = A_index[i];
+    }
+    else if (storage_type == JDS)
+    {
+        //
+        //--- Sort, from that has maximum connect nodes to that has minimum connect nodes
+        //
+        for (i = 0; i < rows; i++)
+        {
+            row_index_mapping_n2o[i] = i;
+            // 'diag_entry' used as a temporary array
+            // to store the number of nodes connected to this node
+            diag_entry[i] = (long)a_mesh->nod_vector[i]->getConnectedNodes().size();
+
+            lbuff0 = 0;
+            for (j = 0; j < diag_entry[i]; j++)
+            if (a_mesh->nod_vector[i]->getConnectedNodes()[j] <
+                static_cast<size_t>(rows))
+                lbuff0++;
+            diag_entry[i] = lbuff0;
+
+            size_entry_column += diag_entry[i];
+        }
+
+        //
+        for (i = 0; i < rows; i++)
+        {
+            // 'diag_entry' used as a temporary array
+            // to store the number of nodes connected to this node
+            lbuff0 = diag_entry[i]; // Nodes to this row
+            lbuff1 = row_index_mapping_n2o[i];
+            j = i;
+            while ((j > 0) && (diag_entry[j - 1] < lbuff0))
+            {
+                diag_entry[j] = diag_entry[j - 1];
+                row_index_mapping_n2o[j] = row_index_mapping_n2o[j - 1];
+                j = j - 1;
+            }
+            diag_entry[j] = lbuff0;
+            row_index_mapping_n2o[j] = lbuff1;
+        }
+        // Old index to new one
+        for (i = 0; i < rows; i++)
+            row_index_mapping_o2n[row_index_mapping_n2o[i]] = i;
+        // Maximum number of columns in the sparse table
+        max_columns = diag_entry[0];
+        //--- End of sorting
+        //
+        //--- Create sparse table
+        //
+        num_column_entries = new long[max_columns];
+        entry_column = new long[size_entry_column];
+        // 1. Count entries in each column in sparse table
+        for (i = 0; i < max_columns; i++)
+            num_column_entries[i] = 0;
+        for (i = 0; i < rows; i++)
+            // 'diag_entry' still is used as a temporary array
+            // it stores that numbers of nodes connect to this nodes
+        for (j = 0; j < diag_entry[i]; j++)
+            num_column_entries[j]++;
+
+        // 2. Fill the sparse table, i.e. store all its entries to
+        //    entry_column
+        lbuff0 = 0;
+
+        for (i = 0; i < max_columns; i++)
+        for (j = 0; j < num_column_entries[i]; j++)
+        {
+            // ii is the real row index of this entry in matrix
+            ii = row_index_mapping_n2o[j];
+            // jj is the real column index of this entry in matrix
+            jj = a_mesh->nod_vector[ii]->getConnectedNodes()[i];
+            entry_column[lbuff0] = jj;
+
+            // Till to this stage, 'diag_entry' is really used to store indices of the diagonal entries.
+            // Hereby, 'index' refers to the index in entry_column array.
+            if (ii == jj)
+                diag_entry[ii] = lbuff0;
+            //
+            lbuff0++;
+        }
+    }
+
+    // For the case of symmetry matrix
+    if (symmetry)
+    {
+        for (i = 0; i < rows; i++)
+        {
+            lbuff0 = larraybuffer[i][0];
+            a_mesh->nod_vector[i]->getConnectedNodes().resize(lbuff0);
+            //
+            for (j = 0; j < lbuff0; j++)
+                a_mesh->nod_vector[i]->getConnectedNodes()[j] =
+                larraybuffer[i][j + 1];
+        }
+        for (i = 0; i < rows; i++)
+        {
+            delete[] larraybuffer[i];
+            larraybuffer[i] = 0;
+        }
+        delete[] larraybuffer;
+        larraybuffer = 0;
+    }
+
+
+}
+
 /*\!
  ********************************************************************
    Create sparse matrix table

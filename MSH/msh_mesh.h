@@ -445,6 +445,7 @@ public:
 #ifdef NEW_EQS                              // 1.11.2007 WW
 	// Compute the graph of the sparse matrix related to this mesh. 1.11.2007 WW
 	void CreateSparseTable();
+    void CreateSparseTable_BHE(CRFProcess* m_pcs); 
 	// Get the sparse graph   1.11.2007 WW
 	SparseTable* GetSparseTable(bool quad = false)
 	const {if(!quad) return sparse_graph;
