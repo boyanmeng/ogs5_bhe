@@ -4836,7 +4836,10 @@ double CRFProcess::Execute()
 	// Also allocate temporary memory for linear solver. WW
 	{
 		//_new 02/2010. WW
-		eqs_new->SetDOF(pcs_number_of_primary_nvals);
+        if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+            eqs_new->SetDOF(1);
+        else
+            eqs_new->SetDOF(pcs_number_of_primary_nvals);
 		eqs_new->ConfigNumerics(m_num);
 	}
 	eqs_new->Initialize();
@@ -9531,6 +9534,9 @@ double CRFProcess::CalcIterationNODError(FiniteElement::ErrorMethod method, bool
 		dom->ConfigEQS(m_num, pcs_number_of_primary_nvals
 		               * m_msh->GetNodesNumber(false));
 #else
+        if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+            eqs_new->SetDOF(1);  // HS 06.2014
+        else
 		eqs_new->SetDOF(pcs_number_of_primary_nvals); //_new 02/2010. WW
 		eqs_new->ConfigNumerics(m_num);
 #endif
