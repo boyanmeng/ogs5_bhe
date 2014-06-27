@@ -20,6 +20,8 @@
 #ifdef NEW_EQS
 #include "msh_mesh.h"
 #include "par_ddc.h"
+#include <algorithm>    // std::unique
+#include <vector>       // std::vector
 #endif
 #endif
 
@@ -1005,19 +1007,23 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
 : symmetry(false), storage_type(stype)
 {
     long i = 0, j = 0, ii = 0, jj = 0;
+    size_t idx_BHEs(0);
     long lbuff0 = 0, lbuff1 = 0;
     long** larraybuffer;
     larraybuffer = NULL;
     long n_soil_nodes(0); 
-    //
+    long global_row_index(0), soil_row_index(0), col_index(0);
+    long sum_bhe_nodes(0);
+
+    std::vector<std::vector<long>> connectivity; 
     
     // count the number of BHE nodes
     std::size_t n_BHE_dofs(0); 
     for (i = 0; i < m_vec_BHEs.size(); i++)
         n_BHE_dofs += m_vec_BHEs[i]->get_n_unknowns() * m_vec_nodes[i].size();
     // In HEAT_TRANSPORT_BHE process, number of rows = number of nodes + dof of BHE
-    rows = a_mesh->GetNodesNumber(false) + n_BHE_dofs;
-    n_soil_nodes = a_mesh->GetNodesNumber(false); 
+    n_soil_nodes = a_mesh->GetNodesNumber(false);
+    rows = n_soil_nodes + n_BHE_dofs;
     size_entry_column = 0;
     diag_entry = new long[rows];
 
@@ -1032,6 +1038,85 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
         row_index_mapping_o2n = NULL;
     }
 
+    // Step 1: first we create data structure that stores all connectivity information
+    // outer vector contains index of the row,
+    // inner vector contains index of the column. 
+    for (i = 0; i < rows; i++)
+    {
+        std::vector<long> vec_row_indices; 
+        connectivity.push_back(vec_row_indices); 
+    }
+
+    // Step 2.1: based on connectivity of As, fill in the connectivity
+    for (i = 0; i < n_soil_nodes; i++)
+    {
+        for (j = 0; j < (long)a_mesh->nod_vector[i]->getConnectedNodes().size(); j++)
+        {
+            long col_index = a_mesh->nod_vector[i]->getConnectedNodes()[j];
+
+            /// If linear element is used
+            if (col_index >= rows)
+                continue;
+
+            connectivity[i].push_back(col_index);
+        }
+    }
+
+    // Step 2.2: based on connectivity of R_s_pi and R_pi_s, fill in the connectivity
+    sum_bhe_nodes = 0; 
+    for (idx_BHEs = 0; idx_BHEs < m_vec_BHEs.size(); idx_BHEs++)
+    {
+        for (i = 0; i < vec_BHE_nodes[idx_BHEs].size(); i++)
+        {
+            global_row_index = n_soil_nodes + sum_bhe_nodes + i * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+            soil_row_index = vec_BHE_nodes[idx_BHEs][i];
+
+            // looping over all unknowns of this BHE
+            for (j = 0; j < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); j++)
+            {
+                col_index = global_row_index + j; 
+                // R_s_pi
+                connectivity[soil_row_index].push_back(col_index);
+                // R_pi_s
+                connectivity[col_index].push_back(soil_row_index);
+            }  // end of for j unknowns             
+        }  // end of for i
+
+        sum_bhe_nodes += vec_BHE_nodes[idx_BHEs].size() * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+    }  // end of for idx_BHEs
+
+    // Step 2.3: based on connectivity of A_pi, fill in the connectivity
+    sum_bhe_nodes = n_soil_nodes;
+    for (idx_BHEs = 0; idx_BHEs < m_vec_BHEs.size(); idx_BHEs++)
+    {
+        for (i = 0; i < ( vec_BHE_nodes[idx_BHEs].size() - 1); i++)
+        {
+            for (std::size_t j = 0; j < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); j++)
+            {
+                long node_index_1 = sum_bhe_nodes + (long)(i * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + j;
+                long node_index_2 = sum_bhe_nodes + (long)((i + 1) * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + j;
+
+                connectivity[node_index_1].push_back(node_index_1);
+                connectivity[node_index_1].push_back(node_index_2);
+                connectivity[node_index_2].push_back(node_index_1);
+                connectivity[node_index_2].push_back(node_index_2);
+            }  // end of for j
+        }  // end of for i
+
+        sum_bhe_nodes += vec_BHE_nodes[idx_BHEs].size() * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+    }  // end of for idx_BHEs
+
+    // Step 2.4: filling finished. Sort each vector
+    for (i = 0; i < connectivity.size(); i++)
+    {
+        // sort this vector
+        std::sort(connectivity[i].begin(), connectivity[i].end());
+        // remove redundant entries in this vector
+        connectivity[i].erase(std::unique(connectivity[i].begin(), connectivity[i].end()), connectivity[i].end());
+    }
+
+
+    // Step 3.1: if CRS, convert the connectivity to CRS indeces
     /// CRS storage
     if (storage_type == CRS)
     {
@@ -1045,13 +1130,9 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
         {
             num_column_entries[i] = (long)A_index.size();
 
-            for (j = 0; j < (long)a_mesh->nod_vector[i]->getConnectedNodes().size(); j++)
+            for (j = 0; j < (long)connectivity[i].size(); j++)
             {
-                col_index = a_mesh->nod_vector[i]->getConnectedNodes()[j];
-
-                /// If linear element is used
-                if (col_index >= rows)
-                    continue;
+                col_index = (long)connectivity[i][j];
 
                 if (i == col_index)
                     diag_entry[i] = (long)A_index.size();
@@ -1066,6 +1147,7 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
         for (i = 0; i < size_entry_column; i++)
             entry_column[i] = A_index[i];
     }
+    // Step 3.2: if JDS, convert the connectivity to JDS indeces
     else if (storage_type == JDS)
     {
         //
@@ -1076,17 +1158,16 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
             row_index_mapping_n2o[i] = i;
             // 'diag_entry' used as a temporary array
             // to store the number of nodes connected to this node
-            diag_entry[i] = (long)a_mesh->nod_vector[i]->getConnectedNodes().size();
-
+            diag_entry[i] = (long)connectivity[i].size();
+            
             lbuff0 = 0;
             for (j = 0; j < diag_entry[i]; j++)
-            if (a_mesh->nod_vector[i]->getConnectedNodes()[j] <
-                static_cast<size_t>(rows))
-                lbuff0++;
-            diag_entry[i] = lbuff0;
-
+            if (connectivity[i][j] < static_cast<size_t>(rows))
+                    lbuff0++;
+                diag_entry[i] = lbuff0;
+            
             size_entry_column += diag_entry[i];
-        }
+        }  // end of for i
 
         //
         for (i = 0; i < rows; i++)
@@ -1135,7 +1216,8 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
             // ii is the real row index of this entry in matrix
             ii = row_index_mapping_n2o[j];
             // jj is the real column index of this entry in matrix
-            jj = a_mesh->nod_vector[ii]->getConnectedNodes()[i];
+            // jj = a_mesh->nod_vector[ii]->getConnectedNodes()[i];
+            jj = connectivity[ii][i];
             entry_column[lbuff0] = jj;
 
             // Till to this stage, 'diag_entry' is really used to store indices of the diagonal entries.
@@ -1145,30 +1227,11 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
             //
             lbuff0++;
         }
-    }
-
-    // For the case of symmetry matrix
-    if (symmetry)
-    {
-        for (i = 0; i < rows; i++)
-        {
-            lbuff0 = larraybuffer[i][0];
-            a_mesh->nod_vector[i]->getConnectedNodes().resize(lbuff0);
-            //
-            for (j = 0; j < lbuff0; j++)
-                a_mesh->nod_vector[i]->getConnectedNodes()[j] =
-                larraybuffer[i][j + 1];
-        }
-        for (i = 0; i < rows; i++)
-        {
-            delete[] larraybuffer[i];
-            larraybuffer[i] = 0;
-        }
-        delete[] larraybuffer;
-        larraybuffer = 0;
-    }
+    }  // end of else if storage type
 
 
+
+    std::cout << "Sparsity talbe for Borehole Heat Exchangers prepared. ";
 }
 
 /*\!

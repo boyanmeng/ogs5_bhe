@@ -355,7 +355,7 @@ public:
     SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs, 
                 std::vector<std::vector<std::size_t>> & m_vec_nodes, 
                 std::vector<std::vector<std::size_t>> & m_vec_elems, 
-                MeshLib::CFEMesh* a_mesh, StorageType stype = JDS);
+                MeshLib::CFEMesh* a_mesh, StorageType stype = CRS);
 	~SparseTable();
 	void Write(std::ostream &os = std::cout);
 private:
