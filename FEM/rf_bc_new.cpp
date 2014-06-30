@@ -1010,6 +1010,7 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
 			  //05.2012. WW
 			  long node_idx =  m_msh->GetNODOnPNT(static_cast<const GEOLIB::Point*> 
 								(bc->getGeoObj()));
+
 			  if(node_idx<0)
 			    {
 			      ++p_bc;
@@ -1017,6 +1018,40 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
 			    }
 			  //-------
 				m_node_value = new CBoundaryConditionNode;
+
+                // HS: 06.2014: BHE node
+                if (bc->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+                {
+                    long shift(0);
+                    std::size_t BHE_index(0);
+                    bool found(false);
+                    // get the number of nodes first
+                    shift = bc->getProcess()->m_msh->GetNodesNumber(false); // node number
+                    // identify which BHE does this node belong to. 
+                    for (size_t idx_BHE = 0; idx_BHE < vec_BHEs.size(); idx_BHE++)
+                    {
+                        for (std::size_t idx_node = 0; idx_node < vec_BHE_nodes[idx_BHE].size(); idx_node++)
+                        {
+                            if (node_idx == vec_BHE_nodes[idx_BHE][idx_node])
+                            {
+                                BHE_index = idx_BHE;
+                                found = true;
+                                break;
+                            }  // end of if node_idx
+                            if (!found)
+                                shift += vec_BHEs[idx_BHE]->get_n_unknowns();
+                        }  // end of for idx_BHE
+                    }  // end of for idx_BHE
+
+                    if (found)
+                    {
+                        int idx_pv = vec_BHEs[BHE_index]->get_loc_shift_by_pv(bc->getProcessPrimaryVariable());
+                        shift += idx_pv;
+                        m_node_value->bhe_node_shift = shift - node_idx;
+                    }
+                }
+
+
 				// Get MSH node number
 			  if (bc->getProcessDistributionType()  == FiniteElement::CONSTANT)
 			    m_node_value->geo_node_number = node_idx;

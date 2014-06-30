@@ -221,6 +221,9 @@ public:
 	// 25.08.2011. WW
 	void Read(std::istream& is);
 	void Write(std::ostream& os) const;
+
+    // HS: Borehole Heat Exchanger
+    long bhe_node_shift;
 };
 
 class CBoundaryConditionsGroup

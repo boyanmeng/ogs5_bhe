@@ -6777,7 +6777,10 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 
 
 #else
-			shift = m_bc_node->msh_node_number - m_bc_node->geo_node_number;
+            if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+                shift = m_bc_node->bhe_node_shift;
+            else
+                shift = m_bc_node->msh_node_number - m_bc_node->geo_node_number;
 			if(rank > -1)
 			{
 				bc_msh_node = bc_local_index_in_dom[i];
