@@ -301,3 +301,17 @@ double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     }
     return exchange_coeff;
 }
+
+int BHE_CXC::get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name)
+{
+    int idx(0);
+
+    if (pv_name == FiniteElement::TEMPERATURE_IN_1)
+        idx = 0;
+    else if (pv_name == FiniteElement::TEMPERATURE_OUT_1)
+        idx = 1;
+    else if (pv_name == FiniteElement::TEMPERATURE_G_1)
+        idx = 2;
+
+    return idx;
+}

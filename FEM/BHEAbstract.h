@@ -23,6 +23,7 @@
 #include <iostream>
 #include "Eigen/Eigen"
 #include "../GEO/Polyline.h"
+#include "FEMEnums.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -177,6 +178,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * depending on the index of unknown.
           */
         virtual double get_boundary_heat_exchange_coeff(std::size_t idx_unknown) = 0;
+
+        /**
+          * return the shift index based on primary variable value
+          */
+        virtual int get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name) = 0;
 
         /**
           * get the polyline geometry 

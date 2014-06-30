@@ -157,6 +157,11 @@ namespace BHE  // namespace of borehole heat exchanger
         double get_boundary_heat_exchange_coeff(std::size_t idx_unknown);
 
         /**
+          * return the shift index based on primary variable value
+          */
+        int get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name);
+
+        /**
         * required by eigen library,
         * to make sure the dynamically allocated class has
         * aligned "operator new"
