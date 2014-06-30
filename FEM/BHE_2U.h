@@ -167,6 +167,11 @@ namespace BHE  // namespace of borehole heat exchanger
         int get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name);
 
         /**
+          * return the number of grout zones in this BHE.
+          */
+        std::size_t get_n_grout_zones(void) { return 4; };
+
+        /**
           * required by eigen library, 
           * to make sure the dynamically allocated class has 
           * aligned "operator new"

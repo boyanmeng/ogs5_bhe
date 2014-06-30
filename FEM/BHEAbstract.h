@@ -185,6 +185,11 @@ namespace BHE  // namespace of borehole heat exchanger
         virtual int get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name) = 0;
 
         /**
+          * return the number of grout zones in this BHE.  
+          */
+        virtual std::size_t get_n_grout_zones(void) = 0; 
+
+        /**
           * get the polyline geometry 
           * that is representing this BHE. 
           */
