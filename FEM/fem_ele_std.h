@@ -92,7 +92,7 @@ public:
 	void CalcLaplace();
 	void CalcLaplaceMCF();//AKS
     void CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & laplace_matrix);                  // HS
-    void CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix);                  // HS
+    void CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix, Eigen::MatrixXd & R_s);  // HS
 	// 4. Gravity term
 	void CalcGravity();
 	// 5. Strain coupling matrix
@@ -278,6 +278,7 @@ private:
     Eigen::MatrixXd matBHE_L;             // BHE stiffness matrix, see Diersch (2013) FEFLOW book page 955 M.127
     Eigen::MatrixXd matBHE_W;             // BHE stiffness matrix, see Diersch (2013) FEFLOW book page 956 M.128
     Eigen::MatrixXd matBHE_R_pi_s;        // BHE stiffness matrix, see Diersch (2013) FEFLOW book page 956 M.128
+    Eigen::MatrixXd matBHE_R_s; 
 
     Eigen::MatrixXd matBHE_R;             // BHE boundary heat exchange matrix, see Diersch (2013) FEFLOW book page 955 M.126
     Eigen::MatrixXd matBHE_loc_R;           

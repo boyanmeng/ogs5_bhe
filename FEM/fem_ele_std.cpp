@@ -5298,7 +5298,7 @@ Programming:
 06/2014   HS
 **************************************************************************/
 
-void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix)
+void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix, Eigen::MatrixXd & R_s)
 {
     int i, j;
     // ---- Gauss integral
@@ -5313,6 +5313,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
     ElementValue* gp_ele = ele_gp_value[Index]; 
 
     matBHE_loc_R = Eigen::MatrixXd::Zero(nnodes, nnodes);
+
+    R_s = Eigen::MatrixXd::Zero(nnodes, nnodes);
 
     //----------------------------------------------------------------------
     //======================================================================
@@ -5374,6 +5376,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R;  // K_og
                 break;
             case 3:  // R s
+                R_s += matBHE_loc_R; 
+
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
@@ -5433,6 +5437,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_og
                 break;
             case 4:  // R s
+                R_s += matBHE_loc_R;
+
                 R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(6 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
@@ -5463,6 +5469,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(nnodes, nnodes, nnodes, nnodes) += matBHE_loc_R; // K_o1
                 break;
             case 3:  // R s
+                R_s += matBHE_loc_R;
+
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
                 L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_ig
@@ -5487,6 +5495,8 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(nnodes, nnodes, nnodes, nnodes) += matBHE_loc_R; // K_o1
                 break;
             case 3:  // R s
+                R_s += matBHE_loc_R;
+
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
                 L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_og
@@ -9137,6 +9147,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     int i, j, k;
     std::size_t idx_bhe; 
     long nodes_bhe[2];
+    long nodes_bhe_soil[2];
     double pcs_time_step, dt_inverse;
     ElementMatrix* EleMat = NULL;         //SB-3
     // NUM
@@ -9178,7 +9189,10 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     {
         for (j = 0; j < vec_BHE_nodes[idx_bhe].size(); j++)
         if (vec_BHE_nodes[idx_bhe][j] == nodes[i])
-            nodes_bhe[i] = j; 
+        {
+            nodes_bhe[i] = j;
+            nodes_bhe_soil[i] = vec_BHE_nodes[idx_bhe][j]; 
+        }
     }
 
     // JT2012: Get the time step of this process! Now dt can be independently controlled
@@ -9191,6 +9205,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     matBHE_L = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
     matBHE_W = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
     matBHE_R_pi_s = Eigen::MatrixXd::Zero(loc_mat_size, nnodes);  // see M.128
+    matBHE_R_s = Eigen::MatrixXd::Zero(nnodes, nnodes); 
 
     matBHE_R = Eigen::MatrixXd::Zero(loc_mat_size, loc_mat_size);
 
@@ -9233,7 +9248,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     //std::cout << matBHE_L;
 
     // calculate Cauchy type of boundary condition matrix.....................................
-    CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_L, matBHE_R, matBHE_R_pi_s);
+    CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_L, matBHE_R, matBHE_R_pi_s, matBHE_R_s);
 
     matBHE_L += matBHE_R; 
 
@@ -9308,6 +9323,25 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 #endif
         }
     }
+
+
+    // assemble the Rs matrix to global LHS and RHS, soil part
+    double G = (double)m_bhe->get_n_grout_zones();
+    for (i = 0; i < nnodes; i++)
+    {
+        shift_i = nodes_bhe_soil[i];
+        for (j = 0; j < nnodes; j++)
+        {
+            shift_j = nodes_bhe_soil[j];
+#ifdef NEW_EQS
+            (*A)(shift_i, shift_j) += theta *G * matBHE_R_s(i, j);
+#else
+            MXInc(shift_i, shift_j,  theta * G * matBHE_R_s(i, j));
+#endif
+        }
+    }
+
+    // TODO: R_pi to the RHS. 
            
 }
 
