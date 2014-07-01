@@ -3115,7 +3115,7 @@ void CRFProcess::ConfigHeatTransport_BHE()
 	// the number of primary variables will be different
 	// TODO: 
 	// if 2U type of BHE
-	pcs_number_of_primary_nvals = 9; 
+	pcs_number_of_primary_nvals = 1; // pretend to have only soil temperature.  
 	pcs_primary_function_name[0] = "TEMPERATURE_SOIL";
 	pcs_primary_function_unit[0] = "dC";
 	pcs_primary_function_name[1] = "TEMPERATURE_IN_1";
@@ -5274,7 +5274,42 @@ double CRFProcess::Execute()
 			   }
 			}
 		}
-	}
+
+        // for the BHE process, also need to get the results for the BHEs. 
+        if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+        {
+            long nshift = this->m_msh->GetNodesNumber(false);
+            std::size_t nidx_shift(2); // the first two are T_soil. 
+            long shift(0); 
+            // looping over each BHE; 
+            for (std::size_t i = 0; i < vec_BHEs.size(); i++)
+            {
+                // looping over each BHE node; 
+                for (std::size_t j = 0; j < vec_BHE_nodes[i].size(); j++)
+                {
+                    for (std::size_t k = 0; k < vec_BHEs[i]->get_n_unknowns(); k++)
+                    {
+                        shift = nshift + j*vec_BHEs[i]->get_n_unknowns() + k; 
+                        nidx1 = nidx_shift + 2 * k + 1; 
+                        if (nl_theta > implicit_lim) // fully implicit
+                        {
+                            const double val_n = GetNodeValue(j, nidx1); 
+                            SetNodeValue(j, nidx1, val_n);
+                            eqs_x[shift] = val_n;
+                        }
+                        else  // otherwise need to interpolate
+                        {
+                            const double val_n = GetNodeValue(j, nidx1);       //03.04.2009. WW
+                            SetNodeValue(j, nidx1, (1.0 - nl_theta)*val_n + nl_theta*eqs_x[j + nshift]);
+                            eqs_x[shift] = val_n;
+                        }  // end of if else implicit
+                    }  // end of for k
+                }  // end of for j
+                nshift += vec_BHE_nodes[i].size()*vec_BHEs[i]->get_n_unknowns(); 
+                nidx_shift += vec_BHEs[i]->get_n_unknowns();
+            }  // end of for i
+        }  // end of if HEAT_TRANSPORT_BHE
+    }
 	//----------------------------------------------------------------------
 	// END OF PICARD
 	//----------------------------------------------------------------------
@@ -9758,6 +9793,7 @@ double CRFProcess::CalcIterationNODError(FiniteElement::ErrorMethod method, bool
 					}
 #endif
 				}
+
 			}
 
 			// OTHER CONFIGURATIONS AT THE END OF THIS NON-LINEAR ITERATION
