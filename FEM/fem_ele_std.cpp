@@ -5398,6 +5398,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(0, 0, nnodes, nnodes) += matBHE_loc_R; // K_i1
                 L_matrix.block(nnodes, nnodes, nnodes, nnodes) += matBHE_loc_R; // K_i2
                 L_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_ig
+                L_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += matBHE_loc_R; // K_ig
                 break;
             case 1:  // R o1 o2
                 R_matrix.block(2 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
@@ -5426,8 +5427,6 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R; // K_og
                 break;
             case 3:  // R g2
-                R_matrix.block(4 * nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
-                R_matrix.block(5 * nnodes, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_matrix.block(6 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_matrix.block(7 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
@@ -5522,7 +5521,7 @@ Programming:
 **************************************************************************/
 void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & laplace_matrix)
 {
-    int i, j;
+    int i, j, k, l;
     // ---- Gauss integral
     int gp_r = 0, gp_s = 0, gp_t = 0;
     double fkt;
@@ -5541,6 +5540,7 @@ void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixX
     MNulleVec(summand, 8);
 
     ElementValue* gp_ele = ele_gp_value[Index]; //NW
+    Eigen::MatrixXd mat_Laplace = Eigen::MatrixXd::Zero(3, 3); 
 
     //----------------------------------------------------------------------
     //======================================================================
@@ -5554,22 +5554,33 @@ void CFiniteElementStd::CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixX
         fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
         // Compute geometry
         ComputeShapefct(1);       // Linear interpolation function
-        if (pcs->m_num->ele_supg_method > 0) //NW
-            ComputeGradShapefct(1);  // Linear interpolation function
+        ComputeGradShapefct(1);   // Linear interpolation function
 
         // looping over all unknowns. 
         for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_unknowns(); idx_bhe_unknowns++)
         {
             // get coefficient of Laplace matrix from corresponding BHE. 
-            mat_fac[idx_bhe_unknowns] = m_BHE->get_laplace_coeff(idx_bhe_unknowns);
+            m_BHE->get_laplace_matrix(idx_bhe_unknowns, mat_Laplace);
             // calculate shift. 
             shift = nnodes * idx_bhe_unknowns;
             // calculate mass matrix for current unknown
             for (i = 0; i < nnodes; i++)
-            for (j = 0; j < nnodes; j++)
             {
-                laplace_matrix(shift + i, shift + j) += fkt * dshapefct[i] * mat_fac[idx_bhe_unknowns] * dshapefct[j];
-            }
+                const int iish = i + shift;
+                for (j = 0; j < nnodes; j++)
+                {
+                    const int jjsh = j + shift;
+                    //  if(j>i) continue;  
+                    for (k = 0; k < dim; k++)
+                    {
+                        const int ksh = k*nnodes + i;
+                        for (l = 0; l< (int)dim; l++)
+                        {
+                            (*Laplace)(iish, jjsh) += fkt * dshapefct[ksh] * mat_Laplace(k,l) * dshapefct[l*nnodes + j];
+                        }
+                    }
+                } // j: nodes
+            } // i: nodes	
         }
 
     }   // end of for loop gauss points
@@ -9185,15 +9196,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         std::cout << "Error: In Assemble BHEs, the corresponding Media Property data structure was not found. \n";    
     }
 
-    for (i = 0; i < nnodes; i++)
-    {
-        for (j = 0; j < vec_BHE_nodes[idx_bhe].size(); j++)
-        if (vec_BHE_nodes[idx_bhe][j] == nodes[i])
-        {
-            nodes_bhe[i] = j;
-            nodes_bhe_soil[i] = vec_BHE_nodes[idx_bhe][j]; 
-        }
-    }
+
 
     // JT2012: Get the time step of this process! Now dt can be independently controlled
     pcs_time_step = pcs->Tim->time_step_length;
@@ -9216,12 +9219,29 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 
     // fill in the last time step values
     double T_val_pre; 
+    std::size_t idx_unknown_shift; 
+    idx_unknown_shift = 2;
+    for (k = 0; k < idx_bhe; k++)
+        idx_unknown_shift += vec_BHEs[k]->get_n_unknowns() * 2;
+
     for (std::size_t i = 0; i < m_bhe->get_n_unknowns(); i++)
     {
         for (std::size_t j = 0; j < nnodes; j++)
         {
-            T_val_pre = pcs->GetNodeValue(nodes[j], (i + 1) * 2); // the index "0" and "1" were Ts values, we start from index "2"
+            std::size_t idx_unknown = idx_unknown_shift + 2 * i; 
+            T_val_pre = pcs->GetNodeValue(nodes_bhe[j], idx_unknown); // the index "0" and "1" were Ts values, we start from index "2"
             vec_T_pi_pre(i*nnodes + j) = T_val_pre;
+        }
+    }
+
+
+    for (std::size_t i = 0; i < nnodes; i++)
+    {
+        for (std::size_t j = 0; j < vec_BHE_nodes[idx_bhe].size(); j++)
+        if (vec_BHE_nodes[idx_bhe][j] == nodes[i])
+        {
+            nodes_bhe[i] = j;
+            nodes_bhe_soil[i] = vec_BHE_nodes[idx_bhe][j];
         }
     }
 
@@ -9252,17 +9272,17 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 
     matBHE_L += matBHE_R; 
 
-    // debugging................................
-    std::cout << "matBHE_P: \n";
-    std::cout << matBHE_P;
-    std::cout << "matBHE_L: \n"; 
-    std::cout << matBHE_L; 
-    std::cout << "matBHE_R: \n";
-    std::cout << matBHE_R;
-    std::cout << "matBHE_R_pi_s: \n";
-    std::cout << matBHE_R_pi_s;
-    // exit(1); 
-    // end of debugging.........................
+    //// debugging................................
+    //std::cout << "matBHE_P: \n";
+    //std::cout << matBHE_P << "\n";
+    //std::cout << "matBHE_L: \n"; 
+    //std::cout << matBHE_L << "\n";
+    //std::cout << "matBHE_R: \n";
+    //std::cout << matBHE_R << "\n";
+    //std::cout << "matBHE_R_pi_s: \n";
+    //std::cout << matBHE_R_pi_s << "\n";
+    //// exit(1); 
+    //// end of debugging.........................
 
     // local LHS and RHS, see page 688, Eq. 13.47 of Diersch (2013) FEFLOW book
     // A_pi
@@ -9270,23 +9290,23 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // B_pi
     vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre;
 
-    // debugging................................
-    std::cout << "mat_local_LHS: \n";
-    std::cout << mat_local_LHS;
-    std::cout << "vec_local_RHS: \n"; 
-    std::cout << vec_local_RHS; 
-    exit(1); 
-    // end of debugging.........................
+    //// debugging................................
+    //std::cout << "mat_local_LHS: \n";
+    //std::cout << mat_local_LHS << "\n";
+    //std::cout << "vec_local_RHS: \n"; 
+    //std::cout << vec_local_RHS << "\n";
+    //// exit(1); 
+    //// end of debugging.........................
 
     // put it to the correct posistion of global LHS and RHS
     std::size_t shift_i(0), shift_j(0);
     std::size_t idx_unknown, idx_node; 
-    for (i = 0; i < mat_local_LHS.rows(); i++)
+    for (std::size_t i = 0; i < mat_local_LHS.rows(); i++)
     {
         idx_unknown = i / nnodes; 
         idx_node = nodes_bhe[i % nnodes];
         shift_i = shift_start + idx_node * m_bhe->get_n_unknowns() + idx_unknown;
-        for (j = 0; j < mat_local_LHS.cols(); j++)
+        for (std::size_t j = 0; j < mat_local_LHS.cols(); j++)
         {
             idx_unknown = j / nnodes;
             idx_node = nodes_bhe[j % nnodes];
@@ -9302,15 +9322,15 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     }  // end of for i
 
 
-    for (i = 0; i < vec_local_RHS.size(); i++)
+    for (std::size_t i = 0; i < vec_local_RHS.rows(); i++)
     {
         idx_unknown = i / nnodes;
         idx_node = nodes_bhe[i % nnodes];
         shift_i = shift_start + idx_node * m_bhe->get_n_unknowns() + idx_unknown;
         // B_pi assembly 
-        (*RHS)[shift_j] += vec_local_RHS(i);
+        (*RHS)[shift_i] += vec_local_RHS(i);
 
-        for (j = 0; j < nnodes; j++)
+        for (std::size_t j = 0; j < nnodes; j++)
         {
             // R_pi_s and R_s_pi assembly
             shift_j = nodes[j % nnodes];
@@ -9327,10 +9347,10 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 
     // assemble the Rs matrix to global LHS and RHS, soil part
     double G = (double)m_bhe->get_n_grout_zones();
-    for (i = 0; i < nnodes; i++)
+    for (std::size_t i = 0; i < nnodes; i++)
     {
         shift_i = nodes_bhe_soil[i];
-        for (j = 0; j < nnodes; j++)
+        for (std::size_t j = 0; j < nnodes; j++)
         {
             shift_j = nodes_bhe_soil[j];
 #ifdef NEW_EQS
