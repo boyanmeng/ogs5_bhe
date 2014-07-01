@@ -165,7 +165,7 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the coeff of laplace matrix,
           * depending on the index of unknown.
           */
-        virtual double get_laplace_coeff(std::size_t idx_unknown) = 0;
+        virtual void get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_laplace) = 0;
 
         /**
           * return the coeff of advection matrix,

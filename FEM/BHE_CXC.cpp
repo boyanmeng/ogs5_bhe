@@ -214,13 +214,14 @@ double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
     return mass_coeff;
 }
 
-double BHE_CXC::get_laplace_coeff(std::size_t idx_unknown)
+void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_laplace)
 {
 	// Here we calculates the laplace coefficients in the governing 
 	// equations of BHE. These governing equations can be found in 
 	// 1) Diersch (2013) FEFLOW book on page 952, M.120-122, or
 	// 2) Diersch (2011) Comp & Geosci 37:1122-1135, Eq. 26-28. 
 	double laplace_coeff(0.0);
+    mat_laplace.setZero();
 
 	switch (idx_unknown)
 	{
@@ -241,7 +242,10 @@ double BHE_CXC::get_laplace_coeff(std::size_t idx_unknown)
 		exit(1);
 		break;
 	}
-	return laplace_coeff;
+
+    mat_laplace(0, 0) = laplace_coeff;
+    mat_laplace(1, 1) = laplace_coeff;
+    mat_laplace(2, 2) = laplace_coeff;
 }
 
 void BHE_CXC::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec_advection)
