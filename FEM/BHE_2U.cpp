@@ -266,26 +266,36 @@ double BHE_2U::get_laplace_coeff(std::size_t idx_unknown)
     return laplace_coeff;
 }
 
-double BHE_2U::get_advection_coeff(std::size_t idx_unknown)
+void BHE_2U::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec_advection)
 {
+    vec_advection.setZero();
+
     double advection_coeff(0);
 	switch (idx_unknown)
 	{
 	case 0:
 		// pipe i1, Eq. 10
 		advection_coeff = rho_r * heat_cap_r * _u(0);
+        // z direction 
+        vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 1:
 		// pipe o1, Eq. 11
 		advection_coeff = rho_r * heat_cap_r * _u(0);
+        // z direction 
+        vec_advection(2) = advection_coeff;
 		break;
 	case 2:
 		// pipe i2, Eq. 12
 		advection_coeff = rho_r * heat_cap_r * _u(0);
+        // z direction 
+        vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 3:
 		// pipe o2, Eq. 13
 		advection_coeff = rho_r * heat_cap_r * _u(0);
+        // z direction 
+        vec_advection(2) = advection_coeff;
 		break;
 	case 4:
 		// pipe g1, Eq. 14
@@ -308,7 +318,6 @@ double BHE_2U::get_advection_coeff(std::size_t idx_unknown)
 		exit(1);
 		break;
 	}
-    return advection_coeff;
 }
 
 double BHE_2U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)

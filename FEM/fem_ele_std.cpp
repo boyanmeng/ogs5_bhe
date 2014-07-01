@@ -5888,7 +5888,7 @@ double CFiniteElementStd::CalcCoefDualTransfer()
 
 void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & advection_matrix)
 {
-    int i, j;
+    int i, j, k;
     // ---- Gauss integral
     int gp_r = 0, gp_s = 0, gp_t = 0;
     double fkt;
@@ -5907,7 +5907,7 @@ void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE, Eigen::Matri
     MNulleVec(summand, 8);
 
     ElementValue* gp_ele = ele_gp_value[Index]; //NW
-
+    Eigen::VectorXd vec_Advection = Eigen::VectorXd::Zero(3); 
     //----------------------------------------------------------------------
     //======================================================================
     // Loop over Gauss points
@@ -5920,20 +5920,20 @@ void CFiniteElementStd::CalcAdvection_BHE(BHE::BHEAbstract * m_BHE, Eigen::Matri
         fkt = GetGaussData(gp, gp_r, gp_s, gp_t);
         // Compute geometry
         ComputeShapefct(1);       // Linear interpolation function
-        if (pcs->m_num->ele_supg_method > 0) //NW
-            ComputeGradShapefct(1);  // Linear interpolation function
+        ComputeGradShapefct(1);  // Linear interpolation function
 
         // looping over all unknowns. 
         for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_BHE->get_n_unknowns(); idx_bhe_unknowns++)
         {
             // get coefficient of Laplace matrix from corresponding BHE. 
-            mat_fac[idx_bhe_unknowns] = m_BHE->get_advection_coeff(idx_bhe_unknowns);
+            m_BHE->get_advection_vector(idx_bhe_unknowns, vec_Advection);
             // calculate shift. 
             shift = nnodes * idx_bhe_unknowns;
             // calculate mass matrix for current unknown
             for (i = 0; i < nnodes; i++)
             for (j = 0; j < nnodes; j++)
-                advection_matrix(shift + i, shift + j) += fkt * shapefct[i] * mat_fac[idx_bhe_unknowns] * dshapefct[j];
+            for (k = 0; k < dim; k++)
+                advection_matrix(shift + i, shift + j) += fkt * shapefct[i] * vec_Advection[k] * dshapefct[k * nnodes + j]; 
 
         }
 
@@ -9252,17 +9252,17 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 
     matBHE_L += matBHE_R; 
 
-    //// debugging................................
-    //std::cout << "matBHE_P: \n";
-    //std::cout << matBHE_P;
-    //std::cout << "matBHE_L: \n"; 
-    //std::cout << matBHE_L; 
-    //std::cout << "matBHE_R: \n";
-    //std::cout << matBHE_R;
-    //std::cout << "matBHE_R_pi_s: \n";
-    //std::cout << matBHE_R_pi_s;
-    //exit(1); 
-    //// end of debugging.........................
+    // debugging................................
+    std::cout << "matBHE_P: \n";
+    std::cout << matBHE_P;
+    std::cout << "matBHE_L: \n"; 
+    std::cout << matBHE_L; 
+    std::cout << "matBHE_R: \n";
+    std::cout << matBHE_R;
+    std::cout << "matBHE_R_pi_s: \n";
+    std::cout << matBHE_R_pi_s;
+    // exit(1); 
+    // end of debugging.........................
 
     // local LHS and RHS, see page 688, Eq. 13.47 of Diersch (2013) FEFLOW book
     // A_pi
@@ -9270,13 +9270,13 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // B_pi
     vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre;
 
-    //// debugging................................
-    //std::cout << "mat_local_LHS: \n";
-    //std::cout << mat_local_LHS;
-    //std::cout << "vec_local_RHS: \n"; 
-    //std::cout << vec_local_RHS; 
-    //exit(1); 
-    //// end of debugging.........................
+    // debugging................................
+    std::cout << "mat_local_LHS: \n";
+    std::cout << mat_local_LHS;
+    std::cout << "vec_local_RHS: \n"; 
+    std::cout << vec_local_RHS; 
+    exit(1); 
+    // end of debugging.........................
 
     // put it to the correct posistion of global LHS and RHS
     std::size_t shift_i(0), shift_j(0);

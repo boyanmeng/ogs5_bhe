@@ -171,7 +171,7 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the coeff of advection matrix,
           * depending on the index of unknown.
           */
-        virtual double get_advection_coeff(std::size_t idx_unknown) = 0;
+        virtual void get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec_advection) = 0;
 
         /**
           * return the coeff of boundary heat exchange matrix,
