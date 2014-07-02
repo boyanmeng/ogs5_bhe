@@ -9221,9 +9221,18 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     double T_val_pre; 
     std::size_t idx_unknown_shift; 
     idx_unknown_shift = 2;
+    for (std::size_t i = 0; i < nnodes; i++)
+    {
+        for (std::size_t j = 0; j < vec_BHE_nodes[idx_bhe].size(); j++)
+        if (vec_BHE_nodes[idx_bhe][j] == nodes[i])
+        {
+            nodes_bhe[i] = j;
+            nodes_bhe_soil[i] = vec_BHE_nodes[idx_bhe][j];
+        }
+    }
+
     for (k = 0; k < idx_bhe; k++)
         idx_unknown_shift += vec_BHEs[k]->get_n_unknowns() * 2;
-
     for (std::size_t i = 0; i < m_bhe->get_n_unknowns(); i++)
     {
         for (std::size_t j = 0; j < nnodes; j++)
@@ -9235,15 +9244,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     }
 
 
-    for (std::size_t i = 0; i < nnodes; i++)
-    {
-        for (std::size_t j = 0; j < vec_BHE_nodes[idx_bhe].size(); j++)
-        if (vec_BHE_nodes[idx_bhe][j] == nodes[i])
-        {
-            nodes_bhe[i] = j;
-            nodes_bhe_soil[i] = vec_BHE_nodes[idx_bhe][j];
-        }
-    }
+
 
     //----------------------------------------------------------------------
     // Calculate matrices
