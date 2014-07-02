@@ -1231,7 +1231,7 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
 
 
 
-    std::cout << "Sparsity talbe for Borehole Heat Exchangers prepared. ";
+    std::cout << "Sparsity table for Borehole Heat Exchangers prepared. \n";
 }
 
 /*\!
