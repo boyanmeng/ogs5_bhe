@@ -9328,9 +9328,18 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         idx_unknown = i / nnodes;
         idx_node = nodes_bhe[i % nnodes];
         shift_i = shift_start + idx_node * m_bhe->get_n_unknowns() + idx_unknown;
-        // B_pi assembly 
-        (*RHS)[shift_i] += vec_local_RHS(i);
-
+         
+        // RHS assembly
+        #ifdef NEW_EQS
+            if (m_dom)
+                m_dom->eqs->b[shift_i] += vec_local_RHS(i);
+            else
+                pcs->eqs_new->b[shift_i] += vec_local_RHS(i);
+        #else
+            pcs->eqs->b[shift_i] += vec_local_RHS(i);
+        #endif
+        
+        // B_pi assembly
         for (std::size_t j = 0; j < nnodes; j++)
         {
             // R_pi_s and R_s_pi assembly
