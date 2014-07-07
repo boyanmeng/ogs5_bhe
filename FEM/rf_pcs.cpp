@@ -10250,8 +10250,32 @@ double CRFProcess::CalcIterationNODError(FiniteElement::ErrorMethod method, bool
 				//
 				for (size_t l = 0; l < m_msh->GetNodesNumber(false); l++)
 					SetNodeValue(l, nidx0, GetNodeValue(l, nidx1));
-			}
-		}
+			}  // end of if RICHARDS_FLOW
+		}  // end of for pcs_number_of_primary_function_name
+
+        if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+        {
+            std::size_t nidx_shift(2), nidx0(0), nidx1(0); // the first two are T_soil. 
+            // looping over each BHE; 
+            for (std::size_t i = 0; i < vec_BHEs.size(); i++)
+            {
+                // looping over each BHE node; 
+                for (std::size_t j = 0; j < vec_BHE_nodes[i].size(); j++)
+                {
+                    for (std::size_t k = 0; k < vec_BHEs[i]->get_n_unknowns(); k++)
+                    {
+                        nidx0 = nidx_shift + 2 * k; 
+                        nidx1 = nidx_shift + 2 * k + 1;
+
+                        SetNodeValue(j, nidx0, GetNodeValue(j, nidx1));
+
+                    }  // end of for k
+                }  // end of for j
+                nidx_shift += vec_BHEs[i]->get_n_unknowns();
+            }  // end of for i
+
+        }  // end of if HEAT_TRANSPORT_BHE
+
 	}
 
 /**************************************************************************
