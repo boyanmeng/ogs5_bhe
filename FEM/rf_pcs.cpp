@@ -5294,13 +5294,13 @@ double CRFProcess::Execute()
                         if (nl_theta > implicit_lim) // fully implicit
                         {
                             const double val_n = GetNodeValue(j, nidx1); 
-                            SetNodeValue(j, nidx1, val_n);
+                            SetNodeValue(j, nidx1, eqs_x[shift]);
                             eqs_x[shift] = val_n;
                         }
                         else  // otherwise need to interpolate
                         {
-                            const double val_n = GetNodeValue(j, nidx1);       //03.04.2009. WW
-                            SetNodeValue(j, nidx1, (1.0 - nl_theta)*val_n + nl_theta*eqs_x[j + nshift]);
+                            const double val_n = GetNodeValue(j, nidx1); 
+                            SetNodeValue(j, nidx1, (1.0 - nl_theta)*val_n + nl_theta*eqs_x[shift]);
                             eqs_x[shift] = val_n;
                         }  // end of if else implicit
                     }  // end of for k
