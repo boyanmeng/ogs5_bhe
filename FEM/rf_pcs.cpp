@@ -5306,7 +5306,7 @@ double CRFProcess::Execute()
                     }  // end of for k
                 }  // end of for j
                 nshift += vec_BHE_nodes[i].size()*vec_BHEs[i]->get_n_unknowns(); 
-                nidx_shift += vec_BHEs[i]->get_n_unknowns();
+                nidx_shift += 2 * vec_BHEs[i]->get_n_unknowns();
             }  // end of for i
         }  // end of if HEAT_TRANSPORT_BHE
     }
@@ -10271,7 +10271,7 @@ double CRFProcess::CalcIterationNODError(FiniteElement::ErrorMethod method, bool
 
                     }  // end of for k
                 }  // end of for j
-                nidx_shift += vec_BHEs[i]->get_n_unknowns();
+                nidx_shift += 2 * vec_BHEs[i]->get_n_unknowns();
             }  // end of for i
 
         }  // end of if HEAT_TRANSPORT_BHE
