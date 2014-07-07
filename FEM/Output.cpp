@@ -1695,79 +1695,98 @@ double COutput::NODWritePLYDataTEC(int number)
 	m_msh->getPointsForInterpolationAlongPolyline (ply, interpolation_points);
 	m_msh->setMinEdgeLength(tmp_min_edge_length);
 
-//   std::cout << "size of nodes_vector: " << nodes_vector.size() << ", size of old_nodes_vector: " << old_nodes_vector.size() << "\n";
-	//bool b_specified_pcs = (m_pcs != NULL); //NW m_pcs = PCSGet(pcs_type_name);
-	for (size_t j(0); j < nodes_vector.size(); j++)
-	{
-//		tec_file << m_ply->getSBuffer()[j] << " ";
-		tec_file << interpolation_points[j] << " ";
-		//WW
-//		long old_gnode = nodes_vector[m_ply->getOrderedPoints()[j]];
-		gnode = nodes_vector[j];
-		for (size_t k = 0; k < no_variables; k++)
-		{
-			//if(!(_nod_value_vector[k].compare("FLUX")==0))  // removed JOD, does not work for multiple flow processes
-			//if (!b_specified_pcs) //NW
-			if (msh_type_name != "COMPARTMENT") // JOD 4.10.01
-				m_pcs = PCSGet(_nod_value_vector[k], bdummy);
 
-			if (!m_pcs)
-			{
-				cout << "Warning in COutput::NODWritePLYDataTEC - no PCS data"
-				     << "\n";
-				tec_file
-				<< "Warning in COutput::NODWritePLYDataTEC - no PCS data"
-				<< "\n";
-				return 0.0;
-			}
-			// WW
-//			double old_val_n = m_pcs->GetNodeValue(old_gnode, NodeIndex[k]);
-			val_n = m_pcs->GetNodeValue(gnode, NodeIndex[k]);
-//			tec_file << old_val_n << " ";
-			tec_file << val_n << " ";
-			if (m_pcs->type == 1212 && (_nod_value_vector[k].find("SATURATION")
-			                            != string::npos))
-				tec_file << 1. - val_n << " ";
+    if (m_pcs->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+    {
+        for (std::size_t j(0); j < nodes_vector.size(); j++)
+        {
+            tec_file << interpolation_points[j] << " ";
+            for (std::size_t k = 0; k < no_variables; k++)
+            {
+                val_n = m_pcs->GetNodeValue(j, NodeIndex[k]);
+                tec_file << val_n << " ";
+            }  // end of for k
+            tec_file << "\n";
+        }  // end of for j
+    }
+    else
+    {
+        //   std::cout << "size of nodes_vector: " << nodes_vector.size() << ", size of old_nodes_vector: " << old_nodes_vector.size() << "\n";
+        //bool b_specified_pcs = (m_pcs != NULL); //NW m_pcs = PCSGet(pcs_type_name);
+        for (size_t j(0); j < nodes_vector.size(); j++)
+        {
+            //		tec_file << m_ply->getSBuffer()[j] << " ";
+            tec_file << interpolation_points[j] << " ";
+            //WW
+            //		long old_gnode = nodes_vector[m_ply->getOrderedPoints()[j]];
+            gnode = nodes_vector[j];
+            for (size_t k = 0; k < no_variables; k++)
+            {
+                //if(!(_nod_value_vector[k].compare("FLUX")==0))  // removed JOD, does not work for multiple flow processes
+                //if (!b_specified_pcs) //NW
+                if (msh_type_name != "COMPARTMENT") // JOD 4.10.01
+                if (!m_pcs)
+                    m_pcs = PCSGet(_nod_value_vector[k], bdummy);
 
-			if (_nod_value_vector[k].compare("FLUX") == 0)
-			{
-				if (aktueller_zeitschritt == 0) //OK
-					flux_nod = 0.0;
-				else
-					flux_nod = NODFlux(gnode);
-				tec_file << flux_nod << " ";
-				//flux_sum += abs(m_pcs->eqs->b[gnode]);
-				flux_sum += abs(flux_nod);
-				//OK cout << gnode << " " << flux_nod << " " << flux_sum << "\n";
-			}
-		}
-		if (dm_pcs) //WW
-		{
-			for (size_t i = 0; i < ns; i++)
-				ss[i] = dm_pcs->GetNodeValue(gnode, stress_i[i]);
-			tec_file << -DeviatoricStress(ss) / 3.0 << " ";
-			tec_file << sqrt(3.0 * TensorMutiplication2(ss, ss,
-			                                            m_msh->GetCoordinateFlag() /
-			                                            10) / 2.0) << "  ";
-			for (size_t i = 0; i < ns; i++)
-				ss[i] = dm_pcs->GetNodeValue(gnode, strain_i[i]);
-			DeviatoricStress(ss);
-			tec_file << sqrt(3.0 * TensorMutiplication2(ss, ss,
-			                                            m_msh->GetCoordinateFlag() /
-			                                            10) / 2.0);
-		}
+                if (!m_pcs)
+                {
+                    cout << "Warning in COutput::NODWritePLYDataTEC - no PCS data"
+                        << "\n";
+                    tec_file
+                        << "Warning in COutput::NODWritePLYDataTEC - no PCS data"
+                        << "\n";
+                    return 0.0;
+                }
+                // WW
+                //			double old_val_n = m_pcs->GetNodeValue(old_gnode, NodeIndex[k]);
+                val_n = m_pcs->GetNodeValue(gnode, NodeIndex[k]);
+                //			tec_file << old_val_n << " ";
+                tec_file << val_n << " ";
+                if (m_pcs->type == 1212 && (_nod_value_vector[k].find("SATURATION")
+                    != string::npos))
+                    tec_file << 1. - val_n << " ";
 
-		// MFP //OK4704
-		//OK4704
-		for (size_t k = 0; k < mfp_value_vector.size(); k++)
-			//     tec_file << MFPGetNodeValue(gnode,mfp_value_vector[k],0) << " "; //NB
-			tec_file << MFPGetNodeValue(gnode, mfp_value_vector[k], atoi(
-			                                    &mfp_value_vector[k][mfp_value_vector[k
-			                                                         ].size() - 1]) - 1)
-			<< " ";  //NB: MFP output for all phases
+                if (_nod_value_vector[k].compare("FLUX") == 0)
+                {
+                    if (aktueller_zeitschritt == 0) //OK
+                        flux_nod = 0.0;
+                    else
+                        flux_nod = NODFlux(gnode);
+                    tec_file << flux_nod << " ";
+                    //flux_sum += abs(m_pcs->eqs->b[gnode]);
+                    flux_sum += abs(flux_nod);
+                    //OK cout << gnode << " " << flux_nod << " " << flux_sum << "\n";
+                }
+            }
+            if (dm_pcs) //WW
+            {
+                for (size_t i = 0; i < ns; i++)
+                    ss[i] = dm_pcs->GetNodeValue(gnode, stress_i[i]);
+                tec_file << -DeviatoricStress(ss) / 3.0 << " ";
+                tec_file << sqrt(3.0 * TensorMutiplication2(ss, ss,
+                    m_msh->GetCoordinateFlag() /
+                    10) / 2.0) << "  ";
+                for (size_t i = 0; i < ns; i++)
+                    ss[i] = dm_pcs->GetNodeValue(gnode, strain_i[i]);
+                DeviatoricStress(ss);
+                tec_file << sqrt(3.0 * TensorMutiplication2(ss, ss,
+                    m_msh->GetCoordinateFlag() /
+                    10) / 2.0);
+            }
 
-		tec_file << "\n";
-	}
+            // MFP //OK4704
+            //OK4704
+            for (size_t k = 0; k < mfp_value_vector.size(); k++)
+                //     tec_file << MFPGetNodeValue(gnode,mfp_value_vector[k],0) << " "; //NB
+                tec_file << MFPGetNodeValue(gnode, mfp_value_vector[k], atoi(
+                &mfp_value_vector[k][mfp_value_vector[k
+                ].size() - 1]) - 1)
+                << " ";  //NB: MFP output for all phases
+
+            tec_file << "\n";
+        }
+    } // end of if HEAT_TRANSPORT_BHE
+
 	tec_file.close();                     // kg44 close file
 	return flux_sum;
 }
