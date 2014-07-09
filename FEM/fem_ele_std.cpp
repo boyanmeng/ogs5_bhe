@@ -9343,8 +9343,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         for (std::size_t j = 0; j < nnodes; j++)
         {
             // R_pi_s and R_s_pi assembly
-            shift_i = nodes[j % nnodes];
-            shift_j = shift_start + nodes_bhe[i % nnodes] * m_bhe->get_n_unknowns() + idx_unknown;
+            shift_j = nodes[j % nnodes]; 
 #ifdef NEW_EQS
             (*A)(shift_i, shift_j) += matBHE_R_pi_s(i, j);
             (*A)(shift_j, shift_i) += matBHE_R_pi_s(i, j);
