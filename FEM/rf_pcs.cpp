@@ -6992,6 +6992,35 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 					        idx_1);
 				}
 				else
+                if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+                {
+                    // if it is the TEMPERATURE_IN, 
+                    if (m_bc_node->bhe_pipe_flag == 0 )
+                    {
+                        // Do the same
+                        bc_value = time_fac * fac * m_bc_node->node_value;
+                    }
+                    else // out flow pipe
+                    {
+                        double temp_val(0.0);
+                        long eqs_index(0);
+                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1
+                        {
+                            // get TEMPERATURE_IN_1 value
+                            eqs_index = bc_msh_node + shift - 1;
+                            temp_val = eqs_p->x[eqs_index]; // TODO, potential bug
+                            bc_value = time_fac * fac * temp_val;
+                        }
+                        else if ( m_bc_node->bhe_pv_index == 3) // TEMPERATURE_OUT_2
+                        {
+                            // get TEMPERATURE_IN_2 value
+                            eqs_index = bc_msh_node + shift - 2;
+                            temp_val = eqs_p->x[eqs_index]; // TODO, potential bug
+                            bc_value = time_fac * fac * temp_val;
+                        }
+                    }
+                }
+                else
 					// time_fac*fac*PCSGetNODValue(bc_msh_node,"PRESSURE1",0);
 					bc_value = time_fac * fac * m_bc_node->node_value;
 				//----------------------------------------------------------------
