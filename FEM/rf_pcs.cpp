@@ -69,6 +69,7 @@
 #include "rf_kinreact.h"
 #include "fem_ele_vec.h"//WX:08.2011
 #include "StepperBulischStoer.h"
+#include "BHEAbstract.h"
 
 /*-----------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------*/
@@ -869,22 +870,89 @@ void CRFProcess::Create()
 			Read_Processed_BC();
 		else
 		{
-			for (int i = 0; i < DOF; i++)
-			{
-				//OKm_bc_group = BCGetGroup(_pcs_type_name,pcs_primary_function_name[i]);
-				//OKif(!m_bc_group){
-				BCGroupDelete(pcs_type_name, pcs_primary_function_name[i]);
-				m_bc_group = new CBoundaryConditionsGroup();
-				//OK
-				m_bc_group->setProcessTypeName(pcs_type_name);
-				m_bc_group->setProcessPrimaryVariableName(
-				        pcs_primary_function_name[i]); //OK
-				m_bc_group->Set(this, Shift[i]);
+            if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+            {
+                // for each BHE, 
+                for (size_t idx_bhe = 0; idx_bhe < vec_BHEs.size(); idx_bhe++)
+                {
+                    // check which type it is
+                    // then decide how many BC to add
+                    if (vec_BHEs[idx_bhe]->get_type() == BHE::BHE_TYPE_2U)
+                    {
+                        // T_IN_1
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_IN_1");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_IN_1");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                        // T_IN_2
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_IN_2");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_IN_2");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                        // T_OUT_1
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_OUT_1");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_OUT_1");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                        // T_OUT_2
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_OUT_2");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_OUT_2");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                    }
+                    else
+                    {
+                        // T_IN
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_IN_1");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_IN_1"); 
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                        // T_OUT
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_OUT_1");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_OUT_1");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                    }
 
-				bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
-				m_bc_group = NULL;
-				//OK}
-			}
+                }
+            }
+            else
+            {
+                for (int i = 0; i < DOF; i++)
+                {
+                    //OKm_bc_group = BCGetGroup(_pcs_type_name,pcs_primary_function_name[i]);
+                    //OKif(!m_bc_group){
+                    BCGroupDelete(pcs_type_name, pcs_primary_function_name[i]);
+                    m_bc_group = new CBoundaryConditionsGroup();
+                    //OK
+                    m_bc_group->setProcessTypeName(pcs_type_name);
+                    m_bc_group->setProcessPrimaryVariableName(
+                        pcs_primary_function_name[i]); //OK
+                    m_bc_group->Set(this, Shift[i]);
+
+                    bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                    m_bc_group = NULL;
+                    //OK}
+                }
+            }
 			if (bc_node_value.size() < 1) //WW
 				cout << "Warning: no boundary conditions specified for "
 				     << pcs_type_name << "\n";

@@ -922,10 +922,10 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
 	}
 
     FiniteElement::PrimaryVariable primary_variable; 
-    if (pcs->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
-        primary_variable = FiniteElement::TEMPERATURE_IN_1;
-    else
-        primary_variable = FiniteElement::convertPrimaryVariable(_pcs_pv_name);
+    //if (pcs->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+    //    primary_variable = FiniteElement::TEMPERATURE_IN_1;
+    //else
+    primary_variable = FiniteElement::convertPrimaryVariable(_pcs_pv_name);
 
 	std::list<CBoundaryCondition*>::const_iterator p_bc = bc_list.begin();
 
