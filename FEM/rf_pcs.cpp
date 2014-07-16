@@ -7008,14 +7008,22 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                         {
                             // get TEMPERATURE_IN_1 value
                             eqs_index = bc_msh_node + shift - 1;
-                            temp_val = eqs_p->x[eqs_index]; // TODO, potential bug
+                        #ifdef NEW_EQS
+                            temp_val = eqs_p->x[eqs_index];
+                        #else
+                            temp_val = eqs->x[eqs_index];
+                        #endif
                             bc_value = time_fac * fac * temp_val;
                         }
                         else if ( m_bc_node->bhe_pv_index == 3) // TEMPERATURE_OUT_2
                         {
                             // get TEMPERATURE_IN_2 value
                             eqs_index = bc_msh_node + shift - 2;
-                            temp_val = eqs_p->x[eqs_index]; // TODO, potential bug
+                        #ifdef NEW_EQS
+                            temp_val = eqs_p->x[eqs_index];
+                        #else
+                            temp_val = eqs->x[eqs_index];
+                        #endif
                             bc_value = time_fac * fac * temp_val;
                         }
                     }
