@@ -247,11 +247,11 @@ void BHE_1U::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec
         vec_advection(2) = 1.0 * advection_coeff;
 		break;
 	case 2:
-		// pipe g1, Eq. 21
+		// grout g1, Eq. 21
 		advection_coeff = 0.0;
 		break;
 	case 3:
-		// pipe g1, Eq. 22
+		// grout g2, Eq. 22
 		advection_coeff = 0.0;
 		break;
 	default:
