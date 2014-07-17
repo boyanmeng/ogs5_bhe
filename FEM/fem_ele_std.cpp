@@ -5315,6 +5315,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
     matBHE_loc_R = Eigen::MatrixXd::Zero(nnodes, nnodes);
 
     R_s = Eigen::MatrixXd::Zero(nnodes, nnodes);
+    R_matrix.setZero(); 
 
     //----------------------------------------------------------------------
     //======================================================================
@@ -5354,35 +5355,35 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
         case BHE::BHE_TYPE_1U:
             switch (idx_bhe_unknowns)
             {
-            case 0:  // R i1
+            case 0:  // PHI_fig
                 R_matrix.block(0, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
                 R_matrix.block(2 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
 
                 L_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
                 L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
                 break;
-            case 1:  // R o1
+            case 1:  // PHI_fog
                 R_matrix.block(nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
                 R_matrix.block(3 * nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
 
                 L_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
                 L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
                 break;
-            case 2:  // R g1
+            case 2:  // PHI_gg
                 R_matrix.block(2 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
                 R_matrix.block(3 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
 
-                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R;  // K_ig
-                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R;  // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_ig  // notice we only have 1 PHI_gg term here. 
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_og  // see Diersch 2013 FEFLOW book page 954 Table M.2
                 break;
-            case 3:  // R s
+            case 3:  // PHI_gs
                 R_s += matBHE_loc_R; 
 
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 // HS: Rs should not appear in grout part. 
-                // L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_ig
-                // L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_og
+                L_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_ig
+                L_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_og
                 break;
             }
             break;
@@ -5436,7 +5437,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 L_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
                 break;
             case 4:  // R s
-                R_s += matBHE_loc_R;
+                R_s += -1.0 * matBHE_loc_R;
 
                 R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
@@ -9218,7 +9219,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     Eigen::VectorXd vec_T_pi_pre = Eigen::VectorXd::Zero(loc_mat_size); 
 
     // fill in the last time step values
-    double T_val_pre; 
+    double T_val_pre, T_val_cur;
     std::size_t idx_unknown_shift; 
     idx_unknown_shift = 2;
     for (std::size_t i = 0; i < nnodes; i++)
@@ -9237,9 +9238,11 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     {
         for (std::size_t j = 0; j < nnodes; j++)
         {
-            std::size_t idx_unknown = idx_unknown_shift + 2 * i; 
+            std::size_t idx_unknown = idx_unknown_shift + 2 * i;  
             T_val_pre = pcs->GetNodeValue(nodes_bhe[j], idx_unknown); // the index "0" and "1" were Ts values, we start from index "2"
-            vec_T_pi_pre(i*nnodes + j) = T_val_pre;
+            // take the current value 
+            T_val_cur = pcs->GetNodeValue(nodes_bhe[j], idx_unknown + 1);
+            vec_T_pi_pre(i*nnodes + j) = (1.0 - theta) * T_val_pre + theta * T_val_cur;
         }
     }
 
