@@ -145,10 +145,16 @@ void BHE_1U::calc_Pr()
 */
 void BHE_1U::calc_heat_transfer_coefficients()
 {
-	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
-	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
-	_PHI_gg = 1.0 / _R_gg * 1.0 / S_g1;
-	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+
+	//_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
+	//_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
+	//_PHI_gg = 1.0 / _R_gg * 1.0 / S_g1;
+	//_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+    
+    _PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
+    _PHI_fog = 0.0;
+    _PHI_gg = 0.0;
+    _PHI_gs = 0.0;
 }
 
 /**
@@ -274,19 +280,19 @@ double BHE_1U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:
-        // R i1 and i2 Eq. 90-91
+        // PHI_fig
         exchange_coeff = _PHI_fig;
         break;
     case 1:
-        // R o1 and o2 Eq. 92-93
+        // PHI_fog
         exchange_coeff = _PHI_fog;
         break;
     case 2:
-        // R g1
+        // PHI_gg
         exchange_coeff = _PHI_gg;
         break;
     case 3:
-        // R s
+        // PHI_gs
         exchange_coeff = _PHI_gs;
         break;
     default:

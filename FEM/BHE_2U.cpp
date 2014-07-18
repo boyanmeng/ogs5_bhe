@@ -337,23 +337,23 @@ double BHE_2U::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:
-        // R i1 and i2 Eq. 90-91
+        // PHI_fig
         exchange_coeff = _PHI_fig;
         break;
     case 1:
-        // R o1 and o2 Eq. 92-93
+        // PHI_fog
         exchange_coeff = _PHI_fog;
         break;
     case 2:
-        // R g1
+        // PHI_gg_1
         exchange_coeff = _PHI_gg_1;
         break;
     case 3:
-        // R g1
+        // PHI_gg_2
         exchange_coeff = _PHI_gg_2;
         break;
     case 4:
-        // R s
+        // PHI_gs
         exchange_coeff = _PHI_gs;
         break;
     default:

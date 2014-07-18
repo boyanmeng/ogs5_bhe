@@ -291,15 +291,15 @@ double BHE_CXC::get_boundary_heat_exchange_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:
-        // R i1 and i2 Eq. 90-91
+        // PHI_fog
         exchange_coeff = _PHI_fog;
         break;
     case 1:
-        // R o1 and o2 Eq. 92-93
+        // PHI_ff
         exchange_coeff = _PHI_ff;
         break;
     case 2:
-        // R g1
+        // PHI_gs
         exchange_coeff = _PHI_gs;
         break;
     default:
