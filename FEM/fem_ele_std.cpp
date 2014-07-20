@@ -9389,7 +9389,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         {
             shift_j = nodes_bhe_soil[j];
 #ifdef NEW_EQS
-            // (*A)(shift_i, shift_j) += theta *G * matBHE_R_s(i, j);
+            (*A)(shift_i, shift_j) += -1.0 * theta *G * matBHE_R_s(i, j);
 #else
             MXInc(shift_i, shift_j,  theta * G * matBHE_R_s(i, j));
 #endif
