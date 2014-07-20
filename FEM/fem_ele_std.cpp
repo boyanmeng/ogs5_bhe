@@ -9299,7 +9299,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // A_pi
     mat_local_LHS = dt_inverse * matBHE_P + theta * matBHE_L; 
     // B_pi
-    vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre - matBHE_R_pi_s * vec_T_soil_cur;
+    vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre + matBHE_R_pi_s * vec_T_soil_cur;
 
     //// debugging................................
     //std::cout << "mat_local_LHS: \n";
