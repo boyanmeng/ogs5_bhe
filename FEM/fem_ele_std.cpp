@@ -5316,7 +5316,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
 
     R_s = Eigen::MatrixXd::Zero(nnodes, nnodes);
     R_matrix.setZero(); 
-
+    R_pi_s_matrix.setZero();
     //----------------------------------------------------------------------
     //======================================================================
     // looping over all unknowns. 
@@ -9217,6 +9217,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     vec_local_RHS = Eigen::VectorXd::Zero(loc_mat_size);
 
     Eigen::VectorXd vec_T_pi_pre = Eigen::VectorXd::Zero(loc_mat_size); 
+    Eigen::VectorXd vec_T_pi_cur = Eigen::VectorXd::Zero(loc_mat_size); 
     Eigen::VectorXd vec_T_soil_pre = Eigen::VectorXd::Zero(nnodes);  // nodal soil temperature vector
     Eigen::VectorXd vec_T_soil_cur = Eigen::VectorXd::Zero(nnodes);  // nodal soil temperature vector
 
@@ -9243,6 +9244,8 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
             std::size_t idx_unknown = idx_unknown_shift + 2 * i;  
             T_val_pre = pcs->GetNodeValue(nodes_bhe[j], idx_unknown); // the index "0" and "1" were Ts values, we start from index "2"
             vec_T_pi_pre(i*nnodes + j) = T_val_pre;
+            T_val_pre = pcs->GetNodeValue(nodes_bhe[j], idx_unknown + 1); // current value
+            vec_T_pi_cur(i*nnodes + j) = T_val_pre;
         }
     }
     for (std::size_t j = 0; j < nnodes; j++)
@@ -9363,10 +9366,21 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
 
 
     
-    double G = (double)m_bhe->get_n_grout_zones();
-    Eigen::VectorXd vec_RHS;
+    size_t G = m_bhe->get_n_grout_zones();
+    Eigen::VectorXd vec_RHS = Eigen::VectorXd::Zero(nnodes);
+    Eigen::VectorXd vec_T_gi; 
+    size_t n_pipes; 
+    if (m_bhe->get_type() == BHE::BHE_TYPE_2U)
+        n_pipes = 4;
+    else
+        n_pipes = 2; 
     // calculate RHS vector
-    vec_RHS = (1.0 - theta) * -1.0 * G * matBHE_R_s * vec_T_soil_pre;
+    vec_RHS.setZero(); 
+    for (size_t k = 0; k < G; k++)
+    {
+        vec_T_gi = vec_T_pi_cur.segment((n_pipes + k)*nnodes, nnodes);
+        vec_RHS += -1.0 * matBHE_R_s * vec_T_gi;
+    } 
     // assemble the Rs matrix to global LHS and RHS, soil part
     for (std::size_t i = 0; i < nnodes; i++)
     {
@@ -9375,7 +9389,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         {
             shift_j = nodes_bhe_soil[j];
 #ifdef NEW_EQS
-            (*A)(shift_i, shift_j) += theta *G * matBHE_R_s(i, j);
+            // (*A)(shift_i, shift_j) += theta *G * matBHE_R_s(i, j);
 #else
             MXInc(shift_i, shift_j,  theta * G * matBHE_R_s(i, j));
 #endif
