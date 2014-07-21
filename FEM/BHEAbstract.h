@@ -201,6 +201,18 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         void set_geo_ply(const GEOLIB::Polyline* ply) { _geo_ply = ply; }
 
+        /**
+        * set the polyline geometry
+        * that is representing this BHE.
+        */
+        void set_ply_eps(double eps) { _ply_eps = eps; }
+
+        /**
+        * set the polyline geometry
+        * that is representing this BHE.
+        */
+        double get_ply_eps(void) { return _ply_eps; }
+
 		/**
 		  * total refrigerant flow discharge of BHE
 		  * unit is m^3/sec 
@@ -318,6 +330,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * name of the borehole heat exchanger
           */
         const std::string _name;
+
+        /**
+          * epsilon value of the BHE polyline
+          */
+        double _ply_eps; 
 
 	};
 

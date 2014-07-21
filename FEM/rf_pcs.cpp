@@ -3274,8 +3274,11 @@ void CRFProcess::ConfigBHEs()
             if (mmp_vector[i]->geo_name.size() > 0)
             {
                 const GEOLIB::Polyline* ply; 
+                CGLPolyline* m_ply = GEOGetPLYByName(mmp_vector[i]->geo_name);
                 ply = this->m_msh->getGEOObjects()->getPolylineVecObj(*(m_msh->getProjectName()))->getElementByName(mmp_vector[i]->geo_name); 
                 vec_BHEs.back()->set_geo_ply(ply);
+                vec_BHEs.back()->set_ply_eps(m_ply->epsilon); 
+                m_ply = NULL; 
             }
         } // end of if
     } // end of for
@@ -3291,9 +3294,12 @@ void CRFProcess::ConfigBHEs()
         // data structure to store the node index
         std::vector<std::size_t> vec_mesh_nodes; 
         std::vector<std::size_t> vec_mesh_elems;
+        double tmp_min_edge_length(m_msh->getMinEdgeLength());
+        m_msh->setMinEdgeLength(vec_BHEs[i]->get_ply_eps());
         // get the connecting nodes and elems index
         this->m_msh->GetNODOnPLY(ply_BHE, vec_mesh_nodes);
         this->m_msh->GetELEOnPLY(ply_BHE, vec_mesh_elems, true);
+        m_msh->setMinEdgeLength(tmp_min_edge_length);
         // store the connecting node index vector
         vec_BHE_nodes.push_back(vec_mesh_nodes); 
         vec_BHE_elems.push_back(vec_mesh_elems); 
