@@ -5118,6 +5118,7 @@ double CRFProcess::Execute()
 #ifdef LIS
 	iter_lin = eqs_new->Solver(this->m_num); //NW
 #else
+    eqs_new->Write(); 
 	iter_lin = eqs_new->Solver();
 #endif
 #endif
@@ -5984,7 +5985,8 @@ void CRFProcess::GlobalAssembly()
 			AddFCT_CorrectionVector();
 
 		//	          MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
-		//eqs_new->Write();
+        std::cout << "Before the source terms: \n";
+        eqs_new->Write();
 		IncorporateSourceTerms();
 
 		//MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
@@ -6009,7 +6011,9 @@ void CRFProcess::GlobalAssembly()
 		eqs_new->AssembleRHS_PETSc();
 		eqs_new->AssembleMatrixPETSc(MAT_FINAL_ASSEMBLY );
 #endif
-		IncorporateBoundaryConditions();
+        std::cout << "Before the boundary conditions: \n";
+        eqs_new->Write();
+        IncorporateBoundaryConditions();
 
 		//ofstream Dum("rf_pcs.txt", ios::out); // WW
 		// eqs_new->Write(Dum);   Dum.close();
@@ -7015,7 +7019,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             // get TEMPERATURE_IN_1 value
                             eqs_index = bc_msh_node + shift - 1;
                         #ifdef NEW_EQS
-                            temp_val = eqs_p->x[eqs_index];
+                            temp_val = eqs_new->x[eqs_index];
                         #else
                             temp_val = eqs->x[eqs_index];
                         #endif
@@ -7026,7 +7030,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             // get TEMPERATURE_IN_2 value
                             eqs_index = bc_msh_node + shift - 2;
                         #ifdef NEW_EQS
-                            temp_val = eqs_p->x[eqs_index];
+                            temp_val = eqs_new->x[eqs_index];
                         #else
                             temp_val = eqs->x[eqs_index];
                         #endif
