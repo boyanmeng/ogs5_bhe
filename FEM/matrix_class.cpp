@@ -1100,6 +1100,17 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
                 connectivity[node_index_1].push_back(node_index_2);
                 connectivity[node_index_2].push_back(node_index_1);
                 connectivity[node_index_2].push_back(node_index_2);
+
+                for (std::size_t k = 0; k < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); k++)
+                {
+                    long node_index_3 = sum_bhe_nodes + (long)(i * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + k;
+                    connectivity[node_index_1].push_back(node_index_3);
+                    connectivity[node_index_3].push_back(node_index_1);
+                    connectivity[node_index_2].push_back(node_index_3);
+                    connectivity[node_index_3].push_back(node_index_2);
+                    connectivity[node_index_3].push_back(node_index_3);
+                }
+
             }  // end of for j
         }  // end of for i
 
