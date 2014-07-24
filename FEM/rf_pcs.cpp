@@ -5984,9 +5984,9 @@ void CRFProcess::GlobalAssembly()
 		if (femFCTmode)     //NW
 			AddFCT_CorrectionVector();
 
-		//	          MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
-        std::cout << "Before the source terms: \n";
-        eqs_new->Write();
+		// MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
+        // std::cout << "Before the source terms: \n";
+        // eqs_new->Write();
 		IncorporateSourceTerms();
 
 		//MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
@@ -6011,8 +6011,8 @@ void CRFProcess::GlobalAssembly()
 		eqs_new->AssembleRHS_PETSc();
 		eqs_new->AssembleMatrixPETSc(MAT_FINAL_ASSEMBLY );
 #endif
-        std::cout << "Before the boundary conditions: \n";
-        eqs_new->Write();
+        // std::cout << "Before the boundary conditions: \n";
+        // eqs_new->Write();
         IncorporateBoundaryConditions();
 
 		//ofstream Dum("rf_pcs.txt", ios::out); // WW
