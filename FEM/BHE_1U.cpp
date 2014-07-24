@@ -146,16 +146,11 @@ void BHE_1U::calc_Pr()
 void BHE_1U::calc_heat_transfer_coefficients()
 {
 
-	//_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
-	//_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
-	//_PHI_gg = 1.0 / _R_gg * 1.0 / S_g1;
-	//_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
-
-    _PHI_fig = 1.0 / _R_fig * 1.0 / S_i * 10.0;
-    _PHI_fog = 0.0;
-    _PHI_gg = 0.0;
-    _PHI_gs = 0.0;
-    
+	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
+	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
+	_PHI_gg = 1.0 / _R_gg * 1.0 / S_g1;
+	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+  
 }
 
 /**
