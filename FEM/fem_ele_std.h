@@ -92,7 +92,7 @@ public:
 	void CalcLaplace();
 	void CalcLaplaceMCF();//AKS
     void CalcLaplace_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & laplace_matrix);                  // HS
-    void CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & L_matrix, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix, Eigen::MatrixXd & R_s);  // HS
+    void CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, Eigen::MatrixXd & R_matrix, Eigen::MatrixXd & R_pi_s_matrix, Eigen::MatrixXd & R_s);  // HS
 	// 4. Gravity term
 	void CalcGravity();
 	// 5. Strain coupling matrix
