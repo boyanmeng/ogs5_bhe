@@ -1012,7 +1012,7 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
     long** larraybuffer;
     larraybuffer = NULL;
     long n_soil_nodes(0); 
-    long global_row_index(0), soil_row_index(0), col_index(0);
+    long global_row_index(0), soil_row_index_1(0), soil_row_index_2(0), col_index(0);
     long sum_bhe_nodes(0);
 
     std::vector<std::vector<long>> connectivity; 
@@ -1066,19 +1066,23 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
     sum_bhe_nodes = 0; 
     for (idx_BHEs = 0; idx_BHEs < m_vec_BHEs.size(); idx_BHEs++)
     {
-        for (i = 0; i < vec_BHE_nodes[idx_BHEs].size(); i++)
+        for (i = 0; i < vec_BHE_nodes[idx_BHEs].size() -1 ; i++)
         {
             global_row_index = n_soil_nodes + sum_bhe_nodes + i * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
-            soil_row_index = vec_BHE_nodes[idx_BHEs][i];
+            soil_row_index_1 = vec_BHE_nodes[idx_BHEs][i];
+            soil_row_index_2 = vec_BHE_nodes[idx_BHEs][i+1];
 
             // looping over all unknowns of this BHE
             for (j = 0; j < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); j++)
             {
                 col_index = global_row_index + j; 
                 // R_s_pi
-                connectivity[soil_row_index].push_back(col_index);
+                connectivity[soil_row_index_1].push_back(col_index);
                 // R_pi_s
-                connectivity[col_index].push_back(soil_row_index);
+                connectivity[col_index].push_back(soil_row_index_1);
+                // same for the connecting node
+                connectivity[soil_row_index_2].push_back(col_index);
+                connectivity[col_index].push_back(soil_row_index_2);
             }  // end of for j unknowns             
         }  // end of for i
 
