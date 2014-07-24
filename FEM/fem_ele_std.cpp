@@ -5356,34 +5356,34 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // PHI_fig
-                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
                 break;
             case 1:  // PHI_fog
-                R_matrix.block(nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(3 * nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(3 * nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
-                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
+                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
                 break;
             case 2:  // PHI_gg
-                R_matrix.block(2 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(3 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(2 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(3 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_ig  // notice we only have 1 PHI_gg term here. 
-                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_og  // see Diersch 2013 FEFLOW book page 954 Table M.2
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_ig  // notice we only have 1 PHI_gg term here. 
+                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_og  // see Diersch 2013 FEFLOW book page 954 Table M.2
                 break;
             case 3:  // PHI_gs
-                R_s += -1.0 * matBHE_loc_R; 
+                R_s += 1.0 * matBHE_loc_R; 
 
-                R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 // HS: Rs should not appear in grout part. 
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_ig
-                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;  // K_og
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_ig
+                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_og
                 break;
             }
             break;
@@ -5391,53 +5391,53 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R i1 i2
-                R_matrix.block(0, 4 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(4 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(nnodes, 5 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(5 * nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(0, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(4 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
-                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i2
-                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
-                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
+                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i2
+                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
                 break;
             case 1:  // R o1 o2
-                R_matrix.block(2 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(6 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(3 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(7 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(2 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(3 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
-                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o2
-                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
-                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
+                R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o2
+                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
                 break;
             case 2:  // R g1
-                R_matrix.block(4 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(6 * nnodes, 4 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(4 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(7 * nnodes, 4 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(5 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(6 * nnodes, 5 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(5 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(7 * nnodes, 5 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(4 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * nnodes, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(4 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * nnodes, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(6 * nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(5 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R; // K_ig
-                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R; // K_ig
-                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R; // K_og
-                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += -2.0 * matBHE_loc_R; // K_og
+                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R; // K_og
+                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += 2.0 * matBHE_loc_R; // K_og
                 break;
             case 3:  // R g2
-                R_matrix.block(6 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(7 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(6 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(7 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
-                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
-                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
-                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(4 * nnodes, 4 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(5 * nnodes, 5 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(6 * nnodes, 6 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(7 * nnodes, 7 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
                 break;
             case 4:  // R s
-                R_s += -1.0 * matBHE_loc_R;
+                R_s += 1.0 * matBHE_loc_R;
 
                 R_pi_s_matrix.block(4 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(5 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
@@ -5455,18 +5455,18 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R i1
-                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(0, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_ig
+                R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_ig
                 break;
             case 1:  // R io
-                R_matrix.block(0, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(0, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
-                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
+                R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
+                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
                 break;
             case 3:  // R s
                 R_s += matBHE_loc_R;
@@ -5481,18 +5481,18 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
             switch (idx_bhe_unknowns)
             {
             case 0:  // R o1
-                R_matrix.block(dim, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(2 * nnodes, dim, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(dim, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(2 * nnodes, dim, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
-                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_og
+                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
+                R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_og
                 break;
             case 1:  // R io
-                R_matrix.block(0, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;
-                R_matrix.block(nnodes, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R;
+                R_matrix.block(0, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R;
+                R_matrix.block(nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
 
-                R_matrix.block(0, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_i1
-                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += -1.0 * matBHE_loc_R; // K_o1
+                R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
+                R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
                 break;
             case 3:  // R s
                 R_s += matBHE_loc_R;
@@ -9269,8 +9269,8 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         // else
         CalcMass_BHE(m_bhe, matBHE_P);
     }
-    std::cout << "matBHE_P: \n";
-    std::cout << matBHE_P << "\n";
+    //std::cout << "matBHE_P: \n";
+    //std::cout << matBHE_P << "\n";
 
     // Laplace matrix for BHE.......................................................
     CalcLaplace_BHE(m_bhe, matBHE_L);
@@ -9287,9 +9287,9 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // calculate Cauchy type of boundary condition matrix.....................................
     CalcBoundaryHeatExchange_BHE(m_bhe, matBHE_R, matBHE_R_pi_s, matBHE_R_s);
 
-    std::cout << "matBHE_R: \n";
-    std::cout << matBHE_R << "\n";
-    matBHE_L.setZero();  // test, later should be removed. 
+    //std::cout << "matBHE_R: \n";
+    //std::cout << matBHE_R << "\n";
+    // matBHE_L.setZero();  // test, later should be removed. 
     matBHE_L += matBHE_R; 
 
     //// debugging................................
@@ -9310,15 +9310,15 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // B_pi
     vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre; // + matBHE_R_pi_s * vec_T_soil_cur;
 
-    // debugging................................
-    std::cout << "mat_local_LHS: \n";
-    std::cout << mat_local_LHS << "\n";
-    std::cout << "vec_T_pi_pre: \n"; 
-    std::cout << vec_T_pi_pre << "\n";
-    std::cout << "vec_local_RHS: \n";
-    std::cout << vec_local_RHS << "\n";
-    // exit(1); 
-    // end of debugging.........................
+    //// debugging................................
+    //std::cout << "mat_local_LHS: \n";
+    //std::cout << mat_local_LHS << "\n";
+    //std::cout << "vec_T_pi_pre: \n"; 
+    //std::cout << vec_T_pi_pre << "\n";
+    //std::cout << "vec_local_RHS: \n";
+    //std::cout << vec_local_RHS << "\n";
+    //// exit(1); 
+    //// end of debugging.........................
 
     // put it to the correct posistion of global LHS and RHS
     std::size_t shift_i(0), shift_j(0);
@@ -9360,7 +9360,6 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
             pcs->eqs->b[shift_i] += vec_local_RHS(i);
         #endif
         
-        /*
         // B_pi assembly
         for (std::size_t j = 0; j < nnodes; j++)
         {
@@ -9374,11 +9373,9 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
             MXInc(shift_j, shift_i, matBHE_R_pi_s(i, j));
 #endif
         }
-        */
     }
 
 
-    /*
     size_t G = m_bhe->get_n_grout_zones();
     Eigen::VectorXd vec_RHS = Eigen::VectorXd::Zero(nnodes);
     Eigen::VectorXd vec_T_gi; 
@@ -9417,8 +9414,6 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         pcs->eqs->b[shift_i] += vec_RHS(i);
 #endif
     }
-    */
-
 
 }
 
