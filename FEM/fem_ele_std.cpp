@@ -9308,7 +9308,7 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // A_pi
     mat_local_LHS = dt_inverse * matBHE_P + theta * matBHE_L; 
     // B_pi
-    vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre; // + matBHE_R_pi_s * vec_T_soil_cur;
+    vec_local_RHS = (dt_inverse * matBHE_P - (1.0 - theta) * matBHE_L) * vec_T_pi_pre; 
 
     //// debugging................................
     //std::cout << "mat_local_LHS: \n";
@@ -9379,18 +9379,6 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     size_t G = m_bhe->get_n_grout_zones();
     Eigen::VectorXd vec_RHS = Eigen::VectorXd::Zero(nnodes);
     Eigen::VectorXd vec_T_gi; 
-    size_t n_pipes; 
-    if (m_bhe->get_type() == BHE::BHE_TYPE_2U)
-        n_pipes = 4;
-    else
-        n_pipes = 2; 
-    // calculate RHS vector
-    vec_RHS.setZero(); 
-    for (size_t k = 0; k < G; k++)
-    {
-        vec_T_gi = vec_T_pi_cur.segment((n_pipes + k)*nnodes, nnodes);
-        vec_RHS += -1.0 * matBHE_R_s * vec_T_gi;
-    } 
     // assemble the Rs matrix to global LHS and RHS, soil part
     for (std::size_t i = 0; i < nnodes; i++)
     {
@@ -9399,20 +9387,11 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         {
             shift_j = nodes_bhe_soil[j];
 #ifdef NEW_EQS
-            (*A)(shift_i, shift_j) += -1.0 * theta *G * matBHE_R_s(i, j);
+            (*A)(shift_i, shift_j) += 1.0 * theta *G * matBHE_R_s(i, j);
 #else
-            MXInc(shift_i, shift_j,  theta * G * matBHE_R_s(i, j));
+            MXInc(shift_i, shift_j,  1.0 * theta * G * matBHE_R_s(i, j));
 #endif
         }
-        // R_pi to the RHS. 
-#ifdef NEW_EQS
-        if (m_dom)
-            m_dom->eqs->b[shift_i] += vec_RHS(i);
-        else
-            pcs->eqs_new->b[shift_i] += vec_RHS(i);
-#else
-        pcs->eqs->b[shift_i] += vec_RHS(i);
-#endif
     }
 
 }
