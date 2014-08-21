@@ -69,7 +69,7 @@ void BHE_1U::calc_thermal_resistances()
 	// Eq. 51
 	chi = std::log(std::sqrt(D*D + 2 * d0*d0) / 2 / d0) / std::log(D / std::sqrt(2) / d0);
 	// Eq. 52
-    _R_g = std::acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+    _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
 	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
@@ -80,7 +80,7 @@ void BHE_1U::calc_thermal_resistances()
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar;
-	R_ar = std::acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
+	R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
 	_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 
 }
