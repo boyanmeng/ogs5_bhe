@@ -193,8 +193,8 @@ int pcs_number_heat = -1;						// JT2012
 vector<int>pcs_number_mass;						// JT2012
 
 std::vector<BHE::BHEAbstract*> vec_BHEs;              // HS2014
-std::vector<std::vector<std::size_t>> vec_BHE_nodes;  // HS2014
-std::vector<std::vector<std::size_t>> vec_BHE_elems;  // HS2014
+std::vector< std::vector<std::size_t> > vec_BHE_nodes;  // HS2014
+std::vector< std::vector<std::size_t> > vec_BHE_elems;  // HS2014
 
 namespace process
 {class CRFProcessDeformation;
@@ -1004,7 +1004,7 @@ void CRFProcess::Create()
 	double* nod_values = NULL;
 	double* ele_values = NULL;            // PCH
 
-    if (_pcs_type == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+    if (_pcs_type == FiniteElement::HEAT_TRANSPORT_BHE)
     {
         std::string tmp_name_str; 
         number_of_nvals = 2 * 1 + pcs_number_of_secondary_nvals;  // only counting T_soil
@@ -1107,7 +1107,7 @@ void CRFProcess::Create()
            nod_val_vector.push_back(nod_values);
            nod_values = NULL;
 	}
-    if (_pcs_type == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+    if (_pcs_type == FiniteElement::HEAT_TRANSPORT_BHE)
     {
         for (std::size_t i = 0; i < vec_BHE_nodes.size(); i++)
         {
@@ -4953,7 +4953,7 @@ double CRFProcess::Execute()
 #if defined(USE_PETSC) // || defined(other parallel libs)//03.3012. WW
 	   InitializeRHS_with_u0();
 #else
-        if (this->getProcessType() == FiniteElement::ProcessType::HEAT_TRANSPORT_BHE)
+        if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
         {
             // first soil temperature
             nidx1 = GetNodeValueIndex(pcs_primary_function_name[0]) + 1;
