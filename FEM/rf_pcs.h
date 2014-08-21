@@ -1065,8 +1065,8 @@ extern void PCSCreateNew();                       //OK
 #endif
 
 extern std::vector<BHE::BHEAbstract*> vec_BHEs;   //HS2014
-extern std::vector<std::vector<std::size_t>> vec_BHE_nodes;  // HS2014
-extern std::vector<std::vector<std::size_t>> vec_BHE_elems;  // HS2014
+extern std::vector< std::vector<std::size_t> > vec_BHE_nodes;  // HS2014
+extern std::vector< std::vector<std::size_t> > vec_BHE_elems;  // HS2014
 
 extern bool PCSCheck();                           //OK
 // New solvers WW

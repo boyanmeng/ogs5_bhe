@@ -24,6 +24,7 @@
 #include "Eigen/Eigen"
 #include "../GEO/Polyline.h"
 #include "FEMEnums.h"
+#include <cmath>
 
 namespace BHE  // namespace of borehole heat exchanger
 {
