@@ -353,8 +353,8 @@ public:
 	            StorageType stype = JDS);
 	SparseTable(CPARDomain &m_dom, bool quadratic, bool symm = false);
     SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs, 
-                std::vector<std::vector<std::size_t>> & m_vec_nodes, 
-                std::vector<std::vector<std::size_t>> & m_vec_elems, 
+                std::vector< std::vector<std::size_t> > & m_vec_nodes, 
+                std::vector< std::vector<std::size_t> > & m_vec_elems, 
                 MeshLib::CFEMesh* a_mesh, StorageType stype = CRS);
 	~SparseTable();
 	void Write(std::ostream &os = std::cout);
