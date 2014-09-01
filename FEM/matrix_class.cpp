@@ -1001,8 +1001,8 @@ Create sparse matrix table for the process HEAT_TRANSPORT_BHE
 ********************************************************************
 */
 SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs, 
-                         std::vector<std::vector<std::size_t>> & m_vec_nodes,
-                         std::vector<std::vector<std::size_t>> & m_vec_elems, 
+                         std::vector< std::vector<std::size_t> > & m_vec_nodes,
+                         std::vector< std::vector<std::size_t> > & m_vec_elems, 
                          MeshLib::CFEMesh* a_mesh, StorageType stype)
 : symmetry(false), storage_type(stype)
 {
@@ -1015,7 +1015,7 @@ SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs,
     long global_row_index(0), soil_row_index_1(0), soil_row_index_2(0), col_index(0);
     long sum_bhe_nodes(0);
 
-    std::vector<std::vector<long>> connectivity; 
+    std::vector< std::vector<long> > connectivity; 
     
     // count the number of BHE nodes
     std::size_t n_BHE_dofs(0); 
