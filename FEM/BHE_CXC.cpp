@@ -173,9 +173,9 @@ void BHE_CXC::calc_Pr()
 */
 void BHE_CXC::calc_heat_transfer_coefficients()
 {
-	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
-	_PHI_ff = 1.0 / _R_ff * 1.0 / S_io;
-	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+	_PHI_fog = 1.0 / _R_fog * S_o;
+	_PHI_ff = 1.0 / _R_ff * S_io;
+	_PHI_gs = 1.0 / _R_gs * S_gs;
 }
 
 /**
@@ -199,13 +199,13 @@ double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:  // i1
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_i;
         break;
-    case 1:  // i2
-        mass_coeff = rho_r * heat_cap_r;
+    case 1:  // o1
+        mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
-    case 2:  // o1
-        mass_coeff = rho_g * heat_cap_g;
+    case 2:  // grout
+        mass_coeff = rho_g * heat_cap_g * CSA_g;
         break;
     default:
         break;
@@ -227,15 +227,15 @@ void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_
 	{
 	case 0:
 		// pipe i1, Eq. 26
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 1:
 		// pipe o1, Eq. 27
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
 		break;
 	case 2:
 		// pipe g1, Eq. 28
-		laplace_coeff = porosity_g * lambda_g;
+        laplace_coeff = porosity_g * lambda_g * CSA_g;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n"; 
@@ -257,13 +257,13 @@ void BHE_CXC::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & ve
 	{
 	case 0:
 		// pipe i1, Eq. 26
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
         // z direction 
         vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 1:
 		// pipe o1, Eq. 27
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
         // z direction 
         vec_advection(2) = advection_coeff;
 		break;

@@ -174,9 +174,9 @@ void BHE_CXA::calc_Pr()
 */
 void BHE_CXA::calc_heat_transfer_coefficients()
 {
-	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
-	_PHI_ff  = 1.0 / _R_ff * 1.0 / S_io;
-	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+	_PHI_fig = 1.0 / _R_fig * S_i;
+	_PHI_ff  = 1.0 / _R_ff * S_io;
+	_PHI_gs = 1.0 / _R_gs * S_gs;
 }
 
 /**

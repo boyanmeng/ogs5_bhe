@@ -149,11 +149,11 @@ void BHE_2U::calc_Pr()
   */
 void BHE_2U::calc_heat_transfer_coefficients()
 {
-	_PHI_fig = 1.0 / _R_fig * 1.0 / S_i;
-	_PHI_fog = 1.0 / _R_fog * 1.0 / S_o;
-	_PHI_gg_1 = 1.0 / _R_gg_1 * 1.0 / S_g1;
-	_PHI_gg_2 = 1.0 / _R_gg_2 * 1.0 / S_g2;
-	_PHI_gs = 1.0 / _R_gs * 1.0 / S_gs;
+	_PHI_fig = 1.0 / _R_fig * S_i;
+	_PHI_fog = 1.0 / _R_fog * S_o;
+	_PHI_gg_1 = 1.0 / _R_gg_1 * S_g1;
+	_PHI_gg_2 = 1.0 / _R_gg_2 * S_g2;
+	_PHI_gs = 1.0 / _R_gs * S_gs;
 }
 
 /**
@@ -186,28 +186,28 @@ double BHE_2U::get_mass_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:  // i1
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_i;
         break;
     case 1:  // i2
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_i;
         break;
     case 2:  // o1
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 3:  // o2
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 4:  // g1
-        mass_coeff = rho_g * heat_cap_g;
+        mass_coeff = rho_g * heat_cap_g * CSA_g1;
         break;
     case 5:  // g2
-        mass_coeff = rho_g * heat_cap_g;
+        mass_coeff = rho_g * heat_cap_g * CSA_g1;
         break;
     case 6:  // g3
-        mass_coeff = rho_g * heat_cap_g;
+        mass_coeff = rho_g * heat_cap_g * CSA_g2;
         break;
     case 7:  // g4
-        mass_coeff = rho_g * heat_cap_g;
+        mass_coeff = rho_g * heat_cap_g * CSA_g2;
         break;
     default:
         break;
@@ -229,35 +229,35 @@ void BHE_2U::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_l
 	{
 	case 0:
 		// pipe i1, Eq. 18
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm(); 
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 1:
 		// pipe o1, Eq. 18
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 2:
 		// pipe i2,  Eq. 18
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
 		break;
 	case 3:
 		// pipe o2,  Eq. 18
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
 		break;
 	case 4:
 		// pipe g1, Eq. 14
-		laplace_coeff = porosity_g * lambda_g; 
+        laplace_coeff = porosity_g * lambda_g * CSA_g1;
 		break;
 	case 5:
 		// pipe g2, Eq. 15
-		laplace_coeff = porosity_g * lambda_g;
+        laplace_coeff = porosity_g * lambda_g * CSA_g1;
 		break;
 	case 6:
 		// pipe g3, Eq. 16
-		laplace_coeff = porosity_g * lambda_g;
+        laplace_coeff = porosity_g * lambda_g * CSA_g2;
 		break;
 	case 7:
 		// pipe g4, Eq. 17
-		laplace_coeff = porosity_g * lambda_g;
+        laplace_coeff = porosity_g * lambda_g * CSA_g2;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n";
@@ -279,25 +279,25 @@ void BHE_2U::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec
 	{
 	case 0:
 		// pipe i1, Eq. 10
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
         // z direction 
         vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 1:
 		// pipe o1, Eq. 11
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
         // z direction 
         vec_advection(2) = advection_coeff;
 		break;
 	case 2:
 		// pipe i2, Eq. 12
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
         // z direction 
         vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 3:
 		// pipe o2, Eq. 13
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
         // z direction 
         vec_advection(2) = advection_coeff;
 		break;
