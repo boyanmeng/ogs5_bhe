@@ -5381,7 +5381,6 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
 
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
                 R_pi_s_matrix.block(3 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
-                // HS: Rs should not appear in grout part. 
                 R_matrix.block(2 * nnodes, 2 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_ig
                 R_matrix.block(3 * nnodes, 3 * nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R;  // K_og
                 break;

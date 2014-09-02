@@ -5118,7 +5118,7 @@ double CRFProcess::Execute()
 #ifdef LIS
 	iter_lin = eqs_new->Solver(this->m_num); //NW
 #else
-    eqs_new->Write(); 
+    // eqs_new->Write(); 
 	iter_lin = eqs_new->Solver();
 #endif
 #endif
