@@ -200,13 +200,13 @@ double BHE_CXA::get_mass_coeff(std::size_t idx_unknown)
     switch (idx_unknown)
     {
     case 0:  // i1
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_i;
         break;
     case 1:  // i2
-        mass_coeff = rho_r * heat_cap_r;
+        mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 2:  // o1
-        mass_coeff = rho_g * heat_cap_g;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g;
         break;
     default:
         break;
@@ -228,15 +228,15 @@ void BHE_CXA::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_
 	{
 	case 0:
 		// pipe i1, Eq. 23
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 1:
 		// pipe o1, Eq. 24
-		laplace_coeff = lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm();
+        laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
 		break;
 	case 2:
 		// pipe g1, Eq. 25
-		laplace_coeff = porosity_g * lambda_g;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n";
@@ -258,13 +258,13 @@ void BHE_CXA::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & ve
 	{
 	case 0:
 		// pipe i1, Eq. 23
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
         // z direction 
         vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 1:
 		// pipe o1, Eq. 24
-		advection_coeff = rho_r * heat_cap_r * _u(0);
+        advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
         // z direction 
         vec_advection(2) = advection_coeff;
 		break;

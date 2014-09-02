@@ -205,7 +205,7 @@ double BHE_CXC::get_mass_coeff(std::size_t idx_unknown)
         mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 2:  // grout
-        mass_coeff = rho_g * heat_cap_g * CSA_g;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g;
         break;
     default:
         break;
@@ -235,7 +235,7 @@ void BHE_CXC::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_
 		break;
 	case 2:
 		// pipe g1, Eq. 28
-        laplace_coeff = porosity_g * lambda_g * CSA_g;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n"; 
