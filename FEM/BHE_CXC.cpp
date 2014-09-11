@@ -173,9 +173,9 @@ void BHE_CXC::calc_Pr()
 */
 void BHE_CXC::calc_heat_transfer_coefficients()
 {
-	_PHI_fog = 1.0 / _R_fog * S_o;
-	_PHI_ff = 1.0 / _R_ff * S_io;
-	_PHI_gs = 1.0 / _R_gs * S_gs;
+	_PHI_fog = 1.0 / _R_fog ;
+	_PHI_ff = 1.0 / _R_ff ;
+	_PHI_gs = 1.0 / _R_gs ;
 }
 
 /**

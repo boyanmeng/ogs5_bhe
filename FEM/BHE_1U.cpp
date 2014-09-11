@@ -82,7 +82,7 @@ void BHE_1U::calc_thermal_resistances()
 	double R_ar;
 	R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
 	_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
-
+    
 }
 
 /**
@@ -145,10 +145,10 @@ void BHE_1U::calc_Pr()
 */
 void BHE_1U::calc_heat_transfer_coefficients()
 {
-    _PHI_fig = 1.0 / _R_fig * S_i;
-    _PHI_fog = 1.0 / _R_fog * S_o;
-    _PHI_gg = 1.0 / _R_gg * S_g1;
-    _PHI_gs = 1.0 / _R_gs * S_gs;
+    _PHI_fig = 1.0 / _R_fig ;
+    _PHI_fog = 1.0 / _R_fog ;
+    _PHI_gg = 1.0 / _R_gg ;
+    _PHI_gs = 1.0 / _R_gs ;
 }
 
 /**
