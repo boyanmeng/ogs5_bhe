@@ -85,6 +85,12 @@ void BHE_2U::calc_thermal_resistances()
 	_R_gg_1 = 2.0 * _R_gs * ( R_ar_1 - 2.0 * chi * _R_g ) / ( 2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g ) ;
 	_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 
+    if (!isfinite(_R_gg_1) || !isfinite(_R_gg_2))
+    {
+        std::cout << "Error!!! Grout Thermal Resistance is an infinite number! The simulation will be stopped! \n";
+        exit(1);
+    }
+
 }
 
 /**
