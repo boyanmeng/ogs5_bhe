@@ -11,7 +11,7 @@
 using namespace BHE;
 
 /**
-* return the thermal resistance for the inlet pipline
+* return  the thermal resistance for the inlet pipline
 * idx is the index, when 2U case,
 * 0 - the first u-tube
 * 1 - the second u-tube
