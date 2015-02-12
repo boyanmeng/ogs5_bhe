@@ -84,7 +84,7 @@ void BHE_CXC::calc_thermal_resistances()
 	// thermal resistance due to grout-soil exchange
 	_R_gs = (1 - chi)*_R_g;
 
-    if (!isfinite(_R_gs))
+	if (!std::isfinite(_R_gs))
     {
         std::cout << "Error!!! Grout Thermal Resistance is an infinite number! The simulation will be stopped! \n";
         exit(1);
