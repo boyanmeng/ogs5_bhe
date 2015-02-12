@@ -1018,16 +1018,16 @@ void CRFProcess::Create()
             switch (vec_BHEs[i]->get_type())
             {
                 case BHE::BHE_TYPE_1U: // 1U type has 4 unknowns
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << std::string(pcs_primary_function_name[1]) << "_" << vec_BHEs[i]->get_name()))->str();
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();;
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << std::string(pcs_primary_function_name[3]) << "_" << vec_BHEs[i]->get_name()))->str();;
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << std::string(pcs_primary_function_name[5]) << "_" << vec_BHEs[i]->get_name()))->str();
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[6] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << std::string(pcs_primary_function_name[6]) << "_" << vec_BHEs[i]->get_name()))->str();
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break;
