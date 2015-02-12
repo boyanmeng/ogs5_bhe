@@ -1018,64 +1018,100 @@ void CRFProcess::Create()
             switch (vec_BHEs[i]->get_type())
             {
                 case BHE::BHE_TYPE_1U: // 1U type has 4 unknowns
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[1]);
+                    tmp_name_str.append("_"); 
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();;
+                    tmp_name_str = std::string(pcs_primary_function_name[3]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[5]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[6] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[6]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break;
                 case BHE::BHE_TYPE_2U: // 2U type has 8 unknowns
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[1]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[2] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[2]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[3]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[4] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[4]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[5]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[6] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[6]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[7] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[7]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[8] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[8]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break; 
                 case BHE::BHE_TYPE_CXC: // CXC type has 3 unknowns
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[1]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[3]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[5]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break;
                 case BHE::BHE_TYPE_CXA: // CXA type has 3 unknowns
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[1] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[1]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[3] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[3]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
-                    tmp_name_str = static_cast<ostringstream*>(&(ostringstream() << pcs_primary_function_name[5] << "_" << vec_BHEs[i]->get_name()))->str();
+                    tmp_name_str = std::string(pcs_primary_function_name[5]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break;
@@ -4972,96 +5008,96 @@ double CRFProcess::Execute()
                     switch (vec_BHEs[j]->get_type())
                     {
                     case BHE::BHE_TYPE_1U:
-                        str_tmp = "TEMPERATURE_IN_1_"; 
+                        str_tmp = std::string("TEMPERATURE_IN_1_"); 
                         str_tmp.append(vec_BHEs[j]->get_name()); 
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns ] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp = std::string("TEMPERATURE_OUT_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp = std::string("TEMPERATURE_G_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_2_";
+                        str_tmp = std::string("TEMPERATURE_G_2_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 3] = GetNodeValue(k, nidx1);
 
                         break; 
                     case BHE::BHE_TYPE_2U:
-                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp = std::string("TEMPERATURE_IN_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_IN_2_";
+                        str_tmp = std::string("TEMPERATURE_IN_2_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp = std::string("TEMPERATURE_OUT_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_OUT_2_";
+                        str_tmp = std::string("TEMPERATURE_OUT_2_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 3] = GetNodeValue(k, nidx1);
-                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp = std::string("TEMPERATURE_G_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 4] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_2_";
+                        str_tmp = std::string("TEMPERATURE_G_2_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 5] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_3_";
+                        str_tmp = std::string("TEMPERATURE_G_3_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 6] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_4_";
+                        str_tmp = std::string("TEMPERATURE_G_4_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 7] = GetNodeValue(k, nidx1);
                         break;
                     case BHE::BHE_TYPE_CXC:
-                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp = std::string("TEMPERATURE_IN_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp = std::string("TEMPERATURE_OUT_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp = std::string("TEMPERATURE_G_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
 
                         break;
                     case BHE::BHE_TYPE_CXA:
-                        str_tmp = "TEMPERATURE_IN_1_";
+                        str_tmp = std::string("TEMPERATURE_IN_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_OUT_1_";
+                        str_tmp = std::string("TEMPERATURE_OUT_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 1] = GetNodeValue(k, nidx1);
 
-                        str_tmp = "TEMPERATURE_G_1_";
+                        str_tmp = std::string("TEMPERATURE_G_1_");
                         str_tmp.append(vec_BHEs[j]->get_name());
                         nidx1 = GetNodeValueIndex(str_tmp) + 1;
                         eqs_x[node_shift + k*n_unknowns + 2] = GetNodeValue(k, nidx1);
