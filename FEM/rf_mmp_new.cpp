@@ -2789,7 +2789,7 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 {
 	SolidProp::CSolidProperties* m_msp = NULL;
 	double heat_capacity_fluids, specific_heat_capacity_solid, specific_heat_capacity_ice;
-	double density_solid;
+	double density_solid, density_ice;
 	double porosity, Sat, PG;
 	int group;
 	double T0, T1 = 0.0;
@@ -2876,10 +2876,11 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		group = m_pcs->m_msh->ele_vector[number]->GetPatchIndex();
 		m_msp = msp_vector[group];
 		// heat capacity 
-		specific_heat_capacity_solid = m_msp->Heat_Capacity(0.0);
+		specific_heat_capacity_solid = m_msp->Heat_Capacity(0.0); 
 		specific_heat_capacity_ice = m_msp->Heat_Capacity(1.0);
 
-		density_solid = fabs(m_msp->Density());
+		density_solid = fabs(m_msp->Density(0.0));
+		density_ice = fabs(m_msp->Density(1.0));
 		if (FLOW)
 		{
 			porosity = assem->MediaProp->Porosity(number, theta);
@@ -2890,7 +2891,7 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 			heat_capacity_fluids = 0.0;
 			porosity = 0.0;
 		}
-		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;
+		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;  // TODO change this function into freezing model
 		break;
 	//....................................................................
 	default:

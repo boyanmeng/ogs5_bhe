@@ -1207,6 +1207,12 @@ double CSolidProperties::Density(double refence )
 	case 1:
 		val = (*data_Density)(0);
 		break;
+	case 6:
+		if (refence == 0.0)
+		    val = (*data_Density)(0);
+		else 
+	        val = (*data_Density)(1);
+		break;
 	}
 	return val;
 }
