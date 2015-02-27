@@ -159,6 +159,14 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 				in_sd >> (*data_Density)(0);
 				in_sd.clear();
 			}
+			else if (Density_mode == 6) // this is a model for soil + ice
+			{
+				// rho1 = soil density, rho2 = ice density
+				data_Density = new Matrix(2);
+				in_sd >> (*data_Density)(0); // soil density
+				in_sd >> (*data_Density)(1); // ice density
+				in_sd.clear();
+			}
 		}
 		//....................................................................
 		if(line_string.find("$THERMAL") != string::npos)
@@ -215,6 +223,13 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
                      in_sd>> (*data_Capacity)(i);
                   in_sd.clear();
                   break;
+			   case 6:  // soil and ice heat capacity
+				   data_Capacity = new Matrix(2);
+				   in_sd >> (*data_Capacity)(0);
+				   in_sd >> (*data_Capacity)(1);
+				   in_sd.clear();
+				   break;
+
             }
          }
 
@@ -285,6 +300,12 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 					                     0) >> (*data_Conductivity)(i,1);
 					in_sd.clear();
 				}
+				break;
+			case 6:       //  thermal conductivity soil and ice
+				data_Conductivity = new Matrix(2);
+				in_sd >> (*data_Conductivity)(0);
+				in_sd >> (*data_Conductivity)(1);
+				in_sd.clear();
 				break;
 			case 5:       // DECOVALEX2015, Task B2, Buffer: f(S,T) by matrix function 
 				in_sd >> T_0;
