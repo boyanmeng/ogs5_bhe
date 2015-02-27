@@ -233,7 +233,24 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
             }
          }
 
-         //....................................................................
+
+		//....................................................................
+		// subkeyword found
+		if (line_string.find("LATENT_HEAT") != string::npos)
+		{
+			in_sd.str(GetLineFromFile1(msp_file));
+			in_sd >> freezing_latent_heat; // TYZ: 2015.02.27. Latent heat for freezing J/kg	
+		}
+
+		//....................................................................
+		// subkeyword found
+		if (line_string.find("FREEZING_SIGMOID_COEFFICENT") != string::npos)
+		{
+			in_sd.str(GetLineFromFile1(msp_file));
+			in_sd >> freezing_sigmoid_coeff; // TYZ: 2015.02.27. sigmoid coefficient for freezing unitless
+		}
+
+        //....................................................................
 		// subkeyword found
 		if(line_string.compare("CONDUCTIVITY") == 0)
 		{
@@ -989,6 +1006,10 @@ CSolidProperties::CSolidProperties()
 	thermal_conductivity_tensor_type = 0;
 	thermal_conductivity_tensor_dim = 1;
 	thermal_conductivity_tensor[0] = 1.0;
+
+	// freezing model parameters
+	freezing_latent_heat = 0.0; // TYZ: 2015.02.27. Latent heat for freezing J/kg
+	freezing_sigmoid_coeff = 0.0; // TYZ: 2015.02.27. sigmoid coefficient for freezing unitless
 
 	  //Reactive system
 	reaction_system = "INERT";
