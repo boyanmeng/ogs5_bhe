@@ -2788,7 +2788,7 @@ double CMediumProperties::HeatCapacity(long number, double theta,
                                        CFiniteElementStd* assem)
 {
 	SolidProp::CSolidProperties* m_msp = NULL;
-	double heat_capacity_fluids, specific_heat_capacity_solid;
+	double heat_capacity_fluids, specific_heat_capacity_solid, specific_heat_capacity_ice;
 	double density_solid;
 	double porosity, Sat, PG;
 	int group;
@@ -2870,6 +2870,27 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		heat_capacity = assem->SolidProp->Heat_Capacity(T1) * fabs(
 		        assem->SolidProp->Density()) + Porosity(assem)
 		                * MFPCalcFluidsHeatCapacity(assem);
+		break;
+	case 6:                               // const
+		//OK411
+		group = m_pcs->m_msh->ele_vector[number]->GetPatchIndex();
+		m_msp = msp_vector[group];
+		// heat capacity 
+		specific_heat_capacity_solid = m_msp->Heat_Capacity(0.0);
+		specific_heat_capacity_ice = m_msp->Heat_Capacity(1.0);
+
+		density_solid = fabs(m_msp->Density());
+		if (FLOW)
+		{
+			porosity = assem->MediaProp->Porosity(number, theta);
+			heat_capacity_fluids = MFPCalcFluidsHeatCapacity(assem);
+		}
+		else
+		{
+			heat_capacity_fluids = 0.0;
+			porosity = 0.0;
+		}
+		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;
 		break;
 	//....................................................................
 	default:

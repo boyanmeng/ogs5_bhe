@@ -1241,6 +1241,12 @@ void CSolidProperties::NullDensity()
 			 //refence contains value of solid density (current)
 			 val = (*data_Capacity)(0) + ((*data_Capacity)(1)-(*data_Capacity)(0))/((*data_Capacity)(3)-(*data_Capacity)(2))*(refence - (*data_Capacity)(2));
 			 break;
+		 case 6: //Freezing model - TYZ
+			 if (refence == 0.0)
+				 val = (*data_Capacity)(0);//soil heat capacity 0
+			 else
+				 val = (*data_Capacity)(1);//ice heat capacity 1
+			 break;
          default:
             val = (*data_Capacity)(0);
             break;
