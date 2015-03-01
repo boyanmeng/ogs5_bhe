@@ -2793,6 +2793,9 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 	double porosity, Sat, PG;
 	int group;
 	double T0, T1 = 0.0;
+    double sigmoid_coeff; 
+    double phi_i;
+
 	//  double H0,H1;
 	// ???
 	bool FLOW = false;                    //WW
@@ -2871,8 +2874,10 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		        assem->SolidProp->Density()) + Porosity(assem)
 		                * MFPCalcFluidsHeatCapacity(assem);
 		break;
-	case 6:                               // const
-		//OK411
+	case 6: 
+		// TYZ, heat capacity for ice freezing model 
+        phi_i = 0.0; 
+
 		group = m_pcs->m_msh->ele_vector[number]->GetPatchIndex();
 		m_msp = msp_vector[group];
 		// heat capacity 
@@ -2891,7 +2896,15 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 			heat_capacity_fluids = 0.0;
 			porosity = 0.0;
 		}
-		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;  // TODO change this function into freezing model
+
+        // get the freezing model parameter
+        sigmoid_coeff = m_msp->getFreezingSigmoidCoeff();
+        // get interpolated current temperature
+        T1 = assem->interpolate(assem->NodalVal1);
+        // get the volume fraction of ice
+        phi_i = CalcIceVolFrac(T1, sigmoid_coeff);
+        // TODO change this function into freezing model
+		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;  
 		break;
 	//....................................................................
 	default:
@@ -2902,6 +2915,22 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		//....................................................................
 	}
 	return heat_capacity;
+}
+
+
+/**************************************************************************
+FEMLib-Method:
+Task: calculate the volume fraction of ice based on temperatuer
+Programing:
+02/2015 HS Implementation
+**************************************************************************/
+double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff)
+{
+    double phi_i = 0.0; 
+
+    phi_i = 1.0 - 1.0 / (1.0 + std::exp(-1.0 * freezing_sigmoid_coeff * T_in_dC));
+    
+    return phi_i; 
 }
 
 /**************************************************************************
