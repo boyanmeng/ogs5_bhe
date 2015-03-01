@@ -221,6 +221,14 @@ public:
 	// 25.08.2011. WW
 	void Read(std::istream& is);
 	void Write(std::ostream& os) const;
+
+    // HS: Borehole Heat Exchanger
+    long bhe_node_shift;
+    // HS: check whether this is inflow pipe or outflow pipe
+    // 0 - inflow
+    // 1 - outflow
+    std::size_t bhe_pipe_flag;
+    std::size_t bhe_pv_index; 
 };
 
 class CBoundaryConditionsGroup

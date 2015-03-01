@@ -27,6 +27,8 @@ ProcessType convertProcessType ( const std::string& pcs_type_string)
 		return GROUNDWATER_FLOW;
 	if (pcs_type_string.compare ("HEAT_TRANSPORT") == 0)
 		return HEAT_TRANSPORT;
+	if (pcs_type_string.compare( "HEAT_TRANSPORT_BHE") == 0)
+		return HEAT_TRANSPORT_BHE; 
 	if (pcs_type_string.compare ("DEFORMATION") == 0)
 		return DEFORMATION;
 	if (pcs_type_string.compare ("DEFORMATION_FLOW") == 0)
@@ -78,6 +80,8 @@ std::string convertProcessTypeToString ( ProcessType pcs_type )
 		return "GROUNDWATER_FLOW";
 	if (pcs_type == HEAT_TRANSPORT)
 		return "HEAT_TRANSPORT";
+	if (pcs_type == HEAT_TRANSPORT_BHE)
+		return "HEAT_TRANSPORT_BHE"; 
 	if (pcs_type == DEFORMATION)
 		return "DEFORMATION";
 	if (pcs_type == DEFORMATION_FLOW)
@@ -168,6 +172,24 @@ PrimaryVariable convertPrimaryVariable ( const std::string& pcs_pv_string )
 		return TEMPERATURE;
 	if (pcs_pv_string.compare ("TEMPERATURE2") == 0)
 		return TEMPERATURE2;
+	if (pcs_pv_string.compare("TEMPERATURE_SOIL") == 0)
+		return TEMPERATURE_SOIL;
+	if (pcs_pv_string.compare("TEMPERATURE_IN_1") == 0)
+		return TEMPERATURE_IN_1;
+	if (pcs_pv_string.compare("TEMPERATURE_IN_2") == 0)
+		return TEMPERATURE_IN_2;
+	if (pcs_pv_string.compare("TEMPERATURE_OUT_1") == 0)
+		return TEMPERATURE_OUT_1;
+	if (pcs_pv_string.compare("TEMPERATURE_OUT_2") == 0)
+		return TEMPERATURE_OUT_2;
+	if (pcs_pv_string.compare("TEMPERATURE_G_1") == 0)
+		return TEMPERATURE_G_1;
+	if (pcs_pv_string.compare("TEMPERATURE_G_2") == 0)
+		return TEMPERATURE_G_2;
+	if (pcs_pv_string.compare("TEMPERATURE_G_3") == 0)
+		return TEMPERATURE_G_3;
+	if (pcs_pv_string.compare("TEMPERATURE_G_4") == 0)
+		return TEMPERATURE_G_4;
 	if (pcs_pv_string.compare ("DISPLACEMENT_X1") == 0)
 		return DISPLACEMENT_X;
 	if (pcs_pv_string.compare ("DISPLACEMENT_Y1") == 0)
@@ -254,6 +276,24 @@ std::string convertPrimaryVariableToString ( PrimaryVariable pcs_pv )
 		return "TEMPERATURE1";
 	if (pcs_pv == TEMPERATURE2)
 		return "TEMPERATURE2";
+	if (pcs_pv == TEMPERATURE_SOIL)
+		return "TEMPERATURE_SOIL";
+	if (pcs_pv == TEMPERATURE_IN_1)
+		return "TEMPERATURE_IN_1";
+	if (pcs_pv == TEMPERATURE_IN_2)
+		return "TEMPERATURE_IN_2";
+	if (pcs_pv == TEMPERATURE_OUT_1)
+		return "TEMPERATURE_OUT_1";
+	if (pcs_pv == TEMPERATURE_OUT_2)
+		return "TEMPERATURE_OUT_2";
+	if (pcs_pv == TEMPERATURE_G_1)
+		return "TEMPERATURE_G_1";
+	if (pcs_pv == TEMPERATURE_G_2)
+		return "TEMPERATURE_G_2";
+	if (pcs_pv == TEMPERATURE_G_3)
+		return "TEMPERATURE_G_3";
+	if (pcs_pv == TEMPERATURE_G_4)
+		return "TEMPERATURE_G_4";
 	if (pcs_pv == CARBON1)
 		return "CARBON1";
 	if (pcs_pv == WATER1)

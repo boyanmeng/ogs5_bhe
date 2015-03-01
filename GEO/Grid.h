@@ -197,13 +197,16 @@ Grid<POINT>::Grid(std::vector<POINT*> const& pnts, size_t max_num_per_grid_cell)
 		_n_steps[1] = static_cast<size_t> (ceil(_n_steps[0] * delta[1] / delta[0]));
 		_n_steps[2] = static_cast<size_t> (ceil(_n_steps[0] * delta[2] / delta[0]));
 	}
+    for (size_t k(0); k < 3; k++) {
+        _n_steps[k] = std::max(1.0, (double)_n_steps[k]);
+    }
 
 	const size_t n_plane(_n_steps[0] * _n_steps[1]);
 	_grid_quad_to_node_map = new std::vector<POINT*>[n_plane * _n_steps[2]];
 
 	// some frequently used expressions to fill the grid vectors
-	for (size_t k(0); k < 3; k++) {
-		_step_sizes[k] = delta[k] / _n_steps[k];
+    for (size_t k(0); k < 3; k++) {
+        _step_sizes[k] = delta[k] / std::max( 1.0, (double)_n_steps[k] );
 		if (_step_sizes[k]==0)
 			_inverse_step_sizes[k] = 1.0;
 		else

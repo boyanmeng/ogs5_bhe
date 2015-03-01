@@ -300,6 +300,25 @@ public:
     double graindiameter;
     double hydraulicrad;
     double betaexpo;
+
+    // HS: borehole heat exchanger related parameters
+    bool is_BHE;  // indicate whether this MMP is a borehole heat exchanger. 
+    BHE::BHE_TYPE bhe_type;
+    BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
+    double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
+    double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness;
+    double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
+    std::size_t bhe_fluid_type_idx;
+    double bhe_refrigerant_viscosity;
+    double bhe_refrigerant_density;
+    double bhe_refrigerant_heat_capacity;
+	double bhe_refrigerant_alpha_L; 
+    double bhe_grout_density;
+	double bhe_grout_porosity;
+    double bhe_grout_heat_capacity;
+    double bhe_regrigerant_heat_conductivity;
+
+
 };
 
 class CMediumPropertiesGroup                      //YD

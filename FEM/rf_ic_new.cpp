@@ -625,11 +625,49 @@ void CInitialCondition::SetPolyline(int nidx)
 		//			std::cout << "Error in CInitialCondition::SetPolyline - polyline: "
 		//					<< geo_name << " not found" << "\n";
 		//		}
-		if (getGeoObj())
-		{
-			std::vector<long> nodes_vector;
-			m_msh->GetNODOnPLY(static_cast<const GEOLIB::Polyline*>(getGeoObj()), nodes_vector);
-			for (size_t i = 0; i < nodes_vector.size(); i++)
+        if (getGeoObj())
+        {
+            std::vector<long> nodes_vector;
+            std::vector<long> nodes_vector_BHE; 
+            m_msh->GetNODOnPLY(static_cast<const GEOLIB::Polyline*>(getGeoObj()), nodes_vector);
+            for (size_t i = 0; i < nodes_vector.size(); i++)
+            if (this->getProcess()->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+            {
+                // HEAT_TRANSPORT_BHE needs special treatment
+                if (nidx == 0 || nidx == 1)
+                {
+                    // this is soil temperature
+                    this->getProcess()->SetNodeValue(nodes_vector[i], nidx, geo_node_value);
+                }
+                else
+                {
+                    std::size_t idx_BHE(0); 
+                    std::size_t local_node_index(0);
+                    // other variables
+                    // get global node index based on 
+                    // 1) which BHE it is 
+                    // 2) which variable it is
+                    // 3) and where the location is. 
+                    for (std::size_t j = 0; j < vec_BHEs.size(); j++)
+                    if (this->getGeoName() == vec_BHEs[j]->get_name())
+                    {
+                        idx_BHE = j;
+                        break;
+                    } // end of if
+
+                    nodes_vector_BHE.clear(); 
+                    for (std::size_t j = 0; j < vec_BHE_nodes[idx_BHE].size(); j++)
+                    {
+                        nodes_vector_BHE.push_back(j); 
+                    }
+
+                    for (std::size_t k = 0; k < nodes_vector_BHE.size(); k++)
+                        this->getProcess()->SetNodeValue(nodes_vector_BHE[k], nidx, geo_node_value);
+
+
+                } // end of else
+            }  // end of if
+            else
 				this->getProcess()->SetNodeValue(nodes_vector[i],
 				                                 nidx,
 				                                 geo_node_value);

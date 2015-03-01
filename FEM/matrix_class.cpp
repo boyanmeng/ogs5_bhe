@@ -20,6 +20,8 @@
 #ifdef NEW_EQS
 #include "msh_mesh.h"
 #include "par_ddc.h"
+#include <algorithm>    // std::unique
+#include <vector>       // std::vector
 #endif
 #endif
 
@@ -991,6 +993,262 @@ SparseTable::SparseTable(CPARDomain &m_dom, bool quadratic, bool symm) :
 			lbuff0++;
 		}
 }
+
+/*\!
+********************************************************************
+Create sparse matrix table for the process HEAT_TRANSPORT_BHE
+06/2014 HS
+********************************************************************
+*/
+SparseTable::SparseTable(std::vector<BHE::BHEAbstract*> & m_vec_BHEs, 
+                         std::vector< std::vector<std::size_t> > & m_vec_nodes,
+                         std::vector< std::vector<std::size_t> > & m_vec_elems, 
+                         MeshLib::CFEMesh* a_mesh, StorageType stype)
+: symmetry(false), storage_type(stype)
+{
+    long i = 0, j = 0, ii = 0, jj = 0;
+    size_t idx_BHEs(0);
+    long lbuff0 = 0, lbuff1 = 0;
+    long** larraybuffer;
+    larraybuffer = NULL;
+    long n_soil_nodes(0); 
+    long global_row_index(0), soil_row_index_1(0), soil_row_index_2(0), col_index(0);
+    long sum_bhe_nodes(0);
+
+    std::vector< std::vector<long> > connectivity; 
+    
+    // count the number of BHE nodes
+    std::size_t n_BHE_dofs(0); 
+    for (i = 0; i < m_vec_BHEs.size(); i++)
+        n_BHE_dofs += m_vec_BHEs[i]->get_n_unknowns() * m_vec_nodes[i].size();
+    // In HEAT_TRANSPORT_BHE process, number of rows = number of nodes + dof of BHE
+    n_soil_nodes = a_mesh->GetNodesNumber(false);
+    rows = n_soil_nodes + n_BHE_dofs;
+    size_entry_column = 0;
+    diag_entry = new long[rows];
+
+    if (storage_type == JDS)
+    {
+        row_index_mapping_n2o = new long[rows];
+        row_index_mapping_o2n = new long[rows];
+    }
+    else if (storage_type == CRS)
+    {
+        row_index_mapping_n2o = NULL;
+        row_index_mapping_o2n = NULL;
+    }
+
+    // Step 1: first we create data structure that stores all connectivity information
+    // outer vector contains index of the row,
+    // inner vector contains index of the column. 
+    for (i = 0; i < rows; i++)
+    {
+        std::vector<long> vec_row_indices; 
+        connectivity.push_back(vec_row_indices); 
+    }
+
+    // Step 2.1: based on connectivity of As, fill in the connectivity
+    for (i = 0; i < n_soil_nodes; i++)
+    {
+        for (j = 0; j < (long)a_mesh->nod_vector[i]->getConnectedNodes().size(); j++)
+        {
+            long col_index = a_mesh->nod_vector[i]->getConnectedNodes()[j];
+
+            /// If linear element is used
+            if (col_index >= rows)
+                continue;
+
+            connectivity[i].push_back(col_index);
+        }
+    }
+
+    // Step 2.2: based on connectivity of R_s_pi and R_pi_s, fill in the connectivity
+    sum_bhe_nodes = 0; 
+    for (idx_BHEs = 0; idx_BHEs < m_vec_BHEs.size(); idx_BHEs++)
+    {
+        for (i = 0; i < vec_BHE_nodes[idx_BHEs].size() -1 ; i++)
+        {
+            global_row_index = n_soil_nodes + sum_bhe_nodes + i * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+            soil_row_index_1 = vec_BHE_nodes[idx_BHEs][i];
+            soil_row_index_2 = vec_BHE_nodes[idx_BHEs][i+1];
+
+            // looping over all unknowns of this BHE
+            for (j = 0; j < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); j++)
+            {
+                col_index = global_row_index + j; 
+                // R_s_pi
+                connectivity[soil_row_index_1].push_back(col_index);
+                // R_pi_s
+                connectivity[col_index].push_back(soil_row_index_1);
+                // same for the connecting node
+                connectivity[soil_row_index_2].push_back(col_index);
+                connectivity[col_index].push_back(soil_row_index_2);
+            }  // end of for j unknowns             
+        }  // end of for i
+
+        sum_bhe_nodes += vec_BHE_nodes[idx_BHEs].size() * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+    }  // end of for idx_BHEs
+
+    // Step 2.3: based on connectivity of A_pi, fill in the connectivity
+    sum_bhe_nodes = n_soil_nodes;
+    for (idx_BHEs = 0; idx_BHEs < m_vec_BHEs.size(); idx_BHEs++)
+    {
+        for (i = 0; i < ( vec_BHE_nodes[idx_BHEs].size() - 1); i++)
+        {
+            for (std::size_t j = 0; j < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); j++)
+            {
+                long node_index_1 = sum_bhe_nodes + (long)(i * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + j;
+                long node_index_2 = sum_bhe_nodes + (long)((i + 1) * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + j;
+
+                connectivity[node_index_1].push_back(node_index_1);
+                connectivity[node_index_1].push_back(node_index_2);
+                connectivity[node_index_2].push_back(node_index_1);
+                connectivity[node_index_2].push_back(node_index_2);
+
+                for (std::size_t k = 0; k < m_vec_BHEs[idx_BHEs]->get_n_unknowns(); k++)
+                {
+                    long node_index_3 = sum_bhe_nodes + (long)(i * m_vec_BHEs[idx_BHEs]->get_n_unknowns()) + k;
+                    connectivity[node_index_1].push_back(node_index_3);
+                    connectivity[node_index_3].push_back(node_index_1);
+                    connectivity[node_index_2].push_back(node_index_3);
+                    connectivity[node_index_3].push_back(node_index_2);
+                    connectivity[node_index_3].push_back(node_index_3);
+                }
+
+            }  // end of for j
+        }  // end of for i
+
+        sum_bhe_nodes += vec_BHE_nodes[idx_BHEs].size() * m_vec_BHEs[idx_BHEs]->get_n_unknowns();
+    }  // end of for idx_BHEs
+
+    // Step 2.4: filling finished. Sort each vector
+    for (i = 0; i < connectivity.size(); i++)
+    {
+        // sort this vector
+        std::sort(connectivity[i].begin(), connectivity[i].end());
+        // remove redundant entries in this vector
+        connectivity[i].erase(std::unique(connectivity[i].begin(), connectivity[i].end()), connectivity[i].end());
+    }
+
+
+    // Step 3.1: if CRS, convert the connectivity to CRS indeces
+    /// CRS storage
+    if (storage_type == CRS)
+    {
+        /// num_column_entries saves vector ptr of CRS
+        num_column_entries = new long[rows + 1];
+
+        std::vector<long> A_index;
+        long col_index;
+
+        for (i = 0; i < rows; i++)
+        {
+            num_column_entries[i] = (long)A_index.size();
+
+            for (j = 0; j < (long)connectivity[i].size(); j++)
+            {
+                col_index = (long)connectivity[i][j];
+
+                if (i == col_index)
+                    diag_entry[i] = (long)A_index.size();
+                A_index.push_back(col_index);
+            }
+        }
+
+        size_entry_column = (long)A_index.size();
+        num_column_entries[rows] = size_entry_column;
+
+        entry_column = new long[size_entry_column];
+        for (i = 0; i < size_entry_column; i++)
+            entry_column[i] = A_index[i];
+    }
+    // Step 3.2: if JDS, convert the connectivity to JDS indeces
+    else if (storage_type == JDS)
+    {
+        //
+        //--- Sort, from that has maximum connect nodes to that has minimum connect nodes
+        //
+        for (i = 0; i < rows; i++)
+        {
+            row_index_mapping_n2o[i] = i;
+            // 'diag_entry' used as a temporary array
+            // to store the number of nodes connected to this node
+            diag_entry[i] = (long)connectivity[i].size();
+            
+            lbuff0 = 0;
+            for (j = 0; j < diag_entry[i]; j++)
+            if (connectivity[i][j] < static_cast<size_t>(rows))
+                    lbuff0++;
+                diag_entry[i] = lbuff0;
+            
+            size_entry_column += diag_entry[i];
+        }  // end of for i
+
+        //
+        for (i = 0; i < rows; i++)
+        {
+            // 'diag_entry' used as a temporary array
+            // to store the number of nodes connected to this node
+            lbuff0 = diag_entry[i]; // Nodes to this row
+            lbuff1 = row_index_mapping_n2o[i];
+            j = i;
+            while ((j > 0) && (diag_entry[j - 1] < lbuff0))
+            {
+                diag_entry[j] = diag_entry[j - 1];
+                row_index_mapping_n2o[j] = row_index_mapping_n2o[j - 1];
+                j = j - 1;
+            }
+            diag_entry[j] = lbuff0;
+            row_index_mapping_n2o[j] = lbuff1;
+        }
+        // Old index to new one
+        for (i = 0; i < rows; i++)
+            row_index_mapping_o2n[row_index_mapping_n2o[i]] = i;
+        // Maximum number of columns in the sparse table
+        max_columns = diag_entry[0];
+        //--- End of sorting
+        //
+        //--- Create sparse table
+        //
+        num_column_entries = new long[max_columns];
+        entry_column = new long[size_entry_column];
+        // 1. Count entries in each column in sparse table
+        for (i = 0; i < max_columns; i++)
+            num_column_entries[i] = 0;
+        for (i = 0; i < rows; i++)
+            // 'diag_entry' still is used as a temporary array
+            // it stores that numbers of nodes connect to this nodes
+        for (j = 0; j < diag_entry[i]; j++)
+            num_column_entries[j]++;
+
+        // 2. Fill the sparse table, i.e. store all its entries to
+        //    entry_column
+        lbuff0 = 0;
+
+        for (i = 0; i < max_columns; i++)
+        for (j = 0; j < num_column_entries[i]; j++)
+        {
+            // ii is the real row index of this entry in matrix
+            ii = row_index_mapping_n2o[j];
+            // jj is the real column index of this entry in matrix
+            // jj = a_mesh->nod_vector[ii]->getConnectedNodes()[i];
+            jj = connectivity[ii][i];
+            entry_column[lbuff0] = jj;
+
+            // Till to this stage, 'diag_entry' is really used to store indices of the diagonal entries.
+            // Hereby, 'index' refers to the index in entry_column array.
+            if (ii == jj)
+                diag_entry[ii] = lbuff0;
+            //
+            lbuff0++;
+        }
+    }  // end of else if storage type
+
+
+
+    std::cout << "Sparsity table for Borehole Heat Exchangers prepared. \n";
+}
+
 /*\!
  ********************************************************************
    Create sparse matrix table

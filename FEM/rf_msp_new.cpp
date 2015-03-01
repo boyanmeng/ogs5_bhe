@@ -159,6 +159,14 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 				in_sd >> (*data_Density)(0);
 				in_sd.clear();
 			}
+			else if (Density_mode == 6) // this is a model for soil + ice
+			{
+				// rho1 = soil density, rho2 = ice density
+				data_Density = new Matrix(2);
+				in_sd >> (*data_Density)(0); // soil density
+				in_sd >> (*data_Density)(1); // ice density
+				in_sd.clear();
+			}
 		}
 		//....................................................................
 		if(line_string.find("$THERMAL") != string::npos)
@@ -215,10 +223,34 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
                      in_sd>> (*data_Capacity)(i);
                   in_sd.clear();
                   break;
+			   case 6:  // soil and ice heat capacity
+				   data_Capacity = new Matrix(2);
+				   in_sd >> (*data_Capacity)(0);
+				   in_sd >> (*data_Capacity)(1);
+				   in_sd.clear();
+				   break;
+
             }
          }
 
-         //....................................................................
+
+		//....................................................................
+		// subkeyword found
+		if (line_string.find("LATENT_HEAT") != string::npos)
+		{
+			in_sd.str(GetLineFromFile1(msp_file));
+			in_sd >> freezing_latent_heat; // TYZ: 2015.02.27. Latent heat for freezing J/kg	
+		}
+
+		//....................................................................
+		// subkeyword found
+		if (line_string.find("FREEZING_SIGMOID_COEFFICENT") != string::npos)
+		{
+			in_sd.str(GetLineFromFile1(msp_file));
+			in_sd >> freezing_sigmoid_coeff; // TYZ: 2015.02.27. sigmoid coefficient for freezing unitless
+		}
+
+        //....................................................................
 		// subkeyword found
 		if(line_string.compare("CONDUCTIVITY") == 0)
 		{
@@ -285,6 +317,12 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 					                     0) >> (*data_Conductivity)(i,1);
 					in_sd.clear();
 				}
+				break;
+			case 6:       //  thermal conductivity soil and ice
+				data_Conductivity = new Matrix(2);
+				in_sd >> (*data_Conductivity)(0);
+				in_sd >> (*data_Conductivity)(1);
+				in_sd.clear();
 				break;
 			case 5:       // DECOVALEX2015, Task B2, Buffer: f(S,T) by matrix function 
 				in_sd >> T_0;
@@ -969,6 +1007,10 @@ CSolidProperties::CSolidProperties()
 	thermal_conductivity_tensor_dim = 1;
 	thermal_conductivity_tensor[0] = 1.0;
 
+	// freezing model parameters
+	freezing_latent_heat = 0.0; // TYZ: 2015.02.27. Latent heat for freezing J/kg
+	freezing_sigmoid_coeff = 0.0; // TYZ: 2015.02.27. sigmoid coefficient for freezing unitless
+
 	  //Reactive system
 	reaction_system = "INERT";
 	_reactive_system = FiniteElement::INERT;
@@ -1165,6 +1207,12 @@ double CSolidProperties::Density(double refence )
 	case 1:
 		val = (*data_Density)(0);
 		break;
+	case 6:
+		if (refence == 0.0)
+		    val = (*data_Density)(0);
+		else 
+	        val = (*data_Density)(1);
+		break;
 	}
 	return val;
 }
@@ -1198,6 +1246,12 @@ void CSolidProperties::NullDensity()
 		 case 4: //solid capacity depending on solid density (for thermochemical heat storage) - TN
 			 //refence contains value of solid density (current)
 			 val = (*data_Capacity)(0) + ((*data_Capacity)(1)-(*data_Capacity)(0))/((*data_Capacity)(3)-(*data_Capacity)(2))*(refence - (*data_Capacity)(2));
+			 break;
+		 case 6: //Freezing model - TYZ
+			 if (refence == 0.0)
+				 val = (*data_Capacity)(0);//soil heat capacity 0
+			 else
+				 val = (*data_Capacity)(1);//ice heat capacity 1
 			 break;
          default:
             val = (*data_Capacity)(0);
