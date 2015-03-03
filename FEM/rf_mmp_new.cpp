@@ -2795,6 +2795,8 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 	double T0, T1 = 0.0;
     double sigmoid_coeff; 
     double phi_i;
+	double sigmoid_derive;
+	double latent_heat;
 
 	//  double H0,H1;
 	// ???
@@ -2899,12 +2901,16 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 
         // get the freezing model parameter
         sigmoid_coeff = m_msp->getFreezingSigmoidCoeff();
+		// get the latent heat 
+		latent_heat = m_msp->getlatentheat();
         // get interpolated current temperature
         T1 = assem->interpolate(assem->NodalVal1);
         // get the volume fraction of ice
         phi_i = CalcIceVolFrac(T1, sigmoid_coeff);
+		// get the derivative of the sigmoid function
+		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff);
         // TODO change this function into freezing model
-		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;  
+		heat_capacity = (1 - phi_i) * porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
 		break;
 	//....................................................................
 	default:
@@ -2933,6 +2939,14 @@ double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid
     return phi_i; 
 }
 
+double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoid_coeff)
+{
+	double sigmoid_derive = 0.0;
+
+	sigmoid_derive = freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
+
+	return sigmoid_derive;
+}
 /**************************************************************************
    FEMLib-Method:
    Task:

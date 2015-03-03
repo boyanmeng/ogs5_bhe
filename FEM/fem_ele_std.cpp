@@ -2520,6 +2520,14 @@ void CFiniteElementStd::CalCoefLaplace(bool Gravity, int ip)
 			for(size_t i = 0; i < dim * dim; i++)
 				mat[i] = tensor[i];
 		}
+		else if (SolidProp->GetConductModel() == 7) // heat conductivity value including ice part 
+		{
+			// TG = interpolate(NodalVal1);
+			// Todo 
+			tensor = MediaProp->HeatDispersionTensorNew(ip);
+			for (size_t i = 0; i < dim * dim; i++)
+				mat[i] = tensor[i];
+		}
 		else
 		{
 			tensor = MediaProp->HeatConductivityTensor(Index);
