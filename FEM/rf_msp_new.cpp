@@ -1439,7 +1439,7 @@ double CSolidProperties::Heat_Conductivity(double refence)
 		CalPrimaryVariable(capacity_pcs_name_vector);
 		val = GetMatrixValue(primary_variable[0]+T_0,primary_variable[1],name,&gueltig);
 		break; 
-	case 6: //Freezing model - TYZ 
+	case 7: //Freezing model - TYZ 
 		if (refence == 0.0)
 			val = (*data_Conductivity)(0); // soil thermal conductivity 0
 		else
