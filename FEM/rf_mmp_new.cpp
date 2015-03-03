@@ -2909,7 +2909,7 @@ double CMediumProperties::HeatCapacity(long number, double theta,
         phi_i = CalcIceVolFrac(T1, sigmoid_coeff);
 		// get the derivative of the sigmoid function
 		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff);
-        // TODO change this function into freezing model
+        // Cp and latent heat based on the freezing model
 		heat_capacity = (1 - phi_i) * porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
 		break;
 	//....................................................................

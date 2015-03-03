@@ -319,9 +319,10 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 				}
 				break;
 			case 7:       //  thermal conductivity soil and ice 
-				data_Conductivity = new Matrix(2);
-				in_sd >> (*data_Conductivity)(0);
-				in_sd >> (*data_Conductivity)(1);
+				data_Conductivity = new Matrix(3);
+				in_sd >> (*data_Conductivity)(0); // soild lambda
+				in_sd >> (*data_Conductivity)(1); // ice lambda
+                in_sd >> (*data_Conductivity)(2); // water lambda
 				in_sd.clear();
 				break;
 			case 5:       // DECOVALEX2015, Task B2, Buffer: f(S,T) by matrix function 
@@ -1439,11 +1440,13 @@ double CSolidProperties::Heat_Conductivity(double refence)
 		CalPrimaryVariable(capacity_pcs_name_vector);
 		val = GetMatrixValue(primary_variable[0]+T_0,primary_variable[1],name,&gueltig);
 		break; 
-	case 6: //Freezing model - TYZ 
+	case 7: //Freezing model - TYZ 
 		if (refence == 0.0)
 			val = (*data_Conductivity)(0); // soil thermal conductivity 0
-		else
-			val = (*data_Conductivity)(1); // ice thermal conductivity 1
+        else if (refence == 1.0)
+            val = (*data_Conductivity)(1); // ice thermal conductivity 1
+        else
+			val = (*data_Conductivity)(2); // water thermal conductivity 2
 		break;
 	}
 	return val;
