@@ -318,7 +318,7 @@ std::ios::pos_type CSolidProperties::Read(std::ifstream* msp_file)
 					in_sd.clear();
 				}
 				break;
-			case 6:       //  thermal conductivity soil and ice
+			case 7:       //  thermal conductivity soil and ice 
 				data_Conductivity = new Matrix(2);
 				in_sd >> (*data_Conductivity)(0);
 				in_sd >> (*data_Conductivity)(1);
@@ -1439,6 +1439,12 @@ double CSolidProperties::Heat_Conductivity(double refence)
 		CalPrimaryVariable(capacity_pcs_name_vector);
 		val = GetMatrixValue(primary_variable[0]+T_0,primary_variable[1],name,&gueltig);
 		break; 
+	case 6: //Freezing model - TYZ 
+		if (refence == 0.0)
+			val = (*data_Conductivity)(0); // soil thermal conductivity 0
+		else
+			val = (*data_Conductivity)(1); // ice thermal conductivity 1
+		break;
 	}
 	return val;
 }
