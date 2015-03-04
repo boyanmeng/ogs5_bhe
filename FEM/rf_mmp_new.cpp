@@ -2888,16 +2888,9 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 
 		density_solid = fabs(m_msp->Density(0.0));
 		density_ice = fabs(m_msp->Density(1.0));
-		if (FLOW)
-		{
-			porosity = assem->MediaProp->Porosity(number, theta);
-			heat_capacity_fluids = MFPCalcFluidsHeatCapacity(assem);
-		}
-		else
-		{
-			heat_capacity_fluids = 0.0;
-			porosity = 0.0;
-		}
+
+		porosity = assem->MediaProp->Porosity(number, theta);
+		heat_capacity_fluids = assem->FluidProp->getSpecificHeatCapacity() * assem->FluidProp->Density();
 
         // get the freezing model parameter
         sigmoid_coeff = m_msp->getFreezingSigmoidCoeff();
@@ -2943,7 +2936,7 @@ double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoi
 {
 	double sigmoid_derive = 0.0;
 
-	sigmoid_derive = freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
+	sigmoid_derive = -freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
 
 	return sigmoid_derive;
 }
