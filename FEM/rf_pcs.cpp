@@ -911,6 +911,14 @@ void CRFProcess::Create()
                         m_bc_group->Set(this, 0);
                         bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
                         m_bc_group = NULL;
+                        // T_SOIL
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_SOIL");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_SOIL");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
                     }
                     else
                     {
@@ -927,6 +935,14 @@ void CRFProcess::Create()
                         m_bc_group = new CBoundaryConditionsGroup();
                         m_bc_group->setProcessTypeName(pcs_type_name);
                         m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_OUT_1");
+                        m_bc_group->Set(this, 0);
+                        bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
+                        m_bc_group = NULL;
+                        // T_SOIL
+                        BCGroupDelete(pcs_type_name, "TEMPERATURE_SOIL");
+                        m_bc_group = new CBoundaryConditionsGroup();
+                        m_bc_group->setProcessTypeName(pcs_type_name);
+                        m_bc_group->setProcessPrimaryVariableName("TEMPERATURE_SOIL");
                         m_bc_group->Set(this, 0);
                         bc_group_list.push_back(m_bc_group); //Useless, to be removed. WW
                         m_bc_group = NULL;
@@ -6926,7 +6942,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 
 
 #else
-            if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+            if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && m_bc_node->pcs_pv_name.compare("TEMPERATURE_SOIL") != 0 )
                 shift = m_bc_node->bhe_node_shift;
             else
                 shift = m_bc_node->msh_node_number - m_bc_node->geo_node_number;
@@ -7038,7 +7054,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 					        idx_1);
 				}
 				else
-                if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE)
+                if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && m_bc_node->pcs_pv_name.compare("TEMPERATURE_SOIL") != 0)
                 {
                     // if it is the TEMPERATURE_IN, 
                     if (m_bc_node->bhe_pipe_flag == 0 )
