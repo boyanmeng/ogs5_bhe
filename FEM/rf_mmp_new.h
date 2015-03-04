@@ -306,6 +306,7 @@ public:
     // HS: borehole heat exchanger related parameters
     bool is_BHE;  // indicate whether this MMP is a borehole heat exchanger. 
     BHE::BHE_TYPE bhe_type;
+    BHE::BHE_BOUNDARY_TYPE bhe_bound_type;
     BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
     double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness;

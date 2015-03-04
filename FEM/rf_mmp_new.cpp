@@ -1939,6 +1939,25 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             continue; 
         }
 
+        if (line_string.find("BHE_BOUNDARY_TYPE") != std::string::npos)
+        {
+            std::string str_tmp;
+            in.str(GetLineFromFile1(mmp_file));
+            in >> str_tmp;
+            if (str_tmp.compare("FIXED_INFLOW_TEMP") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP;
+            else if (str_tmp.compare("FIXED_INFLOW_TEMP_CURVE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP_CURVE;
+            else if (str_tmp.compare("POWER_IN_WATT") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT;
+            else if (str_tmp.compare("POWER_IN_WATT_CURVE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE;
+            else if (str_tmp.compare("FIXED_TEMP_DIFF") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_TEMP_DIFF;
+            in.clear();
+            continue;
+        }
+
         if (line_string.find("BHE_LENGTH") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));
