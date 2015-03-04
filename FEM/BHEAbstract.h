@@ -38,6 +38,14 @@ namespace BHE  // namespace of borehole heat exchanger
 		BHE_TYPE_CXA	  // coaxial pipe with centreed inlet
 	};
 
+    enum BHE_BOUNDARY_TYPE {
+        BHE_BOUND_FIXED_INFLOW_TEMP, 
+        BHE_BOUND_FIXED_INFLOW_TEMP_CURVE,
+        BHE_BOUND_POWER_IN_WATT,
+        BHE_BOUND_POWER_IN_WATT_CURVE,
+        BHE_BOUND_FIXED_TEMP_DIFF,
+    };
+
 	/**
 	  * discharge type of the 2U BHE
 	  */
@@ -52,8 +60,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-		BHEAbstract(BHE_TYPE my_type, const std::string name) 
-            : type(my_type), _name(name)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUNDARY_TYPE::BHE_BOUND_FIXED_INFLOW_TEMP)
+            : type(my_type), _name(name), bound_type(my_bound_type)
 		{};
 
 		/**
@@ -77,6 +85,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * return the type of the BHE
 		  */
 		BHE_TYPE get_type() { return type; };
+
+        /**
+          * return the type of boundary condition on this BHE
+          */
+        BHE_BOUNDARY_TYPE get_bound_type() { return bound_type; };
 
         /**
           * return the name of the BHE
@@ -321,6 +334,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * the type of the BHE
 		  */
 		const BHE_TYPE type;
+
+        /**
+          * the type of the boundary condition on this BHE
+          */
+        const BHE_BOUNDARY_TYPE bound_type; 
 
         /**
           * the polyline geometry representing the BHE
