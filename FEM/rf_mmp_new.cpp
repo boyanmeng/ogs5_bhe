@@ -1958,6 +1958,13 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             continue;
         }
 
+        if (line_string.find("BHE_POWER_IN_WATT_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_power_in_watt_val;
+            in.clear();
+            continue;
+        }
         if (line_string.find("BHE_LENGTH") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));

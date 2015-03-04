@@ -38,7 +38,8 @@ namespace BHE  // namespace of borehole heat exchanger
                 double my_heat_cap_g = 1000        /* specific heat capacity of the grout */,
 				double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
 				double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
-				double my_lambda_g = 2.3           /* thermal conductivity of the grout */)
+				double my_lambda_g = 2.3           /* thermal conductivity of the grout */, 
+                double my_power_in_watt = 0.0      /* injected or extracted power */)
 			: BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type)
 		{
 			_u = Eigen::Vector2d::Zero();
@@ -61,6 +62,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_r = my_lambda_r;
 			lambda_p = my_lambda_p;
 			lambda_g = my_lambda_g;
+            power_in_watt_val = my_power_in_watt;
 
 			// Table 1 in Diersch_2011_CG
 			S_i = PI * 2.0 * r_outer;
@@ -171,6 +173,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the number of grout zones in this BHE.
           */
         std::size_t get_n_grout_zones(void) { return 1; };
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        double get_Tin_by_Tout_and_power(double T_out);
 
         /**
         * required by eigen library,

@@ -204,6 +204,11 @@ namespace BHE  // namespace of borehole heat exchanger
         virtual std::size_t get_n_grout_zones(void) = 0; 
 
         /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        virtual double get_Tin_by_Tout_and_power(double T_in) = 0;
+
+        /**
           * get the polyline geometry 
           * that is representing this BHE. 
           */
@@ -328,6 +333,14 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * unit is m
 		  */
 		double D;
+
+        /**
+          * power extracted from or injected into the BHE
+          * unit is Watt
+          * if value positive, then injecting power
+          * if value negative, then extracting power
+          */
+        double power_in_watt_val; 
 	private:
 
 		/**

@@ -330,3 +330,12 @@ int BHE_CXA::get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name)
 
     return idx;
 }
+
+double BHE_CXA::get_Tin_by_Tout_and_power(double T_out)
+{
+    double T_in(0.0);
+
+    T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
+
+    return T_in;
+}

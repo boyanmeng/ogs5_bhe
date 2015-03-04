@@ -40,6 +40,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_p   = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g   = 2.3           /* thermal conductivity of the grout */, 
 			   double my_omega      = 0.04242       /* pipe distance */,
+               double my_power_in_watt = 0.0      /* injected or extracted power */,
 			   BHE_DISCHARGE_TYPE type = BHE::BHE_DISCHARGE_TYPE_PARALLEL) 
                : BHEAbstract(BHE::BHE_TYPE_2U, name, bound_type),
 			_discharge_type(type)
@@ -65,6 +66,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p; 
 			lambda_g = my_lambda_g; 
 			omega = my_omega; 
+            power_in_watt_val = my_power_in_watt;
 
 			S_i  = PI * 2.0 * r_outer;
 			S_o  = PI * 2.0 * r_outer; 
@@ -177,6 +179,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the number of grout zones in this BHE.
           */
         std::size_t get_n_grout_zones(void) { return 4; };
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        double get_Tin_by_Tout_and_power(double T_out);
 
         /**
           * required by eigen library, 

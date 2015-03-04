@@ -1054,6 +1054,7 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
                         shift += idx_pv;
                         m_node_value->bhe_node_shift = shift - node_idx;
                         m_node_value->bhe_pv_index = (std::size_t)idx_pv; 
+                        m_node_value->bhe_index = BHE_index; 
                         if (vec_BHEs[BHE_index]->get_type() == BHE::BHE_TYPE_2U)
                         {
                             if (idx_pv == 0 || idx_pv == 1)
