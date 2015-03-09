@@ -2793,6 +2793,11 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 	double porosity, Sat, PG;
 	int group;
 	double T0, T1 = 0.0;
+    double sigmoid_coeff; 
+    double phi_i;
+	double sigmoid_derive;
+	double latent_heat;
+
 	//  double H0,H1;
 	// ???
 	bool FLOW = false;                    //WW
@@ -2871,8 +2876,10 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		        assem->SolidProp->Density()) + Porosity(assem)
 		                * MFPCalcFluidsHeatCapacity(assem);
 		break;
-	case 6:                               // const
-		//OK411
+	case 6: 
+		// TYZ, heat capacity for ice freezing model 
+        phi_i = 0.0; 
+
 		group = m_pcs->m_msh->ele_vector[number]->GetPatchIndex();
 		m_msp = msp_vector[group];
 		// heat capacity 
@@ -2881,17 +2888,22 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 
 		density_solid = fabs(m_msp->Density(0.0));
 		density_ice = fabs(m_msp->Density(1.0));
-		if (FLOW)
-		{
-			porosity = assem->MediaProp->Porosity(number, theta);
-			heat_capacity_fluids = MFPCalcFluidsHeatCapacity(assem);
-		}
-		else
-		{
-			heat_capacity_fluids = 0.0;
-			porosity = 0.0;
-		}
-		heat_capacity = porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid;  // TODO change this function into freezing model
+
+		porosity = assem->MediaProp->Porosity(number, theta);
+		heat_capacity_fluids = assem->FluidProp->getSpecificHeatCapacity() * assem->FluidProp->Density();
+
+        // get the freezing model parameter
+        sigmoid_coeff = m_msp->getFreezingSigmoidCoeff();
+		// get the latent heat 
+		latent_heat = m_msp->getlatentheat();
+        // get interpolated current temperature
+        T1 = assem->interpolate(assem->NodalVal1);
+        // get the volume fraction of ice
+        phi_i = CalcIceVolFrac(T1, sigmoid_coeff);
+		// get the derivative of the sigmoid function
+		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff);
+        // Cp and latent heat based on the freezing model
+		heat_capacity = (1 - phi_i) * porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
 		break;
 	//....................................................................
 	default:
@@ -2904,6 +2916,30 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 	return heat_capacity;
 }
 
+
+/**************************************************************************
+FEMLib-Method:
+Task: calculate the volume fraction of ice based on temperatuer
+Programing:
+02/2015 HS Implementation
+**************************************************************************/
+double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff)
+{
+    double phi_i = 0.0; 
+
+    phi_i = 1.0 - 1.0 / (1.0 + std::exp(-1.0 * freezing_sigmoid_coeff * T_in_dC));
+    
+    return phi_i; 
+}
+
+double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoid_coeff)
+{
+	double sigmoid_derive = 0.0;
+
+	sigmoid_derive = -freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
+
+	return sigmoid_derive;
+}
 /**************************************************************************
    FEMLib-Method:
    Task:

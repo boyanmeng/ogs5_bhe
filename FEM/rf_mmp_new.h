@@ -124,6 +124,8 @@ private:
 	//CMCD 9/2004 GeoSys 4
 	double StorageFunction(long number,double* gp,double theta);
 	double HeatCapacity(long number,double theta, CFiniteElementStd* assem = NULL);
+    double CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff); // TYZ
+	double Calcsigmoidderive(double freezing_sigmoid_coeff, double phi_i); // TYZ
 	double* HeatConductivityTensor(int number); //MX
 	double* HeatDispersionTensorNew(int ip); //CMCD
 	double* MassDispersionTensorNew(int ip, int phase); //CMCD, SB, BG

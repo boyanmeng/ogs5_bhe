@@ -228,6 +228,8 @@ namespace SolidProp
          double Enthalpy(double temperature, const double latent_factor );
          double Heat_Conductivity(double refence = 0.0);
          void HeatConductivityTensor(const int dim, double* tensor, int group);
+         double getFreezingSigmoidCoeff() { return freezing_sigmoid_coeff;  };
+		 double getlatentheat() { return freezing_latent_heat; };
          //   int GetCapacityMode() {return Capacity_mode;};  ??
          // 3. Elasticity
 #ifdef RFW_FRACTURE
