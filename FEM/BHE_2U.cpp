@@ -402,3 +402,12 @@ double BHE_2U::get_Tin_by_Tout_and_power(double T_out)
 
     return T_in;
 }
+
+double BHE_2U::get_Tin_by_Tout_and_delta_T(double T_out)
+{
+    double T_in(0.0);
+
+    T_in = T_out + delta_T_val;
+
+    return T_in;
+}

@@ -309,6 +309,7 @@ public:
     BHE::BHE_BOUNDARY_TYPE bhe_bound_type;
     BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
     double bhe_power_in_watt_val; 
+    double bhe_delta_T_val; 
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
     double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness;
     double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;

@@ -31,7 +31,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_b_out      = 0.0029        /* pipe-out wall thickness*/,
 			   double my_mu_r       = 0.00054741    /* dynamic viscosity of the refrigerant */,
 			   double my_rho_r      = 988.1         /* density of the refrigerant */,
-			   double my_alpha_L    = 1.0e-4         /* longitudinal dispersivity of the refrigerant in the pipeline */,
+			   double my_alpha_L    = 1.0e-4        /* longitudinal dispersivity of the refrigerant in the pipeline */,
                double my_heat_cap_r = 4180          /* specific heat capacity of the refrigerant */,
                double my_rho_g      = 2190          /* density of the grout */,
 			   double my_porosity_g = 0.5           /* porosity of the grout */,
@@ -40,7 +40,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_p   = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g   = 2.3           /* thermal conductivity of the grout */, 
 			   double my_omega      = 0.04242       /* pipe distance */,
-               double my_power_in_watt = 0.0      /* injected or extracted power */,
+               double my_power_in_watt = 0.0        /* injected or extracted power */,
+               double my_delta_T_val = 0.0          /* Temperature difference btw inflow and outflow temperature */,
 			   BHE_DISCHARGE_TYPE type = BHE::BHE_DISCHARGE_TYPE_PARALLEL) 
                : BHEAbstract(BHE::BHE_TYPE_2U, name, bound_type),
 			_discharge_type(type)
@@ -66,7 +67,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p; 
 			lambda_g = my_lambda_g; 
 			omega = my_omega; 
-            power_in_watt_val = my_power_in_watt;
+            power_in_watt_val = my_power_in_watt; 
+            delta_T_val = my_delta_T_val; 
 
 			S_i  = PI * 2.0 * r_outer;
 			S_o  = PI * 2.0 * r_outer; 
@@ -184,6 +186,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the inflow temperature based on outflow temperature and fixed power.
           */
         double get_Tin_by_Tout_and_power(double T_out);
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed delta_T.
+          */
+        double get_Tin_by_Tout_and_delta_T(double T_out);
 
         /**
           * required by eigen library, 

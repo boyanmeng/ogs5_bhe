@@ -3287,7 +3287,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
-                                           mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val);
+                                           mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_delta_T_val);
                 vec_BHEs.push_back(m_bhe_1u);
                 break;
             case BHE::BHE_TYPE_2U:
@@ -3297,7 +3297,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
-                                           mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_2u_discharge_type);
+                                           mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
                 break;
             case BHE::BHE_TYPE_CXC:
@@ -3306,7 +3306,8 @@ void CRFProcess::ConfigBHEs()
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness, 
 											 mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
-                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_power_in_watt_val);
+                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
+                                             mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_delta_T_val);
                 vec_BHEs.push_back(m_bhe_cxc);
                 break;
             case BHE::BHE_TYPE_CXA:
@@ -3315,7 +3316,8 @@ void CRFProcess::ConfigBHEs()
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
 											 mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
-                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, mmp_vector[i]->bhe_power_in_watt_val);
+                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
+                                             mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_delta_T_val);
                 vec_BHEs.push_back(m_bhe_cxa);
                 break;
             default:
@@ -7081,7 +7083,24 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             #endif
                             // need some calculation
                             // notice that the time_fac will bring the curve value. We do not need it. 
-                            bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout_and_power(T_out); // TODO
+                            bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout_and_power(T_out); 
+                        }
+                        else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF)
+                        {
+                            // get the T_out value
+                            if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
+                                eqs_index = bc_msh_node + shift + 3;
+                            else
+                                eqs_index = bc_msh_node + shift + 1;
+                            #ifdef NEW_EQS
+                                T_out = eqs_new->x[eqs_index];
+                            #else
+                                T_out = eqs->x[eqs_index];
+                            #endif
+                            // need some calculation
+                            // notice that the time_fac will bring the curve value. We do not need it. 
+                            bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout_and_delta_T(T_out);
+
                         }
                     }
                     else // out flow pipe

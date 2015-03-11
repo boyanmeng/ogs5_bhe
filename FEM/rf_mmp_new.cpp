@@ -148,7 +148,10 @@ CMediumProperties::CMediumProperties() :
 	storage_effstress_model = 0;
 	permeability_effstress_model = 0;
 
+    // BHE parameters
     is_BHE = false; 
+    bhe_power_in_watt_val = 0.0; 
+    bhe_delta_T_val = 0.0; 
 }
 
 /**************************************************************************
@@ -1962,6 +1965,13 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
         {
             in.str(GetLineFromFile1(mmp_file));
             in >> bhe_power_in_watt_val;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_DELTA_T_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_delta_T_val;
             in.clear();
             continue;
         }

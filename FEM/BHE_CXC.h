@@ -39,7 +39,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			    double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
 			    double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
 			    double my_lambda_g = 2.3           /* thermal conductivity of the grout */, 
-                double my_power_in_watt = 0.0      /* injected or extracted power */)
+                double my_power_in_watt = 0.0      /* injected or extracted power */, 
+                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */)
                 : BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type)
 		{
 			_u = Eigen::Vector2d::Zero();
@@ -63,6 +64,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p;
 			lambda_g = my_lambda_g;
             power_in_watt_val = my_power_in_watt;
+            delta_T_val = my_delta_T_val; 
 
 			// Table 1 in Diersch_2011_CG
 			S_o = PI * 2.0 * r_outer;
@@ -178,6 +180,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the inflow temperature based on outflow temperature and fixed power.
           */
         double get_Tin_by_Tout_and_power(double T_out);
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed delta_T.
+          */
+        double get_Tin_by_Tout_and_delta_T(double T_out);
 
         /**
         * required by eigen library,

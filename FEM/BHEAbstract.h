@@ -209,6 +209,11 @@ namespace BHE  // namespace of borehole heat exchanger
         virtual double get_Tin_by_Tout_and_power(double T_in) = 0;
 
         /**
+        * return the inflow temperature based on outflow temperature and fixed delta_T.
+        */
+        virtual double get_Tin_by_Tout_and_delta_T(double T_out) = 0;
+
+        /**
           * get the polyline geometry 
           * that is representing this BHE. 
           */
@@ -341,6 +346,12 @@ namespace BHE  // namespace of borehole heat exchanger
           * if value negative, then extracting power
           */
         double power_in_watt_val; 
+
+        /**
+          * temperature difference between inflow and 
+          * outflow pipelines
+          */
+        double delta_T_val;
 	private:
 
 		/**
