@@ -24,6 +24,7 @@
 #include "Eigen/Eigen"
 #include "../GEO/Polyline.h"
 #include "FEMEnums.h"
+// #include "tools.h" // HS: needed for the function GetCurveValue() 
 #include <math.h>
 
 namespace BHE  // namespace of borehole heat exchanger
@@ -42,7 +43,8 @@ namespace BHE  // namespace of borehole heat exchanger
         BHE_BOUND_FIXED_INFLOW_TEMP, 
         BHE_BOUND_FIXED_INFLOW_TEMP_CURVE,
         BHE_BOUND_POWER_IN_WATT,
-        BHE_BOUND_POWER_IN_WATT_CURVE,
+        BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT,
+        BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE,
         BHE_BOUND_FIXED_TEMP_DIFF,
     };
 
@@ -206,12 +208,7 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * return the inflow temperature based on outflow temperature and fixed power.
           */
-        virtual double get_Tin_by_Tout_and_power(double T_in) = 0;
-
-        /**
-        * return the inflow temperature based on outflow temperature and fixed delta_T.
-        */
-        virtual double get_Tin_by_Tout_and_delta_T(double T_out) = 0;
+        virtual double get_Tin_by_Tout(double T_in, double current_time) = 0;
 
         /**
           * get the polyline geometry 
@@ -346,6 +343,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * if value negative, then extracting power
           */
         double power_in_watt_val; 
+
+        /**
+          * index of the power in watt curve
+          */
+        std::size_t power_in_watt_curve_idx; 
 
         /**
           * temperature difference between inflow and 
