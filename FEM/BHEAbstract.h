@@ -135,6 +135,21 @@ namespace BHE  // namespace of borehole heat exchanger
 			calc_heat_transfer_coefficients();
 		};
 
+        /**
+          * update all parameters based on the new flow rate
+          * not necessarily needs to be overwritten.
+          */
+        virtual void update_flow_rate(double new_flow_rate)
+        {
+            Q_r = new_flow_rate; 
+            calc_u();
+            calc_Re();
+            calc_Pr();
+            calc_Nu();
+            calc_thermal_resistances();
+            calc_heat_transfer_coefficients();
+        };
+
 		/**
 		  * thermal resistance calculation, 
 		  * need to be overwritten. 
