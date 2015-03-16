@@ -21,6 +21,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * constructor
 		  */
         BHE_2U(const std::string name               /* name of the BHE */,
+               BHE::BHE_BOUNDARY_TYPE bound_type    /* type of BHE boundary */,
                double my_L          = 100           /* length/depth of the BHE */,
 			   double my_D          = 0.013         /* diameter of the BHE */, 
 			   double my_Qr         = 21.86 / 86400 /* total refrigerant flow discharge of BHE */,
@@ -30,7 +31,7 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_b_out      = 0.0029        /* pipe-out wall thickness*/,
 			   double my_mu_r       = 0.00054741    /* dynamic viscosity of the refrigerant */,
 			   double my_rho_r      = 988.1         /* density of the refrigerant */,
-			   double my_alpha_L    = 1.0e-4         /* longitudinal dispersivity of the refrigerant in the pipeline */,
+			   double my_alpha_L    = 1.0e-4        /* longitudinal dispersivity of the refrigerant in the pipeline */,
                double my_heat_cap_r = 4180          /* specific heat capacity of the refrigerant */,
                double my_rho_g      = 2190          /* density of the grout */,
 			   double my_porosity_g = 0.5           /* porosity of the grout */,
@@ -39,8 +40,11 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_p   = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g   = 2.3           /* thermal conductivity of the grout */, 
 			   double my_omega      = 0.04242       /* pipe distance */,
+               double my_power_in_watt = 0.0        /* injected or extracted power */,
+               std::size_t my_power_curve_idx = -1  /* index of the power curve*/,
+               double my_delta_T_val = 0.0          /* Temperature difference btw inflow and outflow temperature */,
 			   BHE_DISCHARGE_TYPE type = BHE::BHE_DISCHARGE_TYPE_PARALLEL) 
-			:  BHEAbstract(BHE::BHE_TYPE_2U, name), 
+               : BHEAbstract(BHE::BHE_TYPE_2U, name, bound_type),
 			_discharge_type(type)
 		{
 			_u = Eigen::Vector4d::Zero();
@@ -64,6 +68,9 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p; 
 			lambda_g = my_lambda_g; 
 			omega = my_omega; 
+            power_in_watt_val = my_power_in_watt; 
+            power_in_watt_curve_idx = my_power_curve_idx;
+            delta_T_val = my_delta_T_val; 
 
 			S_i  = PI * 2.0 * r_outer;
 			S_o  = PI * 2.0 * r_outer; 
@@ -176,6 +183,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the number of grout zones in this BHE.
           */
         std::size_t get_n_grout_zones(void) { return 4; };
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        double get_Tin_by_Tout(double T_out, double current_time);
 
         /**
           * required by eigen library, 

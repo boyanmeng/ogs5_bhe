@@ -148,7 +148,11 @@ CMediumProperties::CMediumProperties() :
 	storage_effstress_model = 0;
 	permeability_effstress_model = 0;
 
+    // BHE parameters
     is_BHE = false; 
+    bhe_power_in_watt_val = 0.0; 
+    bhe_delta_T_val = 0.0; 
+    bhe_power_in_watt_curve_idx = -1; 
 }
 
 /**************************************************************************
@@ -1939,6 +1943,48 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             continue; 
         }
 
+        if (line_string.find("BHE_BOUNDARY_TYPE") != std::string::npos)
+        {
+            std::string str_tmp;
+            in.str(GetLineFromFile1(mmp_file));
+            in >> str_tmp;
+            if (str_tmp.compare("FIXED_INFLOW_TEMP") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP;
+            else if (str_tmp.compare("FIXED_INFLOW_TEMP_CURVE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP_CURVE;
+            else if (str_tmp.compare("POWER_IN_WATT") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT;
+            else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_DT") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT;
+            else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_FLOW_RATE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE;
+            else if (str_tmp.compare("FIXED_TEMP_DIFF") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_TEMP_DIFF;
+            in.clear();
+            continue;
+        }
+
+        if (line_string.find("BHE_POWER_IN_WATT_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_power_in_watt_val;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_POWER_IN_WATT_CURVE_IDX") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_power_in_watt_curve_idx;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_DELTA_T_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_delta_T_val;
+            in.clear();
+            continue;
+        }
         if (line_string.find("BHE_LENGTH") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));

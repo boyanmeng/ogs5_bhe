@@ -7,6 +7,7 @@
 
 #include "BHE_1U.h"
 #include "makros.h"
+#include "tools.h"
 
 using namespace BHE;
 
@@ -318,3 +319,46 @@ int BHE_1U::get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name)
     
     return idx;
 }
+
+double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
+{
+    double T_in(0.0);
+    double power_tmp(0.0);
+    int flag_valid = false; 
+    double Q_r_tmp(0.0);
+
+    switch (this->get_bound_type())
+    {
+    case BHE_BOUND_POWER_IN_WATT:
+        T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
+        break;
+    case BHE_BOUND_FIXED_TEMP_DIFF: 
+        T_in = T_out + delta_T_val;
+        break; 
+    case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT:
+        // get the power value in the curve
+        power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // calculate the corresponding flow rate needed
+        // using the defined delta_T value
+        Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
+        // update all values dependent on the flow rate
+        update_flow_rate(Q_r_tmp); 
+        // calculate the new T_in
+        T_in = T_out + delta_T_val;
+        break; 
+    case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
+        // get the power value in the curve
+        power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // calculate the dT value based on fixed flow rate
+        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r; 
+        // calcuate the new T_in 
+        T_in = T_out + delta_T_val;
+        break; 
+    default:
+        T_in = T_out; 
+        break;
+    }
+
+    return T_in; 
+}
+

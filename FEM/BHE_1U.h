@@ -21,6 +21,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		* constructor
 		*/
         BHE_1U(const std::string name             /* name of the BHE */,
+               BHE::BHE_BOUNDARY_TYPE bound_type  /* type of BHE boundary */,
                double my_L = 100                  /* length/depth of the BHE */,
 			   double my_D = 0.013                /* diameter of the BHE */,
 			   double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
@@ -38,8 +39,11 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
 			   double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
 			   double my_lambda_g = 2.3           /* thermal conductivity of the grout */,
-			   double my_omega = 0.06             /* pipe distance */)
-			: BHEAbstract(BHE::BHE_TYPE_1U, name)
+			   double my_omega = 0.06             /* pipe distance */, 
+               double my_power_in_watt = 0.0      /* injected or extracted power */, 
+               std::size_t my_power_curve_idx = -1/* index of the power curve*/, 
+               double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */)
+               : BHEAbstract(BHE::BHE_TYPE_1U, name, bound_type)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
@@ -62,6 +66,9 @@ namespace BHE  // namespace of borehole heat exchanger
 			lambda_p = my_lambda_p;
 			lambda_g = my_lambda_g;
 			omega = my_omega;
+            power_in_watt_val = my_power_in_watt; 
+            power_in_watt_curve_idx = my_power_curve_idx; 
+            delta_T_val = my_delta_T_val;
 
 			// Table 1 in Diersch_2011_CG
 			S_i = PI * 2.0 * r_outer;
@@ -174,6 +181,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the number of grout zones in this BHE.
           */
         std::size_t get_n_grout_zones(void) { return 2; };
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        double get_Tin_by_Tout(double T_out, double current_time);
 
         /**
         * required by eigen library,

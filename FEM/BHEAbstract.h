@@ -24,6 +24,7 @@
 #include "Eigen/Eigen"
 #include "../GEO/Polyline.h"
 #include "FEMEnums.h"
+// #include "tools.h" // HS: needed for the function GetCurveValue() 
 #include <math.h>
 
 namespace BHE  // namespace of borehole heat exchanger
@@ -37,6 +38,15 @@ namespace BHE  // namespace of borehole heat exchanger
 		BHE_TYPE_CXC,  // coaxial pipe with annualar inlet
 		BHE_TYPE_CXA	  // coaxial pipe with centreed inlet
 	};
+
+    enum BHE_BOUNDARY_TYPE {
+        BHE_BOUND_FIXED_INFLOW_TEMP, 
+        BHE_BOUND_FIXED_INFLOW_TEMP_CURVE,
+        BHE_BOUND_POWER_IN_WATT,
+        BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT,
+        BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE,
+        BHE_BOUND_FIXED_TEMP_DIFF,
+    };
 
 	/**
 	  * discharge type of the 2U BHE
@@ -52,8 +62,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-		BHEAbstract(BHE_TYPE my_type, const std::string name) 
-            : type(my_type), _name(name)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUNDARY_TYPE::BHE_BOUND_FIXED_INFLOW_TEMP)
+            : type(my_type), _name(name), bound_type(my_bound_type)
 		{};
 
 		/**
@@ -77,6 +87,11 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * return the type of the BHE
 		  */
 		BHE_TYPE get_type() { return type; };
+
+        /**
+          * return the type of boundary condition on this BHE
+          */
+        BHE_BOUNDARY_TYPE get_bound_type() { return bound_type; };
 
         /**
           * return the name of the BHE
@@ -119,6 +134,21 @@ namespace BHE  // namespace of borehole heat exchanger
 			calc_thermal_resistances();
 			calc_heat_transfer_coefficients();
 		};
+
+        /**
+          * update all parameters based on the new flow rate
+          * not necessarily needs to be overwritten.
+          */
+        virtual void update_flow_rate(double new_flow_rate)
+        {
+            Q_r = new_flow_rate; 
+            calc_u();
+            calc_Re();
+            calc_Pr();
+            calc_Nu();
+            calc_thermal_resistances();
+            calc_heat_transfer_coefficients();
+        };
 
 		/**
 		  * thermal resistance calculation, 
@@ -189,6 +219,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * return the number of grout zones in this BHE.  
           */
         virtual std::size_t get_n_grout_zones(void) = 0; 
+
+        /**
+          * return the inflow temperature based on outflow temperature and fixed power.
+          */
+        virtual double get_Tin_by_Tout(double T_in, double current_time) = 0;
 
         /**
           * get the polyline geometry 
@@ -315,12 +350,36 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * unit is m
 		  */
 		double D;
+
+        /**
+          * power extracted from or injected into the BHE
+          * unit is Watt
+          * if value positive, then injecting power
+          * if value negative, then extracting power
+          */
+        double power_in_watt_val; 
+
+        /**
+          * index of the power in watt curve
+          */
+        std::size_t power_in_watt_curve_idx; 
+
+        /**
+          * temperature difference between inflow and 
+          * outflow pipelines
+          */
+        double delta_T_val;
 	private:
 
 		/**
 		  * the type of the BHE
 		  */
 		const BHE_TYPE type;
+
+        /**
+          * the type of the boundary condition on this BHE
+          */
+        const BHE_BOUNDARY_TYPE bound_type; 
 
         /**
           * the polyline geometry representing the BHE
