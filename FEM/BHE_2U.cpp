@@ -252,19 +252,19 @@ void BHE_2U::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_l
 		break;
 	case 4:
 		// pipe g1, Eq. 14
-        laplace_coeff = porosity_g * lambda_g * CSA_g1;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g1;
 		break;
 	case 5:
 		// pipe g2, Eq. 15
-        laplace_coeff = porosity_g * lambda_g * CSA_g1;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g1;
 		break;
 	case 6:
 		// pipe g3, Eq. 16
-        laplace_coeff = porosity_g * lambda_g * CSA_g2;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g2;
 		break;
 	case 7:
 		// pipe g4, Eq. 17
-        laplace_coeff = porosity_g * lambda_g * CSA_g2;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g2;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n";
