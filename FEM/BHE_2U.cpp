@@ -205,16 +205,16 @@ double BHE_2U::get_mass_coeff(std::size_t idx_unknown)
         mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 4:  // g1
-        mass_coeff = rho_g * heat_cap_g * CSA_g1;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
         break;
     case 5:  // g2
-        mass_coeff = rho_g * heat_cap_g * CSA_g1;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
         break;
     case 6:  // g3
-        mass_coeff = rho_g * heat_cap_g * CSA_g2;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
         break;
     case 7:  // g4
-        mass_coeff = rho_g * heat_cap_g * CSA_g2;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
         break;
     default:
         break;
