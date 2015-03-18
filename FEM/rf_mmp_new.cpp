@@ -152,7 +152,7 @@ CMediumProperties::CMediumProperties() :
     is_BHE = false; 
     bhe_power_in_watt_val = 0.0; 
     bhe_delta_T_val = 0.0; 
-    bhe_power_in_watt_curve_idx = -1; 
+    bhe_power_in_watt_curve_idx = 0; 
 }
 
 /**************************************************************************
