@@ -2538,8 +2538,8 @@ void CFiniteElementStd::CalCoefLaplace(bool Gravity, int ip)
             poro = MediaProp->Porosity(Index, pcs->m_num->ls_theta);
             mat_fac = lambda_solid*(1 - poro) + lambda_ice*phi_i + lambda_water*(poro - phi_i);
 
-			for (size_t i = 0; i < dim * dim; i++)
-                mat[i] = mat_fac;
+			for (size_t i = 0; i < dim ; i++)
+                mat[i * dim + i] = mat_fac;
 		}
 		else
 		{
