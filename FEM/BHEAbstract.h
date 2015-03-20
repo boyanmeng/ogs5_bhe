@@ -62,7 +62,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUNDARY_TYPE::BHE_BOUND_FIXED_INFLOW_TEMP)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP)
             : type(my_type), _name(name), bound_type(my_bound_type)
 		{};
 
