@@ -2535,6 +2535,9 @@ void CFiniteElementStd::CalCoefLaplace(bool Gravity, int ip)
             sigmoid_coeff = SolidProp->getFreezingSigmoidCoeff();
             // get the volume fraction of ice
             phi_i = MediaProp->CalcIceVolFrac(TG, sigmoid_coeff);
+			// output the element value
+			this->pcs->SetElementValue(this->MeshElement->GetIndex(),pcs->GetElementValueIndex("PHI_I"),phi_i);
+
             poro = MediaProp->Porosity(Index, pcs->m_num->ls_theta);
             mat_fac = lambda_solid*(1 - poro) + lambda_ice*phi_i + lambda_water*(poro - phi_i);
 

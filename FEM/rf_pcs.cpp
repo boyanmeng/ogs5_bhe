@@ -3259,6 +3259,11 @@ void CRFProcess::ConfigHeatTransport_BHE()
 
     // initialize the BHE data structure
     ConfigBHEs(); 
+	// Output elements values
+
+    // 1 ELE values
+	pcs_number_of_evals = 1;
+	pcs_eval_name[0] = "PHI_I";
 }
 
 /**************************************************************************
