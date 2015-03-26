@@ -3220,6 +3220,9 @@ void CRFProcess::ConfigHeatTransport()
 		pcs_primary_function_unit[1] = "K";
 		pcs_number_of_secondary_nvals = 0;
 	}
+	// 1 ELE values
+	pcs_number_of_evals = 1;
+	pcs_eval_name[0] = "PHI_I";
 }
 
 /**************************************************************************
@@ -3259,9 +3262,8 @@ void CRFProcess::ConfigHeatTransport_BHE()
 
     // initialize the BHE data structure
     ConfigBHEs(); 
-	// Output elements values
 
-    // 1 ELE values
+	// 1 ELE values
 	pcs_number_of_evals = 1;
 	pcs_eval_name[0] = "PHI_I";
 }
