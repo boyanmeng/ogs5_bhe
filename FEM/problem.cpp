@@ -1500,7 +1500,7 @@ void Problem::PostCouplingLoop()
 		// JT: Now done in PreCouplingLoop() // m_pcs->CopyTimestepNODValues(); //MB
 		if(force_post_node_copy){ // JT: safety valve. Set this value to true (in Problem()) and values will be copied here.
 			m_pcs->CopyTimestepNODValues();
-			m_pcs->CopyTimestepELEValues();
+//			m_pcs->CopyTimestepELEValues();
 		}
 	}
 // WW
