@@ -2945,11 +2945,11 @@ double CMediumProperties::HeatCapacity(long number, double theta,
         // get interpolated current temperature
         T1 = assem->interpolate(assem->NodalVal1);
         // get the volume fraction of ice
-        phi_i = CalcIceVolFrac(T1, sigmoid_coeff);
+        phi_i = CalcIceVolFrac(T1, sigmoid_coeff, porosity);
 		// get the derivative of the sigmoid function
-		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff);
+		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff, porosity);
         // Cp and latent heat based on the freezing model
-		heat_capacity = (1 - phi_i) * porosity * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
+		heat_capacity = (porosity - phi_i) * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
 		break;
 	//....................................................................
 	default:
@@ -2969,20 +2969,20 @@ Task: calculate the volume fraction of ice based on temperatuer
 Programing:
 02/2015 HS Implementation
 **************************************************************************/
-double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff)
+double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff, double porosity)
 {
     double phi_i = 0.0; 
 
-    phi_i = 1.0 - 1.0 / (1.0 + std::exp(-1.0 * freezing_sigmoid_coeff * T_in_dC));
+    phi_i = porosity* (1.0 - 1.0 / (1.0 + std::exp(-1.0 * freezing_sigmoid_coeff * T_in_dC)));
     
     return phi_i; 
 }
 
-double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoid_coeff)
+double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoid_coeff, double porosity)
 {
 	double sigmoid_derive = 0.0;
 
-	sigmoid_derive = -freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
+	sigmoid_derive = -porosity* freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
 
 	return sigmoid_derive;
 }
