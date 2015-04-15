@@ -165,7 +165,7 @@ void BHE_1U::calc_u()
 {
 	double tmp_u;
 
-	tmp_u = Q_r / (2.0 * PI * r_inner * r_inner);
+	tmp_u = Q_r / ( PI * r_inner * r_inner);
 
 	_u(0) = tmp_u;
 	_u(1) = tmp_u;
