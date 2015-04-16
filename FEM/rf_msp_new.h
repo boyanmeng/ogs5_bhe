@@ -104,6 +104,9 @@ namespace SolidProp
 	int Time_Dependent_E_nv_mode;//WX:01.2013. E nv is changed with time
 	int Time_Dependent_E_nv_value[5];//WX:01.2013
 
+	double freezing_latent_heat; // TYZ: 2015.02.27. Latent heat for freezing J/kg
+	double freezing_sigmoid_coeff; // TYZ: 2015.02.27. sigmoid coefficient for freezing unitless
+
 	// Rotation matrices and their transpose: UJG 25.11.2009
 	Matrix* Crotm;                        // If this is needed by permaebility calculation, we keep it. Otherwise remove it. (To do, UJG/WW)
 	Matrix* D_tran;
@@ -225,6 +228,8 @@ namespace SolidProp
          double Enthalpy(double temperature, const double latent_factor );
          double Heat_Conductivity(double refence = 0.0);
          void HeatConductivityTensor(const int dim, double* tensor, int group);
+         double getFreezingSigmoidCoeff() { return freezing_sigmoid_coeff;  };
+		 double getlatentheat() { return freezing_latent_heat; };
          //   int GetCapacityMode() {return Capacity_mode;};  ??
          // 3. Elasticity
 #ifdef RFW_FRACTURE

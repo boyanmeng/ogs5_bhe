@@ -148,7 +148,11 @@ CMediumProperties::CMediumProperties() :
 	storage_effstress_model = 0;
 	permeability_effstress_model = 0;
 
+    // BHE parameters
     is_BHE = false; 
+    bhe_power_in_watt_val = 0.0; 
+    bhe_delta_T_val = 0.0; 
+    bhe_power_in_watt_curve_idx = 0; 
 }
 
 /**************************************************************************
@@ -1939,6 +1943,48 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             continue; 
         }
 
+        if (line_string.find("BHE_BOUNDARY_TYPE") != std::string::npos)
+        {
+            std::string str_tmp;
+            in.str(GetLineFromFile1(mmp_file));
+            in >> str_tmp;
+            if (str_tmp.compare("FIXED_INFLOW_TEMP") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP;
+            else if (str_tmp.compare("FIXED_INFLOW_TEMP_CURVE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_INFLOW_TEMP_CURVE;
+            else if (str_tmp.compare("POWER_IN_WATT") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT;
+            else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_DT") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT;
+            else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_FLOW_RATE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE;
+            else if (str_tmp.compare("FIXED_TEMP_DIFF") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_FIXED_TEMP_DIFF;
+            in.clear();
+            continue;
+        }
+
+        if (line_string.find("BHE_POWER_IN_WATT_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_power_in_watt_val;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_POWER_IN_WATT_CURVE_IDX") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_power_in_watt_curve_idx;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_DELTA_T_VALUE") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            in >> bhe_delta_T_val;
+            in.clear();
+            continue;
+        }
         if (line_string.find("BHE_LENGTH") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));
@@ -2788,11 +2834,16 @@ double CMediumProperties::HeatCapacity(long number, double theta,
                                        CFiniteElementStd* assem)
 {
 	SolidProp::CSolidProperties* m_msp = NULL;
-	double heat_capacity_fluids, specific_heat_capacity_solid;
-	double density_solid;
+	double heat_capacity_fluids, specific_heat_capacity_solid, specific_heat_capacity_ice;
+	double density_solid, density_ice;
 	double porosity, Sat, PG;
 	int group;
 	double T0, T1 = 0.0;
+    double sigmoid_coeff; 
+    double phi_i;
+	double sigmoid_derive;
+	double latent_heat;
+
 	//  double H0,H1;
 	// ???
 	bool FLOW = false;                    //WW
@@ -2871,6 +2922,35 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 		        assem->SolidProp->Density()) + Porosity(assem)
 		                * MFPCalcFluidsHeatCapacity(assem);
 		break;
+	case 6: 
+		// TYZ, heat capacity for ice freezing model 
+        phi_i = 0.0; 
+
+		group = m_pcs->m_msh->ele_vector[number]->GetPatchIndex();
+		m_msp = msp_vector[group];
+		// heat capacity 
+		specific_heat_capacity_solid = m_msp->Heat_Capacity(0.0); 
+		specific_heat_capacity_ice = m_msp->Heat_Capacity(1.0);
+
+		density_solid = fabs(m_msp->Density(0.0));
+		density_ice = fabs(m_msp->Density(1.0));
+
+		porosity = assem->MediaProp->Porosity(number, theta);
+		heat_capacity_fluids = assem->FluidProp->getSpecificHeatCapacity() * assem->FluidProp->Density();
+
+        // get the freezing model parameter
+        sigmoid_coeff = m_msp->getFreezingSigmoidCoeff();
+		// get the latent heat 
+		latent_heat = m_msp->getlatentheat();
+        // get interpolated current temperature
+        T1 = assem->interpolate(assem->NodalVal1);
+        // get the volume fraction of ice
+        phi_i = CalcIceVolFrac(T1, sigmoid_coeff, porosity);
+		// get the derivative of the sigmoid function
+		sigmoid_derive = Calcsigmoidderive(phi_i, sigmoid_coeff, porosity);
+        // Cp and latent heat based on the freezing model
+		heat_capacity = (porosity - phi_i) * heat_capacity_fluids + (1.0 - porosity) *specific_heat_capacity_solid* density_solid + phi_i * specific_heat_capacity_ice * density_ice - density_ice * sigmoid_derive * latent_heat ;
+		break;
 	//....................................................................
 	default:
 		std::cout
@@ -2882,6 +2962,30 @@ double CMediumProperties::HeatCapacity(long number, double theta,
 	return heat_capacity;
 }
 
+
+/**************************************************************************
+FEMLib-Method:
+Task: calculate the volume fraction of ice based on temperatuer
+Programing:
+02/2015 HS Implementation
+**************************************************************************/
+double CMediumProperties::CalcIceVolFrac(double T_in_dC, double freezing_sigmoid_coeff, double porosity)
+{
+    double phi_i = 0.0; 
+
+    phi_i = porosity* (1.0 - 1.0 / (1.0 + std::exp(-1.0 * freezing_sigmoid_coeff * T_in_dC)));
+    
+    return phi_i; 
+}
+
+double CMediumProperties::Calcsigmoidderive(double phi_i, double freezing_sigmoid_coeff, double porosity)
+{
+	double sigmoid_derive = 0.0;
+
+	sigmoid_derive = -porosity* freezing_sigmoid_coeff * (1 - phi_i) * phi_i;
+
+	return sigmoid_derive;
+}
 /**************************************************************************
    FEMLib-Method:
    Task:

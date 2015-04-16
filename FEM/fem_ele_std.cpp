@@ -2234,6 +2234,9 @@ void CFiniteElementStd::CalCoefLaplace(bool Gravity, int ip)
 	CFiniteElementStd *h_fem;
 	h_fem = this;
 	double fac_perm = 1.0;
+    double lambda_solid, lambda_ice, lambda_water; // heat conductivity of solid, ice and water
+    double phi_i; // ice volume fraction
+    double sigmoid_coeff; // freezing model coefficient
 
 
 	// For nodal value interpolation
@@ -2519,6 +2522,28 @@ void CFiniteElementStd::CalCoefLaplace(bool Gravity, int ip)
 			tensor = MediaProp->HeatDispersionTensorNew(ip);
 			for(size_t i = 0; i < dim * dim; i++)
 				mat[i] = tensor[i];
+		}
+		else if (SolidProp->GetConductModel() == 7) // heat conductivity value including ice part 
+		{
+			TG = interpolate(NodalVal1); // ground temperature
+			// get heat conductivity including the ice part
+            lambda_solid = SolidProp->Heat_Conductivity(0);
+            lambda_ice = SolidProp->Heat_Conductivity(1);
+            lambda_water = SolidProp->Heat_Conductivity(2);
+			// get the porosity
+			poro = MediaProp->Porosity(Index, pcs->m_num->ls_theta);
+            // get the freezing model parameter
+            sigmoid_coeff = SolidProp->getFreezingSigmoidCoeff();
+            // get the volume fraction of ice
+            phi_i = MediaProp->CalcIceVolFrac(TG, sigmoid_coeff, poro);
+			// output the element value
+		this->pcs->SetElementValue(this->MeshElement->GetIndex(), pcs->GetElementValueIndex("PHI_I"), phi_i);
+
+  
+            mat_fac = lambda_solid*(1 - poro) + lambda_ice*phi_i + lambda_water*(poro - phi_i);
+
+			for (size_t i = 0; i < dim ; i++)
+                mat[i * dim + i] = mat_fac;
 		}
 		else
 		{

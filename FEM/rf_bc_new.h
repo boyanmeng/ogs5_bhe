@@ -228,6 +228,7 @@ public:
     // 0 - inflow
     // 1 - outflow
     std::size_t bhe_pipe_flag;
+    std::size_t bhe_index; 
     std::size_t bhe_pv_index; 
 };
 
