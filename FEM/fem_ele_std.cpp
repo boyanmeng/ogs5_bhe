@@ -5492,7 +5492,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
                 R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
                 break;
-            case 3:  // R s
+            case 2:  // R s
                 R_s += matBHE_loc_R;
 
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
@@ -5518,7 +5518,7 @@ void CFiniteElementStd::CalcBoundaryHeatExchange_BHE(BHE::BHEAbstract * m_BHE, E
                 R_matrix.block(0, 0, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_i1
                 R_matrix.block(nnodes, nnodes, nnodes, nnodes) += 1.0 * matBHE_loc_R; // K_o1
                 break;
-            case 3:  // R s
+            case 2:  // R s
                 R_s += matBHE_loc_R;
 
                 R_pi_s_matrix.block(2 * nnodes, 0, nnodes, nnodes) += -1.0 * matBHE_loc_R;
