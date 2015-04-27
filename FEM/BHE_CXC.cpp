@@ -190,8 +190,8 @@ void BHE_CXC::calc_u()
 {
 	double u_in, u_out;
 
-	u_in = Q_r / (2.0 * PI * r_inner * r_inner);
-	u_out = Q_r / (2.0 * PI * (r_outer * r_outer - r_inner * r_inner));
+	u_in = Q_r / (PI * r_inner * r_inner);
+	u_out = Q_r / (PI * (r_outer * r_outer - r_inner * r_inner));
 	
 	_u(0) = u_in;
 	_u(1) = u_out;
