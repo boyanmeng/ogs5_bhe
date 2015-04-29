@@ -152,7 +152,8 @@ CMediumProperties::CMediumProperties() :
     is_BHE = false; 
     bhe_power_in_watt_val = 0.0; 
     bhe_delta_T_val = 0.0; 
-    bhe_power_in_watt_curve_idx = 0; 
+    bhe_power_in_watt_curve_idx = -1; 
+	bhe_switch_off_threshold = 0.0;
 }
 
 /**************************************************************************
@@ -1985,6 +1986,13 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
+		if (line_string.find("BHE_SWITCH_OFF_THRESHOLD") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_switch_off_threshold;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_LENGTH") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));

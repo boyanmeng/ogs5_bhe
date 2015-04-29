@@ -323,6 +323,7 @@ public:
 	double bhe_grout_porosity;
     double bhe_grout_heat_capacity;
     double bhe_regrigerant_heat_conductivity;
+	double bhe_switch_off_threshold;
 
 
 };
