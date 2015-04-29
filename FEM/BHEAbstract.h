@@ -369,6 +369,12 @@ namespace BHE  // namespace of borehole heat exchanger
           * outflow pipelines
           */
         double delta_T_val;
+
+		/**
+		  * threshold Q value for switching off the BHE
+		  * when using the Q_curve_fixed_dT B.C.
+		  */
+		double threshold;
 	private:
 
 		/**

@@ -41,7 +41,8 @@ namespace BHE  // namespace of borehole heat exchanger
 			    double my_lambda_g = 2.3           /* thermal conductivity of the grout */, 
                 double my_power_in_watt = 0.0      /* injected or extracted power */, 
                 std::size_t my_power_curve_idx = -1/* index of the power curve*/,
-                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */)
+                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */,
+				double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
                 : BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type)
 		{
 			_u = Eigen::Vector2d::Zero();
@@ -67,6 +68,7 @@ namespace BHE  // namespace of borehole heat exchanger
             power_in_watt_val = my_power_in_watt;
             power_in_watt_curve_idx = my_power_curve_idx;
             delta_T_val = my_delta_T_val; 
+			threshold = my_threshold;
 
 			// Table 1 in Diersch_2011_CG
 			S_o = PI * 2.0 * r_outer;
