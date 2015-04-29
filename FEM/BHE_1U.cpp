@@ -89,7 +89,40 @@ void BHE_1U::calc_thermal_resistances()
         std::cout << "Error!!! Grout Thermal Resistance is an infinite number! The simulation will be stopped! \n" ;
         exit(1);
     }
-    
+
+	// check if constraints regarding negative thermal resistances are violated
+	// apply correction procedure
+	// Section (1.5.5) in FEFLOW White Papers Vol V.
+	double constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2 * _R_gs)));
+	int count = 0;
+	while (constraint < 0.0)
+	{
+		if (count == 0)
+		{
+			chi *= (2.0 / 3.0);
+			_R_gs = (1 - chi)*_R_g;
+			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
+		}
+		if (count == 1)
+		{
+			chi *= (1.0 / 3.0);
+			_R_gs = (1 - chi)*_R_g;
+			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
+		}
+		if (count == 2)
+		{
+			chi = 0.0;
+			_R_gs = (1 - chi)*_R_g;
+			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
+			break;
+		}
+		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step " << count << "\n";
+		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2 * _R_gs)));
+		count++;
+	}
 }
 
 /**
