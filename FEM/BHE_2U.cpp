@@ -102,7 +102,7 @@ void BHE_2U::calc_thermal_resistances()
 	{
 		if (count == 0)
 		{
-			chi *= (2.0 / 3.0);
+			chi *= 0.66;
 			_R_gs = (1 - chi)*_R_g;
 			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
@@ -111,7 +111,7 @@ void BHE_2U::calc_thermal_resistances()
 		}
 		if (count == 1)
 		{
-			chi *= (1.0 / 3.0);
+			chi *= 0.5;
 			_R_gs = (1 - chi)*_R_g;
 			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
@@ -128,7 +128,7 @@ void BHE_2U::calc_thermal_resistances()
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 			break;
 		}
-		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step " << count << "\n";
+		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
 		constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2 * _R_gs)));
 		constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2 * _R_gs)));
 		count++;
