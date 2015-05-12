@@ -83,8 +83,8 @@ namespace BHE  // namespace of borehole heat exchanger
             // cross section area calculation
             CSA_i = PI * r_inner * r_inner;
             CSA_o = PI * r_inner * r_inner;
-            CSA_g1 = 0.125 * PI * D * D - CSA_i;
-            CSA_g2 = 0.125 * PI * D * D - CSA_o;
+            CSA_g1 = 0.125 * 0.125 * PI * D * D - CSA_i; // one fourth of the crosssection minus the crossection of pipe
+            CSA_g2 = 0.125 * 0.125 * PI * D * D - CSA_o; // one fourth of the crosssection minus the crossection of pipe
 
 			// initialization calculation
 			initialize(); 
