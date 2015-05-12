@@ -65,13 +65,26 @@ void BHE_2U::calc_thermal_resistances()
 	double chi;
 	double d0; // the average outer diameter of the pipes
 	double s; // diagonal distances of pipes
+    double R_adv, R_con; 
 	d0 = 2.0 * r_inner; 
 	s = omega * std::sqrt(2); 
 	chi = std::log(std::sqrt(D*D + 4 * d0*d0) / 2 / std::sqrt(2) / d0) / std::log(D / 2 / d0);
-	_R_g = acosh( (D*D + d0*d0 - s*s) / (2*D*d0) ) / (2 * PI * lambda_g * lambda_g) * (3.098 - 4.432 * s / D + 2.364 * s * s / D / D);
-	_R_con_b = chi * _R_g; 
     // Eq. 36
-    _R_con_a_i1 = _R_con_a_i2 = _R_con_a_o1 = _R_con_a_o2 = std::log(r_outer/r_inner) / (2.0 * PI * lambda_p);
+    _R_con_a_i1 = _R_con_a_i2 = _R_con_a_o1 = _R_con_a_o2 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
+
+    if (use_ext_therm_resis)
+    {
+        R_adv = 0.25 * (_R_adv_i1 + _R_adv_i2 + _R_adv_o1 + _R_adv_o2);
+        R_con = 0.25 * (_R_con_a_i1 + _R_con_a_i2 + _R_con_a_o1 + _R_con_a_o2);
+        _R_g = 4 * ext_Rb - R_adv - R_con;
+    }
+    else
+    {
+        _R_g = acosh((D*D + d0*d0 - s*s) / (2 * D*d0)) / (2 * PI * lambda_g * lambda_g) * (3.098 - 4.432 * s / D + 2.364 * s * s / D / D);
+    }
+	
+    _R_con_b = chi * _R_g; 
+
 	// Eq. 29 and 30
     _R_fig = _R_adv_i1 + _R_adv_i2 + _R_con_a_i1 + _R_con_a_i2 + _R_con_b;
 	_R_fog = _R_adv_o1 + _R_adv_o2 + _R_con_a_o1 + _R_con_a_o2 + _R_con_b;
@@ -81,8 +94,16 @@ void BHE_2U::calc_thermal_resistances()
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar_1, R_ar_2; 
-	R_ar_1 = acosh( (s*s - d0*d0) / d0 / d0 ) / (2.0 * PI * lambda_g ); 
-	R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
+    if (use_ext_therm_resis)
+    {
+        R_ar_1 = (2.0 + std::sqrt(2.0)) * _R_g * (ext_Ra - R_adv - R_con) / (_R_g + ext_Ra - R_adv - R_con);
+        R_ar_2 = std::sqrt(2.0) * R_ar_1;
+    }
+    else
+    {
+        R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+        R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+    }
 	_R_gg_1 = 2.0 * _R_gs * ( R_ar_1 - 2.0 * chi * _R_g ) / ( 2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g ) ;
 	_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 

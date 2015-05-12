@@ -150,6 +150,7 @@ CMediumProperties::CMediumProperties() :
 
     // BHE parameters
     is_BHE = false; 
+    bhe_use_ext_therm_resis = false; 
     bhe_power_in_watt_val = 0.0; 
     bhe_delta_T_val = 0.0; 
     bhe_power_in_watt_curve_idx = -1; 
@@ -2104,6 +2105,15 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
         {
             in.str(GetLineFromFile1(mmp_file));
             in >> bhe_grout_heat_capacity;
+            in.clear();
+            continue;
+        }
+        if (line_string.find("BHE_THERM_RESIS") != std::string::npos)
+        {
+            in.str(GetLineFromFile1(mmp_file));
+            this->bhe_use_ext_therm_resis = true; 
+            in >> bhe_intern_resistance; 
+            in >> bhe_therm_resistance;
             in.clear();
             continue;
         }

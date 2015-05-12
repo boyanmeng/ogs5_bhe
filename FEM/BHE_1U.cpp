@@ -49,11 +49,11 @@ double BHE_1U::get_thermal_resistance(std::size_t idx = 0)
 */
 void BHE_1U::calc_thermal_resistances()
 {
-	// thermal resistance due to advective flow of refrigerant in the pipes
-	// Eq. 31 in Diersch_2011_CG
-	_R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);
-	_R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
-
+    // thermal resistance due to advective flow of refrigerant in the pipes
+    // Eq. 31 in Diersch_2011_CG
+    _R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);
+    _R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
+    
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG
 	double _R_con_a;
@@ -63,14 +63,25 @@ void BHE_1U::calc_thermal_resistances()
 	double chi;
 	double d0; // the average outer diameter of the pipes
 	double s; // diagonal distances of pipes
+    double R_adv, R_con;
+
 	d0 = 2.0 * r_inner;
 	s = omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 	// Eq. 51
 	chi = std::log(std::sqrt(D*D + 2 * d0*d0) / 2 / d0) / std::log(D / std::sqrt(2) / d0);
-	// Eq. 52
-    _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+    if (use_ext_therm_resis)
+    {
+        R_adv = 0.5 * (_R_adv_i1 + _R_adv_o1); 
+        R_con = 0.5 * (_R_con_a_i1 + _R_con_a_o1); 
+        _R_g = 2 * ext_Rb - R_adv - R_con; 
+    }
+    else
+    {
+        // Eq. 52
+        _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+    }
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
 	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
@@ -81,7 +92,15 @@ void BHE_1U::calc_thermal_resistances()
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar;
-	R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
+    if (use_ext_therm_resis)
+    {
+        R_ar = ext_Ra - 2 * (R_adv + R_con);
+    }
+    else
+    {
+        R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+    }
+    
 	_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 
 	if (!std::isfinite(_R_gg))

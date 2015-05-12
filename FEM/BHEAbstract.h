@@ -62,8 +62,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP)
-            : type(my_type), _name(name), bound_type(my_bound_type)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false)
+            : type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb)
 		{};
 
 		/**
@@ -375,6 +375,21 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * when using the Q_curve_fixed_dT B.C.
 		  */
 		double threshold;
+
+        /**
+          * whether or not using external given borehole thermal resistance values
+          */
+        bool use_ext_therm_resis; 
+
+        /**
+          * external given borehole internal thermal resistance value
+          */
+        double ext_Ra; 
+
+        /**
+          * external given borehole thermal resistance value
+          */
+        double ext_Rb; 
 	private:
 
 		/**

@@ -73,13 +73,28 @@ void BHE_CXC::calc_thermal_resistances()
 	d_o1 = 2.0 * r_outer;
 	// Eq. 68
 	chi = std::log(std::sqrt(D*D + d_o1*d_o1) / std::sqrt(2) / d_o1) / std::log(D / d_o1);
-	// Eq. 69
-	_R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
+    if (use_ext_therm_resis)
+    {
+        _R_g = ext_Rb - _R_adv_b_o1 - _R_con_o1;
+    }
+    else
+    {
+        // Eq. 69
+        _R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
+    }
 	// Eq. 67
 	_R_con_b = chi * _R_g;
-	// Eq. 56 and 57
-	_R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
-	_R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
+    if (use_ext_therm_resis)
+    {
+        _R_ff = ext_Ra;
+    }
+    else
+    {
+        // Eq. 56 
+        _R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
+    }
+	// Eq. 57
+    _R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
 
 	// thermal resistance due to grout-soil exchange
 	_R_gs = (1 - chi)*_R_g;
