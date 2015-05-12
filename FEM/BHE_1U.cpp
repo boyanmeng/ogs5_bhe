@@ -120,21 +120,18 @@ void BHE_1U::calc_thermal_resistances()
 		{
 			chi *= (2.0 / 3.0);
 			_R_gs = (1 - chi)*_R_g;
-			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 		}
 		if (count == 1)
 		{
 			chi *= (1.0 / 3.0);
 			_R_gs = (1 - chi)*_R_g;
-			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 		}
 		if (count == 2)
 		{
 			chi = 0.0;
 			_R_gs = (1 - chi)*_R_g;
-			R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 			break;
 		}

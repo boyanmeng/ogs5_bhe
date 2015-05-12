@@ -125,8 +125,6 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi *= (2.0 / 3.0);
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 		}
@@ -134,8 +132,6 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi *= (1.0 / 3.0);
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 		}
@@ -143,8 +139,6 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi = 0.0;
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 			break;
