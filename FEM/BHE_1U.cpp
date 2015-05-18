@@ -112,19 +112,19 @@ void BHE_1U::calc_thermal_resistances()
 	// check if constraints regarding negative thermal resistances are violated
 	// apply correction procedure
 	// Section (1.5.5) in FEFLOW White Papers Vol V.
-	double constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2 * _R_gs)));
+	double constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2.0 * _R_gs)));
 	int count = 0;
 	while (constraint < 0.0)
 	{
 		if (count == 0)
 		{
-			chi *= (2.0 / 3.0);
+			chi *= 0.66;
 			_R_gs = (1 - chi)*_R_g;
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 		}
 		if (count == 1)
 		{
-			chi *= (1.0 / 3.0);
+			chi *= 0.5;
 			_R_gs = (1 - chi)*_R_g;
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 		}
@@ -135,8 +135,8 @@ void BHE_1U::calc_thermal_resistances()
 			_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 			break;
 		}
-		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step " << count << "\n";
-		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2 * _R_gs)));
+		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
+		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2.0 * _R_gs)));
 		count++;
 	}
 }
@@ -400,7 +400,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 		{
-			Q_r_tmp = 0.0;
+			Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
 			// update all values dependent on the flow rate
 			update_flow_rate(Q_r_tmp);
 			// calculate the new T_in
