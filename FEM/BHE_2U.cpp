@@ -95,8 +95,8 @@ void BHE_2U::calc_thermal_resistances()
 	// check if constraints regarding negative thermal resistances are violated
 	// apply correction procedure
 	// Section (1.5.5) in FEFLOW White Papers Vol V.
-	double constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2 * _R_gs)));
-	double constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2 * _R_gs)));
+	double constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2.0 * _R_gs)));
+	double constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2.0 * _R_gs)));
 	int count = 0;
 	while (constraint1 < 0.0 || constraint2 < 0.0)
 	{
@@ -104,8 +104,6 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi *= 0.66;
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 		}
@@ -113,8 +111,6 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi *= 0.5;
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 		}
@@ -122,15 +118,13 @@ void BHE_2U::calc_thermal_resistances()
 		{
 			chi = 0.0;
 			_R_gs = (1 - chi)*_R_g;
-			R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
-			R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
 			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
 			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
 			break;
 		}
 		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
-		constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2 * _R_gs)));
-		constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2 * _R_gs)));
+		constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2.0 * _R_gs)));
+		constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2.0 * _R_gs)));
 		count++;
 	}
 }

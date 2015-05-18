@@ -362,7 +362,7 @@ double BHE_CXA::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 		{
-			Q_r_tmp = 0.0;
+			Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
 			// update all values dependent on the flow rate
 			update_flow_rate(Q_r_tmp);
 			// calculate the new T_in
