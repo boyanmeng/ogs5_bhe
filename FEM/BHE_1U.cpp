@@ -56,14 +56,14 @@ void BHE_1U::calc_thermal_resistances()
 
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG
-	double _R_con_a;
-	_R_con_a = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
+	// double _R_con_a;
+	// _R_con_a = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 
 	// thermal resistance due to the grout transition
 	double chi;
 	double d0; // the average outer diameter of the pipes
 	double s; // diagonal distances of pipes
-	d0 = 2.0 * r_inner;
+	d0 = 2.0 * r_outer;
 	s = omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
@@ -89,6 +89,9 @@ void BHE_1U::calc_thermal_resistances()
         std::cout << "Error!!! Grout Thermal Resistance is an infinite number! The simulation will be stopped! \n" ;
         exit(1);
     }
+
+	// debug information
+	std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
 
 	// check if constraints regarding negative thermal resistances are violated
 	// apply correction procedure
@@ -119,7 +122,22 @@ void BHE_1U::calc_thermal_resistances()
 		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
 		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2.0 * _R_gs)));
 		count++;
+
+		// debug information
+		std::cout << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
+		double phi_fig = 1.0 / (_R_fig * S_i);
+		double phi_fog = 1.0 / (_R_fog * S_o);
+		double phi_gg = 1.0 / (_R_gg * S_g1);
+		double phi_gs = 1.0 / (_R_gs * S_gs);
+		std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 	}
+
+	// debug information
+	double phi_fig = 1.0 / (_R_fig * S_i);
+	double phi_fog = 1.0 / (_R_fog * S_o);
+	double phi_gg = 1.0 / (_R_gg * S_g1);
+	double phi_gs = 1.0 / (_R_gs * S_gs);
+	std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 }
 
 /**
