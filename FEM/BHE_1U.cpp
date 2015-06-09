@@ -181,8 +181,8 @@ void BHE_1U::calc_Nu()
 */
 void BHE_1U::calc_Re()
 {
-	double u_norm, d;
-	u_norm = _u.norm();
+    double u_norm, d;
+    u_norm = std::abs(_u(0));
 	d = 2.0 * r_inner; // inner diameter of the pipeline
 
 	_Re = u_norm * d / (mu_r / rho_r);
