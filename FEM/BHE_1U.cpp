@@ -49,15 +49,8 @@ double BHE_1U::get_thermal_resistance(std::size_t idx = 0)
 */
 void BHE_1U::calc_thermal_resistances()
 {
-    // thermal resistance due to advective flow of refrigerant in the pipes
-    // Eq. 31 in Diersch_2011_CG
-    _R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);
-    _R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
-    
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG
-	double _R_con_a;
-	_R_con_a = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 
 	// thermal resistance due to the grout transition
 	double chi;
@@ -109,6 +102,9 @@ void BHE_1U::calc_thermal_resistances()
         exit(1);
     }
 
+	// debug information
+	std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
+
 	// check if constraints regarding negative thermal resistances are violated
 	// apply correction procedure
 	// Section (1.5.5) in FEFLOW White Papers Vol V.
@@ -138,7 +134,22 @@ void BHE_1U::calc_thermal_resistances()
 		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
 		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2.0 * _R_gs)));
 		count++;
+
+		// debug information
+		std::cout << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
+		double phi_fig = 1.0 / (_R_fig * S_i);
+		double phi_fog = 1.0 / (_R_fog * S_o);
+		double phi_gg = 1.0 / (_R_gg * S_g1);
+		double phi_gs = 1.0 / (_R_gs * S_gs);
+		std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 	}
+
+	// debug information
+	double phi_fig = 1.0 / (_R_fig * S_i);
+	double phi_fog = 1.0 / (_R_fog * S_o);
+	double phi_gg = 1.0 / (_R_gg * S_g1);
+	double phi_gs = 1.0 / (_R_gs * S_gs);
+	std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 }
 
 /**

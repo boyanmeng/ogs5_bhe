@@ -82,16 +82,14 @@ namespace BHE  // namespace of borehole heat exchanger
             }
 
 			// Table 1 in Diersch_2011_CG
-			S_i = PI * 2.0 * r_outer;
-			S_o = PI * 2.0 * r_outer;
+			S_i = PI * 2.0 * r_inner;
+			S_o = PI * 2.0 * r_inner;
 			S_g1 = D;
-			S_gs = 0.25 * PI * D;
+			S_gs = 0.5 * PI * D; // Corrected value according to FEFLOW White Papers Vol V, Table 1-71
 
             // cross section area calculation
-            CSA_i = PI * r_inner * r_inner;
-            CSA_o = PI * r_inner * r_inner;
-            CSA_g1 = 0.5 * 0.125 * PI * D * D - CSA_i; // half of the crosssection minus the crossection of pipe
-            CSA_g2 = 0.5 * 0.125 * PI * D * D - CSA_o; // half of the crosssection minus the crossection of pipe
+			CSA_i = CSA_o = PI * r_inner * r_inner;
+			CSA_g1 = CSA_g2 = PI * (0.125 * D * D - r_outer * r_outer);
 
 			// initialization calculation
 			initialize();
