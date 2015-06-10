@@ -1961,7 +1961,9 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_DT") == 0)
                 bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT;
             else if (str_tmp.compare("BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT") == 0)
-                bhe_bound_type = BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT; 
+                bhe_bound_type = BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT;
+            else if (str_tmp.compare("BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE") == 0)
+                bhe_bound_type = BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE;
             else if (str_tmp.compare("POWER_IN_WATT_CURVE_FIXED_FLOW_RATE") == 0)
                 bhe_bound_type = BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE;
             else if (str_tmp.compare("FIXED_TEMP_DIFF") == 0)

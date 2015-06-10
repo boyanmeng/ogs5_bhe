@@ -453,6 +453,23 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             T_in = T_out;
         }
         break;
+    case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
+        // get the building power value in the curve
+        building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // get COP value based on T_out
+        COP_tmp = _cop_a + _cop_b * T_out;
+        // now calculate how much power needed from BHE
+        power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
+        // also how much power from electricity
+        power_elect_tmp = building_power_tmp - power_tmp;
+        // print the amount of power needed
+        std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+        // now same procedure
+        // calculate the dT value based on fixed flow rate
+        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+        // calcuate the new T_in 
+        T_in = T_out + delta_T_val;
+        break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
         // get the power value in the curve
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
