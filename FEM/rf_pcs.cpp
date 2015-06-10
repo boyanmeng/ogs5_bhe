@@ -3295,7 +3295,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                            mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance, 
-										   mmp_vector[i]->bhe_switch_off_threshold);
+                                           mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_1u);
                 break;
             case BHE::BHE_TYPE_2U:
@@ -3306,7 +3306,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                            mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-										   mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
+                                           mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
                 break;
             case BHE::BHE_TYPE_CXC:
@@ -3317,7 +3317,7 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                              mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                              mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-											 mmp_vector[i]->bhe_switch_off_threshold);
+                                             mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxc);
                 break;
             case BHE::BHE_TYPE_CXA:
@@ -3328,7 +3328,7 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                              mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                              mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-											 mmp_vector[i]->bhe_switch_off_threshold);
+                                             mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxa);
                 break;
             default:
@@ -7082,6 +7082,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                         else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF || 
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT ||
+                                 vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE )
                         {
                             // get the T_out value

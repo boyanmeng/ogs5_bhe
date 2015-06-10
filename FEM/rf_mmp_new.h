@@ -316,6 +316,7 @@ public:
     double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
     std::size_t bhe_fluid_type_idx;
     std::size_t bhe_power_in_watt_curve_idx; 
+    double bhe_cop_a, bhe_cop_b; // a and b coefficients for COP curve
     double bhe_refrigerant_viscosity;
     double bhe_refrigerant_density;
     double bhe_refrigerant_heat_capacity;
