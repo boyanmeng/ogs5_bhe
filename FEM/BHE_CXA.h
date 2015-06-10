@@ -45,8 +45,10 @@ namespace BHE  // namespace of borehole heat exchanger
                 double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */,
                 double my_ext_Ra = 0.0             /* external defined borehole internal thermal resistance */,
                 double my_ext_Rb = 0.0             /* external defined borehole thermal resistance */,
+                double my_bhe_cop_a = 0.0          /* cop coefficient */,
+                double my_bhe_cop_b = 0.0          /* cop coefficient */,
 				double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
-			: BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type)
+                : BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type, if_use_ext_Ra_Rb, my_bhe_cop_a, my_bhe_cop_b)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();

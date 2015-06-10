@@ -383,9 +383,12 @@ int BHE_1U::get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name)
 double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 {
     double T_in(0.0);
-    double power_tmp(0.0);
+    double power_tmp(0.0); 
+    double building_power_tmp(0.0);
+    double power_elect_tmp(0.0);
     int flag_valid = false; 
     double Q_r_tmp(0.0);
+    double COP_tmp(0.0);
 
     switch (this->get_bound_type())
     {
@@ -418,6 +421,38 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			T_in = T_out;
 		}
         break; 
+    case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
+        // get the building power value in the curve
+        building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // get COP value based on T_out
+        COP_tmp = _cop_a + _cop_b * T_out; 
+        // now calculate how much power needed from BHE
+        power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
+        // also how much power from electricity
+        power_elect_tmp = building_power_tmp - power_tmp;
+        // print the amount of power needed
+        std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+        // now same procedure
+        // if power value exceeds threshold, calculate new values
+        if (fabs(power_tmp) > threshold)
+        {
+            // calculate the corresponding flow rate needed
+            // using the defined delta_T value
+            Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
+            // update all values dependent on the flow rate
+            update_flow_rate(Q_r_tmp);
+            // calculate the new T_in
+            T_in = T_out + delta_T_val;
+        }
+        else
+        {
+            Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
+            // update all values dependent on the flow rate
+            update_flow_rate(Q_r_tmp);
+            // calculate the new T_in
+            T_in = T_out;
+        }
+        break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
         // get the power value in the curve
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
