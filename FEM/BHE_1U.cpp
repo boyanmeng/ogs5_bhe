@@ -58,7 +58,7 @@ void BHE_1U::calc_thermal_resistances()
 	double s; // diagonal distances of pipes
     double R_adv, R_con;
 
-	d0 = 2.0 * r_inner;
+	d0 = 2.0 * r_outer;
 	s = omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
@@ -134,14 +134,6 @@ void BHE_1U::calc_thermal_resistances()
 		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
 		constraint = 1.0 / ((1.0 / _R_gg) + (1.0 / (2.0 * _R_gs)));
 		count++;
-
-		// debug information
-		std::cout << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
-		double phi_fig = 1.0 / (_R_fig * S_i);
-		double phi_fog = 1.0 / (_R_fog * S_o);
-		double phi_gg = 1.0 / (_R_gg * S_g1);
-		double phi_gs = 1.0 / (_R_gs * S_gs);
-		std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 	}
 
 	// debug information
@@ -411,6 +403,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			update_flow_rate(Q_r_tmp);
 			// calculate the new T_in
 			T_in = T_out + delta_T_val;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
 		else
 		{
@@ -419,6 +413,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			update_flow_rate(Q_r_tmp);
 			// calculate the new T_in
 			T_in = T_out;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
         break; 
     case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
@@ -443,6 +439,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             update_flow_rate(Q_r_tmp);
             // calculate the new T_in
             T_in = T_out + delta_T_val;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
         else
         {
@@ -451,6 +449,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             update_flow_rate(Q_r_tmp);
             // calculate the new T_in
             T_in = T_out;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
         break;
     case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
