@@ -49,28 +49,32 @@ double BHE_1U::get_thermal_resistance(std::size_t idx = 0)
 */
 void BHE_1U::calc_thermal_resistances()
 {
-	// thermal resistance due to advective flow of refrigerant in the pipes
-	// Eq. 31 in Diersch_2011_CG
-	_R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);
-	_R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
-
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG
-	// double _R_con_a;
-	// _R_con_a = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 
 	// thermal resistance due to the grout transition
 	double chi;
 	double d0; // the average outer diameter of the pipes
 	double s; // diagonal distances of pipes
-	d0 = 2.0 * r_outer;
+    double R_adv, R_con;
+
+	d0 = 2.0 * r_inner;
 	s = omega * std::sqrt(2);
     // Eq. 49
     _R_con_a_i1 = _R_con_a_o1 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
 	// Eq. 51
 	chi = std::log(std::sqrt(D*D + 2 * d0*d0) / 2 / d0) / std::log(D / std::sqrt(2) / d0);
-	// Eq. 52
-    _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+    if (use_ext_therm_resis)
+    {
+        R_adv = 0.5 * (_R_adv_i1 + _R_adv_o1); 
+        R_con = 0.5 * (_R_con_a_i1 + _R_con_a_o1); 
+        _R_g = 2 * ext_Rb - R_adv - R_con; 
+    }
+    else
+    {
+        // Eq. 52
+        _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
+    }
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
 	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
@@ -81,7 +85,15 @@ void BHE_1U::calc_thermal_resistances()
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar;
-	R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
+    if (use_ext_therm_resis)
+    {
+        R_ar = ext_Ra - 2 * (R_adv + R_con);
+    }
+    else
+    {
+        R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+    }
+    
 	_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 
 	if (!std::isfinite(_R_gg))
@@ -180,8 +192,8 @@ void BHE_1U::calc_Nu()
 */
 void BHE_1U::calc_Re()
 {
-	double u_norm, d;
-	u_norm = _u.norm();
+    double u_norm, d;
+    u_norm = std::abs(_u(0));
 	d = 2.0 * r_inner; // inner diameter of the pipeline
 
 	_Re = u_norm * d / (mu_r / rho_r);
@@ -371,9 +383,12 @@ int BHE_1U::get_loc_shift_by_pv(FiniteElement::PrimaryVariable pv_name)
 double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 {
     double T_in(0.0);
-    double power_tmp(0.0);
+    double power_tmp(0.0); 
+    double building_power_tmp(0.0);
+    double power_elect_tmp(0.0);
     int flag_valid = false; 
     double Q_r_tmp(0.0);
+    double COP_tmp(0.0);
 
     switch (this->get_bound_type())
     {
@@ -406,6 +421,55 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			T_in = T_out;
 		}
         break; 
+    case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
+        // get the building power value in the curve
+        building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // get COP value based on T_out
+        COP_tmp = _cop_a + _cop_b * T_out; 
+        // now calculate how much power needed from BHE
+        power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
+        // also how much power from electricity
+        power_elect_tmp = building_power_tmp - power_tmp;
+        // print the amount of power needed
+        std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+        // now same procedure
+        // if power value exceeds threshold, calculate new values
+        if (fabs(power_tmp) > threshold)
+        {
+            // calculate the corresponding flow rate needed
+            // using the defined delta_T value
+            Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
+            // update all values dependent on the flow rate
+            update_flow_rate(Q_r_tmp);
+            // calculate the new T_in
+            T_in = T_out + delta_T_val;
+        }
+        else
+        {
+            Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
+            // update all values dependent on the flow rate
+            update_flow_rate(Q_r_tmp);
+            // calculate the new T_in
+            T_in = T_out;
+        }
+        break;
+    case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
+        // get the building power value in the curve
+        building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+        // get COP value based on T_out
+        COP_tmp = _cop_a + _cop_b * T_out;
+        // now calculate how much power needed from BHE
+        power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
+        // also how much power from electricity
+        power_elect_tmp = building_power_tmp - power_tmp;
+        // print the amount of power needed
+        std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+        // now same procedure
+        // calculate the dT value based on fixed flow rate
+        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+        // calcuate the new T_in 
+        T_in = T_out + delta_T_val;
+        break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
         // get the power value in the curve
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);

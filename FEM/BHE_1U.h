@@ -22,6 +22,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		*/
         BHE_1U(const std::string name             /* name of the BHE */,
                BHE::BHE_BOUNDARY_TYPE bound_type  /* type of BHE boundary */,
+               bool   if_use_ext_Ra_Rb            /* whether external borehoel thermal resistance are used */,
                double my_L = 100                  /* length/depth of the BHE */,
 			   double my_D = 0.013                /* diameter of the BHE */,
 			   double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
@@ -43,8 +44,12 @@ namespace BHE  // namespace of borehole heat exchanger
                double my_power_in_watt = 0.0      /* injected or extracted power */, 
                std::size_t my_power_curve_idx = -1/* index of the power curve*/, 
                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */,
+               double my_ext_Ra = 0.0             /* external defined borehole internal thermal resistance */, 
+               double my_ext_Rb = 0.0             /* external defined borehole thermal resistance */, 
+               double my_bhe_cop_a = 0.0          /* cop coefficient */,
+               double my_bhe_cop_b = 0.0          /* cop coefficient */,
 			   double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
-               : BHEAbstract(BHE::BHE_TYPE_1U, name, bound_type)
+               : BHEAbstract(BHE::BHE_TYPE_1U, name, bound_type, if_use_ext_Ra_Rb, my_bhe_cop_a, my_bhe_cop_b)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
@@ -71,6 +76,12 @@ namespace BHE  // namespace of borehole heat exchanger
             power_in_watt_curve_idx = my_power_curve_idx; 
             delta_T_val = my_delta_T_val;
 			threshold = my_threshold;
+            if (if_use_ext_Ra_Rb)
+            {
+                use_ext_therm_resis = true;
+                ext_Ra = my_ext_Ra;
+                ext_Rb = my_ext_Rb;
+            }
 
 			// Table 1 in Diersch_2011_CG
 			S_i = PI * 2.0 * r_inner;
