@@ -102,9 +102,6 @@ void BHE_1U::calc_thermal_resistances()
         exit(1);
     }
 
-	// debug information
-	std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
-
 	// check if constraints regarding negative thermal resistances are violated
 	// apply correction procedure
 	// Section (1.5.5) in FEFLOW White Papers Vol V.
@@ -136,7 +133,8 @@ void BHE_1U::calc_thermal_resistances()
 		count++;
 	}
 
-	// debug information
+	// print R and phi values
+	std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
 	double phi_fig = 1.0 / (_R_fig * S_i);
 	double phi_fog = 1.0 / (_R_fog * S_o);
 	double phi_gg = 1.0 / (_R_gg * S_g1);
