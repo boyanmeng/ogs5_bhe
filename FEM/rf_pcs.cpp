@@ -7080,9 +7080,19 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                     // if it is the TEMPERATURE_IN, 
                     if (m_bc_node->bhe_pipe_flag == 0 )
                     {
-                        if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP)
-                            // fixed inflow value
-                            bc_value = time_fac * fac * m_bc_node->node_value;
+						if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP ||
+							vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP_CURVE)
+						{
+							// fixed inflow value
+							bc_value = time_fac * fac * m_bc_node->node_value;
+							// update flow rate related values when using flow rate curve
+							if (vec_BHEs[m_bc_node->bhe_index]->use_flowrate_curve)
+							{
+								int idx = vec_BHEs[m_bc_node->bhe_index]->flowrate_curve_idx;
+								double Q_r_temp = GetCurveValue(idx, 0, aktuelle_zeit, &valid);
+								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
+							}
+						}
                         else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF || 
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT ||
