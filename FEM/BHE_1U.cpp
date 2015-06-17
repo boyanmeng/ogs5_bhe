@@ -418,8 +418,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
         // get the building power value in the curve
         building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
-        // get COP value based on T_out
-        COP_tmp = _cop_a + _cop_b * T_out; 
+        // get COP value based on T_out in the curve 
+		COP_tmp = GetCurveValue(_cop_curve_idx, 0, T_out, &flag_valid);
         // now calculate how much power needed from BHE
         power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
         // also how much power from electricity
@@ -454,8 +454,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
         // get the building power value in the curve
         building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
-        // get COP value based on T_out
-        COP_tmp = _cop_a + _cop_b * T_out;
+		// get COP value based on T_out in the curve 
+		COP_tmp = GetCurveValue(_cop_curve_idx, 0, T_out, &flag_valid);
         // now calculate how much power needed from BHE
         power_tmp = building_power_tmp * (COP_tmp - 1.0) / COP_tmp;
         // also how much power from electricity

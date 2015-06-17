@@ -155,8 +155,7 @@ CMediumProperties::CMediumProperties() :
     bhe_delta_T_val = 0.0; 
     bhe_power_in_watt_curve_idx = -1; 
 	bhe_switch_off_threshold = 0.0;
-    bhe_cop_a = 0.0; 
-    bhe_cop_b = 0.0; 
+	bhe_cop_curve_idx = -1;
 }
 
 /**************************************************************************
@@ -1986,11 +1985,10 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
-        if (line_string.find("BHE_HP_COP_AB") != std::string::npos) // 
+        if (line_string.find("BHE_HP_COP_CURVE_IDX") != std::string::npos) // 
         {
             in.str(GetLineFromFile1(mmp_file));
-            in >> bhe_cop_a;
-            in >> bhe_cop_b; 
+			in >> bhe_cop_curve_idx;
             in.clear();
             continue;
         }

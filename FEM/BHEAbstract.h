@@ -64,8 +64,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, double bhe_cop_a = 0.0, double bhe_cop_b = 0.0)
-            : type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), _cop_a(bhe_cop_a), _cop_b(bhe_cop_b)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, int bhe_cop_curve_idx = -1)
+            : type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), _cop_curve_idx(bhe_cop_curve_idx)
 		{};
 
 		/**
@@ -394,9 +394,9 @@ namespace BHE  // namespace of borehole heat exchanger
         double ext_Rb; 
 
         /**
-        * a and b coefficients of the COP(T_out) curve
+        * COP curve index
         */
-        const double _cop_a, _cop_b;
+        const int _cop_curve_idx;
 
 	private:
 
