@@ -70,18 +70,29 @@ void BHE_1U::calc_thermal_resistances()
         R_con = 0.5 * (_R_con_a_i1 + _R_con_a_o1); 
         _R_g = 2 * ext_Rb - R_adv - R_con; 
     }
-    else
+	else
     {
         // Eq. 52
         _R_g = acosh((D*D + d0*d0 - omega*omega) / (2 * D*d0)) / (2 * PI * lambda_g) * (1.601 - 0.888 * omega / D);
     }
 	_R_con_b = chi * _R_g;
 	// Eq. 29 and 30
-	_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
-	_R_fog = _R_adv_o1 + _R_con_a_o1 + _R_con_b;
+	if (user_defined_therm_resis)
+	{
+		_R_fig = ext_Rfig;
+		_R_fog = ext_Rfog;
+	}
+	else
+	{
+		_R_fig = _R_adv_i1 + _R_con_a_i1 + _R_con_b;
+		_R_fog = _R_adv_o1 + _R_con_a_o1 + _R_con_b;
+	}
 
 	// thermal resistance due to grout-soil exchange
-	_R_gs = (1 - chi)*_R_g;
+	if (user_defined_therm_resis)
+		_R_gs = ext_Rgs;
+	else
+		_R_gs = (1 - chi)*_R_g;
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar;
@@ -94,7 +105,10 @@ void BHE_1U::calc_thermal_resistances()
         R_ar = acosh((2.0*omega*omega - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
     }
     
-	_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
+	if (user_defined_therm_resis)
+		_R_gg = ext_Rgg1;
+	else
+		_R_gg = 2.0 * _R_gs * (R_ar - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar + 2.0 * chi * _R_g);
 
 	if (!std::isfinite(_R_gg))
     {
@@ -109,6 +123,11 @@ void BHE_1U::calc_thermal_resistances()
 	int count = 0;
 	while (constraint < 0.0)
 	{
+		if (user_defined_therm_resis || use_ext_therm_resis)
+		{
+			std::cout << "Error!!! Constraints on thermal resistances are violated! Correction procedure can't be applied due to user defined thermal resistances! The simulation will be stopped! \n";
+			exit(1);
+		}
 		if (count == 0)
 		{
 			chi *= 0.66;

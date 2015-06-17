@@ -309,6 +309,7 @@ public:
     BHE::BHE_BOUNDARY_TYPE bhe_bound_type;
     BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
     bool bhe_use_ext_therm_resis; 
+	bool bhe_user_defined_therm_resis;
     double bhe_power_in_watt_val; 
     double bhe_delta_T_val; 
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
@@ -327,6 +328,7 @@ public:
     double bhe_regrigerant_heat_conductivity;
     double bhe_therm_resistance; 
     double bhe_intern_resistance; 
+	double bhe_R_fig, bhe_R_fog, bhe_R_gg1, bhe_R_gg2, bhe_R_gs;
 	double bhe_switch_off_threshold;
 
 

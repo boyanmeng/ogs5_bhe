@@ -64,8 +64,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		/**
 		  * constructor
 		  */
-        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, int bhe_cop_curve_idx = -1)
-            : type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), _cop_curve_idx(bhe_cop_curve_idx)
+        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, bool user_defined_R_vals = false, int bhe_cop_curve_idx = -1)
+            : type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), user_defined_therm_resis(user_defined_R_vals), _cop_curve_idx(bhe_cop_curve_idx)
 		{};
 
 		/**
@@ -379,7 +379,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		double threshold;
 
         /**
-          * whether or not using external given borehole thermal resistance values
+          * whether or not using external given borehole thermal resistance values Ra, Rb
           */
         bool use_ext_therm_resis; 
 
@@ -392,6 +392,36 @@ namespace BHE  // namespace of borehole heat exchanger
           * external given borehole thermal resistance value
           */
         double ext_Rb; 
+
+		/**
+		* whether or not using user defined borehole thermal resistance Rfig, Rfog, Rgg, Rgs
+		*/
+		bool user_defined_therm_resis;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rfig;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rfog;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgg1;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgg2;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgs;
 
         /**
         * COP curve index
