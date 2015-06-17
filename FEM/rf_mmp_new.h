@@ -309,6 +309,8 @@ public:
     BHE::BHE_BOUNDARY_TYPE bhe_bound_type;
     BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
     bool bhe_use_ext_therm_resis; 
+	bool bhe_user_defined_therm_resis;
+	bool bhe_use_flowrate_curve;
     double bhe_power_in_watt_val; 
     double bhe_delta_T_val; 
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
@@ -316,7 +318,8 @@ public:
     double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
     std::size_t bhe_fluid_type_idx;
     std::size_t bhe_power_in_watt_curve_idx; 
-    double bhe_cop_a, bhe_cop_b; // a and b coefficients for COP curve
+    int bhe_cop_curve_idx; // COP curve index
+	int bhe_flowrate_curve_idx;
     double bhe_refrigerant_viscosity;
     double bhe_refrigerant_density;
     double bhe_refrigerant_heat_capacity;
@@ -327,6 +330,7 @@ public:
     double bhe_regrigerant_heat_conductivity;
     double bhe_therm_resistance; 
     double bhe_intern_resistance; 
+	double bhe_R_fig, bhe_R_fog, bhe_R_gg1, bhe_R_gg2, bhe_R_gs;
 	double bhe_switch_off_threshold;
 
 

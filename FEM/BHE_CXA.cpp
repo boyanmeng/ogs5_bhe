@@ -89,16 +89,26 @@ void BHE_CXA::calc_thermal_resistances()
     {
         _R_ff = ext_Ra;
     }
-    else
+	else if (user_defined_therm_resis)
+	{
+		_R_ff = ext_Rgg1; // Attention! Here ext_Rgg1 is treated as Rff for coaxial type
+	}
+	else
     {
         // Eq. 56 
         _R_ff = _R_adv_o1 + _R_adv_a_i1 + _R_con_o1;
     }
 
     // Eq. 57
-    _R_fig = _R_adv_b_i1 + _R_con_i1 + _R_con_b;
+	if (user_defined_therm_resis)
+		_R_fig = ext_Rfig;
+	else
+		_R_fig = _R_adv_b_i1 + _R_con_i1 + _R_con_b;
 	// thermal resistance due to grout-soil exchange
-	_R_gs = (1 - chi)*_R_g;
+	if (user_defined_therm_resis)
+		_R_gs = ext_Rgs;
+	else
+		_R_gs = (1 - chi)*_R_g;
 
 	if ( !std::isfinite(_R_gs) )
     {

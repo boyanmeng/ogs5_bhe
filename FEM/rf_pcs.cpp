@@ -3289,46 +3289,50 @@ void CRFProcess::ConfigBHEs()
             {
             case BHE::BHE_TYPE_1U:
                 BHE::BHE_1U * m_bhe_1u;
-                m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
+                m_bhe_1u = new BHE::BHE_1U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_user_defined_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
 										   mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                            mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance, 
-                                           mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
+										   mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx, 
+										   mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_1u);
                 break;
             case BHE::BHE_TYPE_2U:
                 BHE::BHE_2U * m_bhe_2u;
-                m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
+				m_bhe_2u = new BHE::BHE_2U(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_user_defined_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                            mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
 										   mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 										   mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                            mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                            mmp_vector[i]->bhe_pipe_distance, mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-                                           mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
+										   mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
+										   mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
                 break;
             case BHE::BHE_TYPE_CXC:
                 BHE::BHE_CXC * m_bhe_cxc;
-                m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
+				m_bhe_cxc = new BHE::BHE_CXC(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_user_defined_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness, 
 											 mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                              mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                              mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-                                             mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
+											 mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
+											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxc);
                 break;
             case BHE::BHE_TYPE_CXA:
                 BHE::BHE_CXA * m_bhe_cxa;
-                m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
+				m_bhe_cxa = new BHE::BHE_CXA(mmp_vector[i]->geo_name, mmp_vector[i]->bhe_bound_type, mmp_vector[i]->bhe_use_ext_therm_resis, mmp_vector[i]->bhe_user_defined_therm_resis, mmp_vector[i]->bhe_length, mmp_vector[i]->bhe_diameter, mmp_vector[i]->bhe_refrigerant_flow_rate,
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
 											 mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
                                              mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
                                              mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
-                                             mmp_vector[i]->bhe_cop_a, mmp_vector[i]->bhe_cop_b, mmp_vector[i]->bhe_switch_off_threshold);
+											 mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
+											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxa);
                 break;
             default:
@@ -7076,9 +7080,19 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                     // if it is the TEMPERATURE_IN, 
                     if (m_bc_node->bhe_pipe_flag == 0 )
                     {
-                        if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP)
-                            // fixed inflow value
-                            bc_value = time_fac * fac * m_bc_node->node_value;
+						if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP ||
+							vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_INFLOW_TEMP_CURVE)
+						{
+							// fixed inflow value
+							bc_value = time_fac * fac * m_bc_node->node_value;
+							// update flow rate related values when using flow rate curve
+							if (vec_BHEs[m_bc_node->bhe_index]->use_flowrate_curve)
+							{
+								int idx = vec_BHEs[m_bc_node->bhe_index]->flowrate_curve_idx;
+								double Q_r_temp = GetCurveValue(idx, 0, aktuelle_zeit, &valid);
+								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
+							}
+						}
                         else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF || 
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT ||
