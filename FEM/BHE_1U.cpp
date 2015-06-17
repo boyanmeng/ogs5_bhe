@@ -482,16 +482,26 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
         // print the amount of power needed
         std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
         // now same procedure
-        // calculate the dT value based on fixed flow rate
-        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r;
+		// Assign Qr whether from curve or fixed value
+		if (use_flowrate_curve)
+			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+		else
+			Q_r_tmp = Q_r;
+		// calculate the dT value based on fixed flow rate
+		delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
         // calcuate the new T_in 
         T_in = T_out + delta_T_val;
         break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
         // get the power value in the curve
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+		// Assign Qr whether from curve or fixed value
+		if (use_flowrate_curve)
+			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+		else
+			Q_r_tmp = Q_r;
         // calculate the dT value based on fixed flow rate
-        delta_T_val = power_tmp / Q_r / heat_cap_r / rho_r; 
+        delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r; 
         // calcuate the new T_in 
         T_in = T_out + delta_T_val;
         break; 

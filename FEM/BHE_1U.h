@@ -51,10 +51,12 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_ext_Rfog = 0.0           /* external defined borehole thermal resistance */,
 			   double my_ext_Rgg1 = 0.0           /* external defined borehole thermal resistance */,
 			   double my_ext_Rgg2 = 0.0           /* external defined borehole thermal resistance */,
-			   double my_ext_Rgs = 0.0           /* external defined borehole thermal resistance */,
+			   double my_ext_Rgs = 0.0            /* external defined borehole thermal resistance */,
                int my_bhe_cop_curve_idx = -1      /* cop curve index */,
+			   bool if_flowrate_curve = false     /* whether flowrate curve is used*/,
+			   int my_flowrate_curve_idx = -1     /* flow rate curve index*/,
 			   double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
-               : BHEAbstract(BHE::BHE_TYPE_1U, name, bound_type, if_use_ext_Ra_Rb, user_defined_R_vals, my_bhe_cop_curve_idx)
+               : BHEAbstract(BHE::BHE_TYPE_1U, name, bound_type, if_use_ext_Ra_Rb, user_defined_R_vals, my_bhe_cop_curve_idx, if_flowrate_curve)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
@@ -95,6 +97,11 @@ namespace BHE  // namespace of borehole heat exchanger
 				ext_Rgg1 = my_ext_Rgg1;
 				ext_Rgg2 = my_ext_Rgg2;
 				ext_Rgs = my_ext_Rgs;
+			}
+			if (if_flowrate_curve)
+			{
+				use_flowrate_curve = true;
+				flowrate_curve_idx = my_flowrate_curve_idx;
 			}
 
 			// Table 1 in Diersch_2011_CG

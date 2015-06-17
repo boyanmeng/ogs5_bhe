@@ -2142,6 +2142,14 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 			in.clear();
 			continue;
 		}
+		if (line_string.find("BHE_FLOW_RATE_CURVE_IDX") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			this->bhe_use_flowrate_curve = true;
+			in >> bhe_flowrate_curve_idx;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_2U_DISCHARGE_TYPE") != std::string::npos)
         {
             std::string str_tmp;

@@ -310,6 +310,7 @@ public:
     BHE::BHE_DISCHARGE_TYPE bhe_2u_discharge_type;
     bool bhe_use_ext_therm_resis; 
 	bool bhe_user_defined_therm_resis;
+	bool bhe_use_flowrate_curve;
     double bhe_power_in_watt_val; 
     double bhe_delta_T_val; 
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
@@ -318,6 +319,7 @@ public:
     std::size_t bhe_fluid_type_idx;
     std::size_t bhe_power_in_watt_curve_idx; 
     int bhe_cop_curve_idx; // COP curve index
+	int bhe_flowrate_curve_idx;
     double bhe_refrigerant_viscosity;
     double bhe_refrigerant_density;
     double bhe_refrigerant_heat_capacity;
