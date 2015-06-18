@@ -51,6 +51,9 @@ void BHE_1U::calc_thermal_resistances()
 {
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG
+	_R_adv_i1 = 1.0 / (_Nu(0) * lambda_r * PI);
+	_R_adv_o1 = 1.0 / (_Nu(1) * lambda_r * PI);
+
 
 	// thermal resistance due to the grout transition
 	double chi;
