@@ -487,7 +487,10 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
         // now same procedure
 		// Assign Qr whether from curve or fixed value
 		if (use_flowrate_curve)
+		{
 			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+			update_flow_rate(Q_r_tmp);
+		}
 		else
 			Q_r_tmp = Q_r;
 		// calculate the dT value based on fixed flow rate
@@ -500,7 +503,10 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
 		// Assign Qr whether from curve or fixed value
 		if (use_flowrate_curve)
+		{
 			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+			update_flow_rate(Q_r_tmp);
+		}
 		else
 			Q_r_tmp = Q_r;
         // calculate the dT value based on fixed flow rate
