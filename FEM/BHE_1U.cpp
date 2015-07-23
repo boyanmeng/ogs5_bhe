@@ -405,9 +405,21 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     switch (this->get_bound_type())
     {
     case BHE_BOUND_POWER_IN_WATT:
-        T_in = power_in_watt_val / Q_r / heat_cap_r / rho_r + T_out;
+		if (use_flowrate_curve)
+		{
+			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+			update_flow_rate(Q_r_tmp);
+		}
+		else
+			Q_r_tmp = Q_r;
+        T_in = power_in_watt_val / Q_r_tmp / heat_cap_r / rho_r + T_out;
         break;
     case BHE_BOUND_FIXED_TEMP_DIFF: 
+		if (use_flowrate_curve)
+		{
+			Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+			update_flow_rate(Q_r_tmp);
+		}
         T_in = T_out + delta_T_val;
         break; 
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT:

@@ -55,8 +55,8 @@ void BHE_CXC::calc_thermal_resistances()
 	Nu_in = _Nu(0);
 	Nu_out = _Nu(1);
 	d_o1 = 2.0 * r_outer;
-	d_i1 = 2.0 * r_inner;
-	d_h = 2.0 * r_outer - d_o1;
+	d_i1 = 2.0 * (r_inner + b_in);
+	d_h = d_o1 - d_i1;
 
 	// thermal resistance due to advective flow of refrigerant in the pipes
 	// Eq. 58, 59, and 60 in Diersch_2011_CG
@@ -70,7 +70,7 @@ void BHE_CXC::calc_thermal_resistances()
 	_R_con_o1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p);
 
 	// thermal resistance due to the grout transition
-	d_o1 = 2.0 * r_outer;
+	d_o1 = 2.0 * (r_outer + b_out);
 	// Eq. 68
 	chi = std::log(std::sqrt(D*D + d_o1*d_o1) / std::sqrt(2) / d_o1) / std::log(D / d_o1);
     if (use_ext_therm_resis)
@@ -129,7 +129,6 @@ void BHE_CXC::calc_Nu()
 
 	d_o1 = 2.0 * r_outer;
 	d_i1 = 2.0 * r_inner;
-	d_h = 2.0 * r_outer - d_o1;
 
 	// first calculating Nu_in
 	if (_Re_i1 < 2300.0)
@@ -151,6 +150,8 @@ void BHE_CXC::calc_Nu()
 	}
 
 	// then calculating Nu_out
+	d_i1 = 2.0 * (r_inner + b_in);
+	d_h = d_o1 - d_i1;
 	if (_Re_o1 < 2300.0)
 	{
 		Nu_out = 3.66;
@@ -183,7 +184,7 @@ void BHE_CXC::calc_Re()
 	double d_i1, d_h;
 
 	d_i1 = 2.0 * r_inner; // inner diameter of the pipeline
-	d_h = 2.0 * r_outer - d_i1;
+	d_h = 2.0 * (r_outer - (r_inner + b_in));
 
 	// _u(0) is u_in, and _u(1) is u_out
 	_Re_o1 = _u(1) * d_h / (mu_r / rho_r);
@@ -216,7 +217,7 @@ void BHE_CXC::calc_u()
 	double u_in, u_out;
 
 	u_in = Q_r / (PI * r_inner * r_inner);
-	u_out = Q_r / (PI * (r_outer * r_outer - r_inner * r_inner));
+	u_out = Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
 	
 	_u(0) = u_in;
 	_u(1) = u_out;
