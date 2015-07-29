@@ -251,6 +251,20 @@ namespace BHE  // namespace of borehole heat exchanger
         */
         double get_ply_eps(void) { return _ply_eps; }
 
+        /**
+          * get the _Tout_first_iter value
+          */
+        double get_Tout_first_iter(void)
+        { return _Tout_first_iter; }
+
+        /**
+          * set the _Tout_first_iter value
+          */
+        void set_Tout_first_iter(double val)
+        {
+            _Tout_first_iter = val;
+        }
+
 		/**
 		  * total refrigerant flow discharge of BHE
 		  * unit is m^3/sec 
@@ -464,6 +478,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * epsilon value of the BHE polyline
           */
         double _ply_eps; 
+
+        /**
+          * T_out value at the first iteration
+          */
+        double _Tout_first_iter; 
 
 	};
 

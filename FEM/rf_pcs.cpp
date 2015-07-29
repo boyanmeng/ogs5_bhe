@@ -7100,7 +7100,8 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE )
                         {
-                            // get the T_out value
+                            /*
+                            // this section is to get the T_out value from the last iteration--
                             if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
                                 eqs_index = bc_msh_node + shift + 3;
                             else
@@ -7110,6 +7111,62 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             #else
                                 T_out = eqs->x[eqs_index];
                             #endif
+                            // ---------------------------------------------------------------
+                            */
+                            
+                            /*
+                            // this section is to get the T_out from the last time step-------
+                            int t_out_idx;
+                            std::string bhe_name = vec_BHEs[m_bc_node->bhe_index]->get_name();
+                            std::string key_word; 
+                            if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
+                                key_word = "TEMPERATURE_OUT_2_";
+                            else
+                                key_word = "TEMPERATURE_OUT_1_"; 
+                            key_word.append(bhe_name); 
+                            t_out_idx = GetNodeValueIndex(key_word);
+                            T_out = GetNodeValue( bc_msh_node, t_out_idx); // last time step value
+                            // ---------------------------------------------------------------
+                            */
+
+                            // this section is the last iteration T_out value ----------------
+                            
+                            // if first iteration, use Tout from the previous time step
+                            if ( iter_nlin == 0 )
+                            {
+                                int t_out_idx;
+                                std::string bhe_name = vec_BHEs[m_bc_node->bhe_index]->get_name();
+                                std::string key_word;
+                                if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
+                                    key_word = "TEMPERATURE_OUT_2_";
+                                else
+                                    key_word = "TEMPERATURE_OUT_1_";
+                                key_word.append(bhe_name);
+                                t_out_idx = GetNodeValueIndex(key_word);
+                                T_out = GetNodeValue(bc_msh_node, t_out_idx); // last time step value
+                            }
+                            // if second ieteration, use Tout from the first iteration and save it
+                            else if ( iter_nlin == 1)
+                            {
+                                if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
+                                    eqs_index = bc_msh_node + shift + 3;
+                                else
+                                    eqs_index = bc_msh_node + shift + 1;
+                                #ifdef NEW_EQS
+                                T_out = eqs_new->x[eqs_index];
+                                #else
+                                T_out = eqs->x[eqs_index];
+                                #endif
+                                // save T_out
+                                vec_BHEs[m_bc_node->bhe_index]->set_Tout_first_iter(T_out); 
+                            }
+                            // if third or more iteration, use Tout from the saved value. 
+                            else
+                            {
+                                T_out = vec_BHEs[m_bc_node->bhe_index]->get_Tout_first_iter(); 
+                            }
+                            // ---------------------------------------------------------------
+
                             // need some calculation
                             // notice that the time_fac will bring the curve value. We do not need it. 
                             bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout(T_out, aktuelle_zeit /*this is current time*/);
