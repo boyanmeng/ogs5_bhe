@@ -150,6 +150,7 @@ CMediumProperties::CMediumProperties() :
 
     // BHE parameters
     is_BHE = false; 
+    bhe_use_flowrate_curve = false; 
     bhe_use_ext_therm_resis = false; 
 	bhe_user_defined_therm_resis = false;
     bhe_power_in_watt_val = 0.0; 
