@@ -7100,7 +7100,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE )
                         {
-                            /*
+                            
                             // this section is to get the T_out value from the last iteration--
                             if (vec_BHEs[m_bc_node->bhe_index]->get_type() == BHE::BHE_TYPE_2U)
                                 eqs_index = bc_msh_node + shift + 3;
@@ -7112,7 +7112,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                                 T_out = eqs->x[eqs_index];
                             #endif
                             // ---------------------------------------------------------------
-                            */
+                            
                             
                             /*
                             // this section is to get the T_out from the last time step-------
@@ -7129,8 +7129,8 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             // ---------------------------------------------------------------
                             */
 
+                            /*
                             // this section is the last iteration T_out value ----------------
-                            
                             // if first iteration, use Tout from the previous time step
                             if ( iter_nlin == 0 )
                             {
@@ -7166,7 +7166,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                                 T_out = vec_BHEs[m_bc_node->bhe_index]->get_Tout_first_iter(); 
                             }
                             // ---------------------------------------------------------------
-
+                            */
                             // need some calculation
                             // notice that the time_fac will bring the curve value. We do not need it. 
                             bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout(T_out, aktuelle_zeit /*this is current time*/);
