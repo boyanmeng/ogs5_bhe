@@ -10,6 +10,7 @@ set( SOURCES
 	BHE_2U.h
 	BHE_CXC.h
 	BHE_CXA.h
+	BHE_Net_ELE_Abstract.h
 	conversion_rate.h
 	display.h
 	eos.h
