@@ -16,7 +16,7 @@ namespace BHE  // namespace of borehole heat exchanger
     class BHE_Net_ELE_Distributor : public BHE_Net_ELE_Abstract 
     {
         public:
-            BHE_Net_ELE_Distributor(Eigen::VectorXd & vec_Inlet_Ratio, Eigen::VectorXd & vec_Outlet_Ratio);
+            BHE_Net_ELE_Distributor(std::string & name, Eigen::VectorXd & vec_Inlet_Ratio, Eigen::VectorXd & vec_Outlet_Ratio);
 
         private:
             /**

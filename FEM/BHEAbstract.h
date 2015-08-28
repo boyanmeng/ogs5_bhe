@@ -66,7 +66,7 @@ namespace BHE  // namespace of borehole heat exchanger
 		  * constructor
 		  */
         BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, bool user_defined_R_vals = false, int bhe_cop_curve_idx = -1, bool if_flowrate_curve = false, int n_T_in = 1, int n_T_out = 1)
-            : BHE_Net_ELE_Abstract(BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in, n_T_out), type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), user_defined_therm_resis(user_defined_R_vals), _cop_curve_idx(bhe_cop_curve_idx), use_flowrate_curve(if_flowrate_curve)
+            : BHE_Net_ELE_Abstract(name, BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in, n_T_out), type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), user_defined_therm_resis(user_defined_R_vals), _cop_curve_idx(bhe_cop_curve_idx), use_flowrate_curve(if_flowrate_curve)
 		{};
 
 		/**

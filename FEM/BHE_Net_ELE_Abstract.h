@@ -29,8 +29,8 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * constructor
           */
-        BHE_Net_ELE_Abstract(BHE_NET_ELE type, int n_inlet = 1, int n_outlet = 1) 
-            : N_IN(n_inlet), N_OUT(n_outlet), _ele_type(type)
+        BHE_Net_ELE_Abstract(std::string name, BHE_NET_ELE type, int n_inlet = 1, int n_outlet = 1) 
+            : N_IN(n_inlet), N_OUT(n_outlet), _name(name), _ele_type(type)
         {
             int i; 
             // initialize T_in
@@ -125,6 +125,8 @@ namespace BHE  // namespace of borehole heat exchanger
         const int N_OUT;
 
         const BHE_NET_ELE _ele_type; 
+
+        std::string _name; 
         
     };
 

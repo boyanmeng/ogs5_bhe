@@ -19,7 +19,7 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * constructor
           */
-        BHE_Net_ELE_Pipe();
+        BHE_Net_ELE_Pipe(std::string & name);
 
     };
 
