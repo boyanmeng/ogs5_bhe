@@ -13,14 +13,24 @@
 
 namespace BHE  // namespace of borehole heat exchanger
 {
+    /**
+    * list the types of BHE net element
+    */
+    enum BHE_NET_ELE {
+        BHE_NET_PIPE,          // pipeline
+        BHE_NET_DISTRIBUTOR,   // distributor
+        BHE_NET_HEATPUMP,      // heat pump
+        BHE_NET_BOREHOLE	   // borehole
+    };
 
     class BHE_Net_ELE_Abstract {
+    
     public:
-
         /**
           * constructor
           */
-        BHE_Net_ELE_Abstract(int n_inlet = 1, int n_outlet = 1) : N_IN(n_inlet), N_OUT(n_outlet)
+        BHE_Net_ELE_Abstract(BHE_NET_ELE type, int n_inlet = 1, int n_outlet = 1) 
+            : N_IN(n_inlet), N_OUT(n_outlet), _ele_type(type)
         {
             int i; 
             // initialize T_in
@@ -106,6 +116,7 @@ namespace BHE  // namespace of borehole heat exchanger
 
         const int N_OUT;
 
+        const BHE_NET_ELE _ele_type; 
         
     };
 
