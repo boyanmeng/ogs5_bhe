@@ -10,6 +10,7 @@
 #define BHE_NET_ELE_ABSTRACT_H
 
 #include "Eigen/Eigen"
+#include <vector>
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -64,6 +65,11 @@ namespace BHE  // namespace of borehole heat exchanger
             return _ele_type; 
         }
 
+        std::string get_ele_name()
+        {
+            return _name; 
+        }
+
         /**
           * get inlet temperature
           */
@@ -108,6 +114,16 @@ namespace BHE  // namespace of borehole heat exchanger
             return N_OUT;
         }
 
+        void add_inlet_connet(BHE_Net_ELE_Abstract* connect)
+        {
+            _vec_ele_inlet.push_back(connect);
+        }
+
+        void add_outlet_connet(BHE_Net_ELE_Abstract* connect)
+        {
+            _vec_ele_outlet.push_back(connect);
+        }
+
     private:
 
         /**
@@ -127,6 +143,10 @@ namespace BHE  // namespace of borehole heat exchanger
         const BHE_NET_ELE _ele_type; 
 
         std::string _name; 
+
+        std::vector<BHE_Net_ELE_Abstract*> _vec_ele_inlet; 
+
+        std::vector<BHE_Net_ELE_Abstract*> _vec_ele_outlet;
         
     };
 
