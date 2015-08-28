@@ -9,6 +9,8 @@
 #ifndef BHE_NET_ELE_ABSTRACT_H
 #define BHE_NET_ELE_ABSTRACT_H
 
+#include "Eigen/Eigen"
+
 namespace BHE  // namespace of borehole heat exchanger
 {
 
@@ -18,23 +20,22 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * constructor
           */
-        BHE_Net_ELE_Abstract(int n_inlet = 1, int n_outlet = 1){
-
+        BHE_Net_ELE_Abstract(int n_inlet = 1, int n_outlet = 1) : N_IN(n_inlet), N_OUT(n_outlet)
+        {
             int i; 
             // initialize T_in
-            T_in = new double[n_inlet];
-            for (i = 0; i < n_inlet; i++)
+            T_in = new double[N_IN];
+            for (i = 0; i < N_IN; i++)
             {
                 T_in[i] = 0.0;
             }
 
             // initialize T_out
-            T_out = new double[n_outlet];
-            for (i = 0; i < n_outlet; i++)
+            T_out = new double[N_OUT];
+            for (i = 0; i < N_OUT; i++)
             {
                 T_out[i] = 0.0;
             }
-
         }
 
         /**
@@ -73,6 +74,22 @@ namespace BHE  // namespace of borehole heat exchanger
             T_out[idx] = val; 
         }
 
+        /**
+          * return the number of inlet temperatures
+          */
+        int get_n_T_in()
+        {
+            return N_IN; 
+        }
+
+        /**
+          * return the number of outlet temperatures
+          */
+        int get_n_T_out()
+        {
+            return N_OUT;
+        }
+
     private:
 
         /**
@@ -84,6 +101,10 @@ namespace BHE  // namespace of borehole heat exchanger
           * array of outlet temperature
           */
         double * T_out; 
+
+        const int N_IN; 
+
+        const int N_OUT;
 
         
     };
