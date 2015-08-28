@@ -10,6 +10,7 @@ set( SOURCES
 	BHE_2U.h
 	BHE_CXC.h
 	BHE_CXA.h
+	BHE_Net.h
 	BHE_Net_ELE_Abstract.h
 	BHE_Net_ELE_Distributor.h
 	BHE_Net_ELE_HeatPump.h
@@ -74,6 +75,7 @@ set( SOURCES
 	BHE_2U.cpp
 	BHE_CXC.cpp
 	BHE_CXA.cpp
+	BHE_Net.cpp
 	BHE_Net_ELE_Distributor.cpp
 	BHE_Net_ELE_HeatPump.cpp
 	BHE_Net_ELE_Pipe.cpp
