@@ -57,6 +57,14 @@ namespace BHE  // namespace of borehole heat exchanger
         }
 
         /**
+          * return the net element type
+          */
+        BHE_NET_ELE get_net_ele_type()
+        {
+            return _ele_type; 
+        }
+
+        /**
           * get inlet temperature
           */
         double get_T_in(int idx = 0) {
