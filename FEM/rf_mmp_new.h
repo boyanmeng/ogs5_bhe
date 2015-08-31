@@ -22,6 +22,8 @@
 // PCSLib
 #include "rf_pcs.h"
 
+#include "BHE_Net_ELE_HeatPump.h"
+
 namespace FiniteElement
 {class CFiniteElementStd;
 }
@@ -332,8 +334,27 @@ public:
     double bhe_intern_resistance; 
 	double bhe_R_fig, bhe_R_fog, bhe_R_gg1, bhe_R_gg2, bhe_R_gs;
 	double bhe_switch_off_threshold;
-
-
+	// BHE Net heat pump parameters
+	bool is_heat_pump;
+	std::string heat_pump_name;
+	BHE::HEAT_PUMP_BOUNDARY_TYPE heat_pump_boundary_type;
+	double heat_pump_power_val;
+	double heat_pump_delta_T_val;
+	double heat_pump_flowrate;
+	int heat_pump_power_curve_idx;
+	int heat_pump_COP_curve_idx;
+	// BHE Net distributor parameters
+	bool is_distributor;
+	std::string distributor_name;
+	int distributor_n_in;
+	int distributor_n_out;
+	Eigen::VectorXd distributor_in_ratios;
+	Eigen::VectorXd distributor_out_ratios;
+	// BHE Net pipe parameters
+	bool is_pipe;
+	std::string pipe_name, pipe_from, pipe_to;
+	int pipe_from_port, pipe_to_port;
+	double pipe_loss_coeff;
 };
 
 class CMediumPropertiesGroup                      //YD
