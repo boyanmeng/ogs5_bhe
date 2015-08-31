@@ -13,6 +13,11 @@
 
 namespace BHE  // namespace of borehole heat exchanger
 {
+	enum HEAT_PUMP_BOUNDARY_TYPE {
+		HEAT_PUMP_BOUND_POWER_FIXED_FLOWRATE,
+		HEAT_PUMP_BOUND_POWER_FIXED_DT,
+	};
+
     class BHE_Net_ELE_HeatPump : public BHE_Net_ELE_Abstract {
 
         public: 

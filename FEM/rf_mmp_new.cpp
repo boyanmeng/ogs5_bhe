@@ -40,6 +40,8 @@ extern double gravity_constant;
 #include "BHE_2U.h"
 #include "BHE_CXC.h"
 #include "BHE_CXA.h"
+#include "BHE_Net_ELE_Distributor.h"
+#include "BHE_Net_ELE_Pipe.h"
 
 using namespace std;
 
@@ -158,6 +160,19 @@ CMediumProperties::CMediumProperties() :
     bhe_power_in_watt_curve_idx = -1; 
 	bhe_switch_off_threshold = 0.0;
 	bhe_cop_curve_idx = -1;
+	// BHE Net parameters
+	is_heat_pump = false;
+	is_distributor = false;
+	is_pipe = false;
+	heat_pump_power_val = 0.0;
+	heat_pump_delta_T_val = 0.0;
+	heat_pump_flowrate = 0.0;
+	heat_pump_power_curve_idx = -1;
+	heat_pump_COP_curve_idx = -1;
+	pipe_loss_coeff = 0.0;
+	pipe_from_port = 0;
+	pipe_to_port = 0;
+	
 }
 
 /**************************************************************************
@@ -1925,6 +1940,134 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
          continue;
       }
 
+	  if (line_string.find("$BHE_NET_HEAT_PUMP") != std::string::npos)
+	  {
+		  is_heat_pump = true;
+	  }
+	  if (line_string.find("HEAT_PUMP_NAME") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_name;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_BOUNDARY_TYPE") != std::string::npos)
+	  {
+		  std::string str_tmp;
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> str_tmp;
+		  if (str_tmp.compare("HEAT_PUMP_BOUND_POWER_FIXED_FLOWRATE") == 0)
+			  heat_pump_boundary_type = BHE::HEAT_PUMP_BOUND_POWER_FIXED_FLOWRATE;
+		  else if (str_tmp.compare("HEAT_PUMP_BOUND_POWER_FIXED_DT") == 0)
+			  heat_pump_boundary_type = BHE::HEAT_PUMP_BOUND_POWER_FIXED_DT;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_POWER_VALUE") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_power_val;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_DELTA_T_VALUE") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_delta_T_val;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_FLOWRATE") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_flowrate;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_POWER_CURVE_IDX") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_power_curve_idx;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("HEAT_PUMP_COP_CURVE_IDX") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_COP_curve_idx;
+		  in.clear();
+		  continue;
+	  }
+
+	  if (line_string.find("$BHE_NET_DISTRIBUTOR") != std::string::npos)
+	  {
+		  is_distributor = true;
+	  }
+	  if (line_string.find("DISTRIBUTOR_NAME") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> distributor_name;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("DISTRIBUTOR_IN") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> distributor_n_in;
+		  distributor_in_ratios = Eigen::VectorXd::Zero(distributor_n_in);
+		  for (int i = 0; i < distributor_n_in; i++)
+		  {
+			  in >> distributor_in_ratios[i];
+		  }
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("DISTRIBUTOR_OUT") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> distributor_n_out;
+		  distributor_out_ratios = Eigen::VectorXd::Zero(distributor_n_out);
+		  for (int i = 0; i < distributor_n_out; i++)
+		  {
+			  in >> distributor_out_ratios[i];
+		  }
+		  in.clear();
+		  continue;
+	  }
+
+	  if (line_string.find("$BHE_NET_PIPE") != std::string::npos)
+	  {
+		  is_pipe = true;
+	  }
+	  if (line_string.find("PIPE_NAME") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> pipe_name;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("PIPE_FROM") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> pipe_from >> pipe_from_port;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("PIPE_TO") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> pipe_to >> pipe_to_port;
+		  in.clear();
+		  continue;
+	  }
+	  if (line_string.find("PIPE_LOSS_COEFFICIENT") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> pipe_loss_coeff;
+		  in.clear();
+		  continue;
+	  }
+
       if (line_string.find("$BOREHOLE_HEAT_EXCHANGER") != std::string::npos)
       {
           is_BHE = true;
@@ -2126,8 +2269,7 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
         {
             in.str(GetLineFromFile1(mmp_file));
             this->bhe_use_ext_therm_resis = true; 
-            in >> bhe_intern_resistance; 
-            in >> bhe_therm_resistance;
+            in >> bhe_intern_resistance >> bhe_therm_resistance;
             in.clear();
             continue;
         }
@@ -2135,11 +2277,7 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 		{
 			in.str(GetLineFromFile1(mmp_file));
 			this->bhe_user_defined_therm_resis = true;
-			in >> bhe_R_fig;
-			in >> bhe_R_fog;
-			in >> bhe_R_gg1;
-			in >> bhe_R_gg2;
-			in >> bhe_R_gs;
+			in >> bhe_R_fig >> bhe_R_fog >> bhe_R_gg1 >> bhe_R_gg2 >> bhe_R_gs;
 			in.clear();
 			continue;
 		}
@@ -2163,11 +2301,6 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
-       
-
-         
-
- 
 
    }
 	return position;
