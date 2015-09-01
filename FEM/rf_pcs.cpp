@@ -3410,6 +3410,12 @@ void CRFProcess::ConfigBHEs()
         // counting dofs
         n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
     }
+
+    // now counting the BHE net extra temperatures
+    if (BHE_network.get_n_elems() > 0)
+    {
+        n_dofs_BHE += BHE_network.get_n_unknowns(); 
+    }
     
 }
 
