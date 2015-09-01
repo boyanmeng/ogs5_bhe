@@ -70,6 +70,9 @@
 #include "fem_ele_vec.h"//WX:08.2011
 #include "StepperBulischStoer.h"
 #include "BHEAbstract.h"
+#include "BHE_Net_ELE_Distributor.h"
+#include "BHE_Net_ELE_HeatPump.h"
+#include "BHE_Net_ELE_Pipe.h"
 
 /*-----------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------*/
@@ -128,6 +131,7 @@ REACT_BRNS* m_vec_BRNS;
 #include "BHE_2U.h"
 #include "BHE_CXA.h"
 #include "BHE_CXC.h"
+#include "BHE_Net.h"
 #include "../GEO/geo_ply.h"
 
 using namespace std;
@@ -192,7 +196,8 @@ int pcs_number_flow = -1;						// JT2012
 int pcs_number_heat = -1;						// JT2012
 vector<int>pcs_number_mass;						// JT2012
 
-std::vector<BHE::BHEAbstract*> vec_BHEs;              // HS2014
+std::vector<BHE::BHEAbstract*> vec_BHEs;                // HS2014
+BHE::BHE_Net BHE_network;                               // HS2015
 std::vector< std::vector<std::size_t> > vec_BHE_nodes;  // HS2014
 std::vector< std::vector<std::size_t> > vec_BHE_elems;  // HS2014
 
@@ -3298,6 +3303,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx, 
 										   mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_1u);
+                BHE_network.add_bhe_net_elem(m_bhe_1u);
                 break;
             case BHE::BHE_TYPE_2U:
                 BHE::BHE_2U * m_bhe_2u;
@@ -3310,6 +3316,7 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
 										   mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
+                BHE_network.add_bhe_net_elem(m_bhe_2u);
                 break;
             case BHE::BHE_TYPE_CXC:
                 BHE::BHE_CXC * m_bhe_cxc;
@@ -3322,6 +3329,7 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
 											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxc);
+                BHE_network.add_bhe_net_elem(m_bhe_cxc);
                 break;
             case BHE::BHE_TYPE_CXA:
                 BHE::BHE_CXA * m_bhe_cxa;
@@ -3334,6 +3342,7 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
 											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxa);
+                BHE_network.add_bhe_net_elem(m_bhe_cxa);
                 break;
             default:
                 break;
@@ -3349,7 +3358,31 @@ void CRFProcess::ConfigBHEs()
                 vec_BHEs.back()->set_ply_eps(m_ply->epsilon); 
                 m_ply = NULL; 
             }
-        } // end of if
+        } // end of if is_BHE
+        else if (mmp_vector[i]->is_distributor)
+        {
+            // initialize the distributor
+            BHE::BHE_Net_ELE_Distributor * m_distributor = new BHE::BHE_Net_ELE_Distributor(mmp_vector[i]->distributor_name,
+                                                                                            mmp_vector[i]->distributor_in_ratios, 
+                                                                                            mmp_vector[i]->distributor_out_ratios);
+            BHE_network.add_bhe_net_elem(m_distributor);
+
+        } // end of if is_distributor
+        else if (mmp_vector[i]->is_heat_pump)
+        {
+            // initialize the heat pump
+            BHE::BHE_Net_ELE_HeatPump * m_heat_pump = new BHE::BHE_Net_ELE_HeatPump(mmp_vector[i]->heat_pump_name);
+            BHE_network.add_bhe_net_elem(m_heat_pump);
+
+        } // end of if is_heat_pump
+        else if (mmp_vector[i]->is_pipe)
+        {
+            // initialize the pipeline
+            BHE::BHE_Net_ELE_Pipe * m_pipe = new BHE::BHE_Net_ELE_Pipe(mmp_vector[i]->pipe_name);
+            BHE_network.add_bhe_net_pipe(m_pipe, mmp_vector[i]->pipe_from, mmp_vector[i]->pipe_to);
+
+        } // end of if is_pipe
+        
     } // end of for
     
     // count how many nodes are sitting on the borehole heat exchanger
@@ -3376,6 +3409,13 @@ void CRFProcess::ConfigBHEs()
         n_nodes_BHE += vec_mesh_nodes.size();
         // counting dofs
         n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
+    }
+
+    // now counting the BHE net extra temperatures
+    if (BHE_network.get_n_elems() > 0)
+    {
+        BHE_network.set_network_elem_global_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
+        n_dofs_BHE += BHE_network.get_n_unknowns();         
     }
     
 }
