@@ -92,7 +92,15 @@ void BHE_Net::count_n_unknowns()
 
 int BHE_Net::get_n_unknowns()
 {
+    // first count
     count_n_unknowns();
 
+    // then return
     return n_unknowns; 
+}
+
+int BHE_Net::get_n_elems()
+{
+    // return the number of elements in the network
+    return _bhe_net.size(); 
 }

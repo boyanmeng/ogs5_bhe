@@ -33,6 +33,8 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         int get_n_unknowns(); 
 
+        int get_n_elems(); 
+
     private:
 
         void count_n_unknowns();
