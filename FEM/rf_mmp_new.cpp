@@ -1998,6 +1998,19 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 		  in.clear();
 		  continue;
 	  }
+	  if (line_string.find("HEAT_PUMP_FLUID_IDX") != std::string::npos)
+	  {
+		  in.str(GetLineFromFile1(mmp_file));
+		  in >> heat_pump_fluid_idx;
+		  in.clear();
+		  // get fluid properties
+		  if (mfp_vector[heat_pump_fluid_idx])
+		  {
+			  heat_pump_refrigerant_density = mfp_vector[heat_pump_fluid_idx]->Density();
+			  heat_pump_refrigerant_heat_capacity = mfp_vector[heat_pump_fluid_idx]->getSpecificHeatCapacity();
+		  }
+		  continue;
+	  }
 
 	  if (line_string.find("$BHE_NET_DISTRIBUTOR") != std::string::npos)
 	  {
