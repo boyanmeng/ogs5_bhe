@@ -36,16 +36,20 @@ namespace BHE  // namespace of borehole heat exchanger
             int i; 
             // initialize T_in
             T_in = new double[N_IN];
+            global_idx_T_in = new long[N_IN];
             for (i = 0; i < N_IN; i++)
             {
                 T_in[i] = 0.0;
+                global_idx_T_in[i] = -1; // uninitialized index value
             }
 
             // initialize T_out
             T_out = new double[N_OUT];
+            global_idx_T_out = new long[N_OUT];
             for (i = 0; i < N_OUT; i++)
             {
                 T_out[i] = 0.0;
+                global_idx_T_out[i] = -1; // uninitialized index value
             }
         }
 
@@ -78,10 +82,38 @@ namespace BHE  // namespace of borehole heat exchanger
         }
 
         /**
+          * get the global index of T_in
+          */
+        long get_T_in_global_index(int idx_T_in = 0) {
+            return global_idx_T_in[idx_T_in];
+        }
+
+        /**
+          * set the global index of T_in
+          */
+        void set_T_in_global_index(long new_idx, int idx_T_in = 0) {
+            global_idx_T_in[idx_T_in] = new_idx;
+        }
+
+        /**
           * get outlet temperature
           */
         double get_T_out(int idx = 0) {
             return T_out[idx];
+        }
+
+        /**
+          * set the global index of T_out
+          */
+        void set_T_out_global_index(long new_idx, int idx_T_out = 0) {
+            global_idx_T_out[idx_T_out] = new_idx;
+        }
+
+        /**
+          * get the global index of T_out
+          */
+        long get_T_out_global_index(int idx_T_out = 0) {
+            return global_idx_T_out[idx_T_out];
         }
 
         /**
@@ -135,6 +167,16 @@ namespace BHE  // namespace of borehole heat exchanger
           * array of outlet temperature
           */
         double * T_out; 
+
+        /**
+        * array of inlet temperature global index
+        */
+        long * global_idx_T_in;
+
+        /**
+        * array of outlet temperature global index
+        */
+        long * global_idx_T_out;
 
         const int N_IN; 
 
