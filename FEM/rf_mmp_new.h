@@ -343,6 +343,9 @@ public:
 	double heat_pump_flowrate;
 	int heat_pump_power_curve_idx;
 	int heat_pump_COP_curve_idx;
+	int heat_pump_fluid_idx;
+	double heat_pump_refrigerant_density;
+	double heat_pump_refrigerant_heat_capacity;
 	// BHE Net distributor parameters
 	bool is_distributor;
 	std::string distributor_name;
