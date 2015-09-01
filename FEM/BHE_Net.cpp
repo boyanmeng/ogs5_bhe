@@ -104,3 +104,35 @@ int BHE_Net::get_n_elems()
     // return the number of elements in the network
     return _bhe_net.size(); 
 }
+
+void BHE_Net::set_network_elem_global_idx(long n_nodes, long n_dofs_BHE)
+{
+    int i; 
+    long idx = n_nodes + n_dofs_BHE; 
+
+    // loop over all elements in the map 
+    typedef bhe_map::iterator it_type;
+    for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
+        // not counting the BHE, not counting the pipe
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE || iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+            continue;
+        else
+        {
+            // assgin index to T_in
+            for (i = 0; i < iterator->second->get_n_T_in(); i++)
+            {
+                iterator->second->set_T_in_global_index(idx, i);
+                idx++; 
+            }
+
+            // assgin index to T_out
+            for (i = 0; i < iterator->second->get_n_T_out(); i++)
+            {
+                iterator->second->set_T_out_global_index(idx, i);
+                idx++;
+            }
+        }
+    }
+
+    
+}
