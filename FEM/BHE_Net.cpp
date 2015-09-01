@@ -5,7 +5,7 @@ using namespace BHE;
 
 BHE_Net::BHE_Net()
 {
-
+    n_unknowns = 0; 
 }
 
 void BHE_Net::add_bhe_net_elem(BHE_Net_ELE_Abstract* element)
@@ -71,4 +71,28 @@ void BHE_Net::add_bhe_net_pipe(BHE_Net_ELE_Pipe* pipe,
         std::cout << "BHE net pipeline already exists!\n";
         exit(1);
     }
+}
+
+void BHE_Net::count_n_unknowns()
+{
+    n_unknowns = 0;
+    // loop over all elements in the map 
+    typedef bhe_map::iterator it_type;
+    for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
+        // not counting the BHE, not counting the pipe
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE || iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+            continue; 
+        else
+        {
+            n_unknowns += iterator->second->get_n_T_in();
+            n_unknowns += iterator->second->get_n_T_out();
+        }
+    }
+}
+
+int BHE_Net::get_n_unknowns()
+{
+    count_n_unknowns();
+
+    return n_unknowns; 
 }
