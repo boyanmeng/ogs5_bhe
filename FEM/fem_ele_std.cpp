@@ -9177,15 +9177,16 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation()
 
 void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 {
-    int i, j;
+    int i;
     long global_idx_unknown; 
     long global_idx_eqns; 
+    BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
 
     // the global eqn index is set to the end of the BHE nodes
     global_idx_eqns = bhe_net->get_global_start_idx();
     // loop over all elements
     typedef BHE::bhe_map::iterator it_type;
-    for (it_type iterator = bhe_net->get_network().begin(); iterator != bhe_net->get_network().end(); iterator++) {
+    for (it_type iterator = m_BHE_map.begin(); iterator != m_BHE_map.end(); iterator++) {
         // only implement governing equations based on
         // pipelines and distributors
         if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
