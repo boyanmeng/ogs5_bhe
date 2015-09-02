@@ -12,6 +12,8 @@
 #include "Eigen/Eigen"
 #include <vector>
 
+using namespace std;
+
 namespace BHE  // namespace of borehole heat exchanger
 {
     /**
@@ -156,6 +158,25 @@ namespace BHE  // namespace of borehole heat exchanger
             _vec_ele_outlet.push_back(connect);
         }
 
+        BHE_Net_ELE_Abstract* get_inlet_connect(int idx = 0)
+        {
+            return _vec_ele_inlet[idx];
+        }
+
+        BHE_Net_ELE_Abstract* get_outlet_connect(int idx = 0)
+        {
+            return _vec_ele_outlet[idx];
+        }
+
+        double get_inlet_ratio(int idx = 0)
+        {
+            _vec_inlet_ratio(idx);
+        }
+
+        double get_outlet_ratio(int idx = 0)
+        {
+            _vec_outlet_ratio(idx);
+        }
     private:
 
         /**
@@ -189,6 +210,16 @@ namespace BHE  // namespace of borehole heat exchanger
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_inlet; 
 
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_outlet;
+
+        /**
+        * how the inlet flow rate is determined.
+        */
+        Eigen::VectorXd _vec_inlet_ratio;
+
+        /**
+        * how the outlet flow rate is determined.
+        */
+        Eigen::VectorXd _vec_outlet_ratio;
         
     };
 

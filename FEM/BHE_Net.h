@@ -15,6 +15,8 @@
 
 namespace BHE  // namespace of borehole heat exchanger
 {
+    typedef std::map<std::string, BHE_Net_ELE_Abstract*> bhe_map;
+
     class BHE_Net {
     public:
         /**
@@ -43,11 +45,14 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         void set_network_elem_global_idx(long n_nodes, long n_dofs_BHE);
 
+        bhe_map get_network()
+        {
+            return _bhe_net;
+        }
+
     private:
 
         void count_n_unknowns();
-
-        typedef std::map<std::string, BHE_Net_ELE_Abstract*> bhe_map;
 
         /**
           * a map including all bhes, distributors, and pipelines

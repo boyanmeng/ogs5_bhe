@@ -19,15 +19,7 @@ namespace BHE  // namespace of borehole heat exchanger
             BHE_Net_ELE_Distributor(std::string & name, Eigen::VectorXd & vec_Inlet_Ratio, Eigen::VectorXd & vec_Outlet_Ratio);
 
         private:
-            /**
-              * how the inlet flow rate is determined. 
-              */
-            Eigen::VectorXd _vec_inlet_ratio; 
 
-            /**
-              * how the outlet flow rate is determined. 
-              */
-            Eigen::VectorXd _vec_outlet_ratio;
 
     }; 
 }
