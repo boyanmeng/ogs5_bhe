@@ -6093,6 +6093,11 @@ void CRFProcess::GlobalAssembly()
 		if (femFCTmode)     //NW
 			AddFCT_CorrectionVector();
 
+        // HS
+        // assemble the BHE_Net governing equations
+        if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && BHE_network.get_n_elems() > vec_BHEs.size())
+            fem->Assemble_LHS_BHE_Net(&BHE_network); 
+
 		// MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
         // std::cout << "Before the source terms: \n";
         // eqs_new->Write();

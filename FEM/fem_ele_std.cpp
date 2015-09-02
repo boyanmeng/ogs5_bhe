@@ -53,6 +53,9 @@ extern double gravity_constant;                   // TEST, must be put in input 
 #define GAS_MASS_FORM
 
 using namespace std;
+using namespace BHE;
+#include "BHE_Net.h"
+
 #include "Eclipse.h"                              //BG 09/2009
 namespace FiniteElement
 {
@@ -9172,6 +9175,86 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation()
 	 */
 }
 
+void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
+{
+    int i, j;
+    long global_idx_unknown; 
+    long global_idx_eqns; 
+
+    // the global eqn index is set to the end of the BHE nodes
+    global_idx_eqns = bhe_net->get_global_start_idx();
+    // loop over all elements
+    typedef BHE::bhe_map::iterator it_type;
+    for (it_type iterator = bhe_net->get_network().begin(); iterator != bhe_net->get_network().end(); iterator++) {
+        // only implement governing equations based on
+        // pipelines and distributors
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        {
+            // inlet end of the pipeline---------------------------------------
+            global_idx_unknown = iterator->second->get_T_in_global_index();
+            // operate on global LHS matrix
+            // inlet end give "+1"
+            #ifdef NEW_EQS
+            (*A)(global_idx_eqns, global_idx_unknown) += 1.0;
+            #else
+            MXInc(global_idx_eqns, global_idx_unknown, 1.0); 
+            #endif
+            // end of the inlet part-------------------------------------------
+
+            // outlet end of the pipeline--------------------------------------
+            global_idx_unknown = iterator->second->get_T_out_global_index();
+            // operate on global LHS matrix
+            // inlet end give "-1"
+            #ifdef NEW_EQS
+            (*A)(global_idx_eqns, global_idx_unknown) += -1.0;
+            #else
+            MXInc(global_idx_eqns, global_idx_unknown, -1.0);
+            #endif
+            // end of the outlet part-------------------------------------------
+
+            // this equation finished, increment
+            global_idx_eqns++;
+        }
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR)
+        {
+            // inlet end of the pipeline---------------------------------------
+            for (i = 0; i < iterator->second->get_n_T_in(); i++)
+            {
+                global_idx_unknown = iterator->second->get_T_in_global_index(i);
+                // operate on global LHS matrix
+                // inlet end give the inlet ratio
+                #ifdef NEW_EQS
+                (*A)(global_idx_eqns, global_idx_unknown) += iterator->second->get_inlet_ratio(i);
+                #else
+                MXInc(global_idx_eqns, global_idx_unknown, iterator->second->get_inlet_ratio(i) );
+                #endif
+            }
+            // end of the inlet part-------------------------------------------
+
+            // outlet end of the pipeline--------------------------------------
+            for (i = 0; i < iterator->second->get_n_T_out(); i++)
+            {
+                global_idx_unknown = iterator->second->get_T_out_global_index(i);
+                // operate on global LHS matrix
+                // inlet end give the inlet ratio
+                #ifdef NEW_EQS
+                (*A)(global_idx_eqns, global_idx_unknown) += iterator->second->get_outlet_ratio(i);
+                #else
+                MXInc(global_idx_eqns, global_idx_unknown, iterator->second->get_outlet_ratio(i));
+                #endif
+            }
+            // end of the outlet part-------------------------------------------
+
+            // this equation finished, increment
+            global_idx_eqns++; 
+        }
+        else
+        {
+            continue; 
+        }
+    }
+
+}
 
 /**************************************************************************
 FEMLib-Method:

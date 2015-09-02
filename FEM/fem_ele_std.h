@@ -18,6 +18,7 @@
 //#include "rf_msp_new.h"
 #include "rf_out_new.h"                           //OK
 #include "BHEAbstract.h"  // HS
+#include "BHE_Net.h"
 
 #include "Eigen/Eigen"
 
@@ -363,6 +364,7 @@ private:
 	void AssembleParabolicEquation();     //OK4104
 	void AssembleMixedHyperbolicParabolicEquation();
     void AssembleMixedHyperbolicParabolicEquation_BHE();  // HS 06.2014
+    void Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net); // HS 08.2015
 	void AssembleParabolicEquationNewton();
 	// JOD
 	void AssembleParabolicEquationNewtonJacobian(double** jacob,
