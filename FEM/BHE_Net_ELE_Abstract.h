@@ -153,9 +153,29 @@ namespace BHE  // namespace of borehole heat exchanger
             _vec_ele_inlet.push_back(connect);
         }
 
+        void add_inlet_connet_port(int port)
+        {
+            _vec_ele_inlet_port.push_back(port);
+        }
+
+        int get_inlet_connet_port(int idx = 0)
+        {
+            return _vec_ele_inlet_port[idx];
+        }
+
         void add_outlet_connet(BHE_Net_ELE_Abstract* connect)
         {
             _vec_ele_outlet.push_back(connect);
+        }
+
+        void add_outlet_connet_port(int port)
+        {
+            _vec_ele_outlet_port.push_back(port);
+        }
+
+        int get_outlet_connet_port(int idx=0)
+        {
+            return _vec_ele_outlet_port[idx];
         }
 
         BHE_Net_ELE_Abstract* get_inlet_connect(int idx = 0)
@@ -167,6 +187,8 @@ namespace BHE  // namespace of borehole heat exchanger
         {
             return _vec_ele_outlet[idx];
         }
+
+
 
         double get_inlet_ratio(int idx = 0)
         {
@@ -222,6 +244,10 @@ namespace BHE  // namespace of borehole heat exchanger
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_inlet; 
 
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_outlet;
+
+        std::vector<int> _vec_ele_inlet_port; 
+
+        std::vector<int> _vec_ele_outlet_port; 
        
     };
 

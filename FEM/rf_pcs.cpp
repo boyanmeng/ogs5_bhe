@@ -3379,7 +3379,11 @@ void CRFProcess::ConfigBHEs()
         {
             // initialize the pipeline
             BHE::BHE_Net_ELE_Pipe * m_pipe = new BHE::BHE_Net_ELE_Pipe(mmp_vector[i]->pipe_name);
-            BHE_network.add_bhe_net_pipe(m_pipe, mmp_vector[i]->pipe_from, mmp_vector[i]->pipe_to);
+            BHE_network.add_bhe_net_pipe(m_pipe, 
+                                         mmp_vector[i]->pipe_from, 
+                                         mmp_vector[i]->pipe_from_port, 
+                                         mmp_vector[i]->pipe_to, 
+                                         mmp_vector[i]->pipe_to_port);
 
         } // end of if is_pipe
         
@@ -3407,6 +3411,8 @@ void CRFProcess::ConfigBHEs()
         vec_BHE_elems.push_back(vec_mesh_elems); 
         // counting the number of nodes on this BHE
         n_nodes_BHE += vec_mesh_nodes.size();
+        // setting the global index
+        vec_BHEs[i]->set_T_in_out_global_idx(this->m_msh->GetNodesNumber(false) + n_dofs_BHE);
         // counting dofs
         n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
     }

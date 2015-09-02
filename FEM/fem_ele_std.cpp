@@ -9207,7 +9207,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             // operate on global LHS matrix
             // inlet end give "-1"
             #ifdef NEW_EQS
-            (*A)(global_idx_eqns, global_idx_unknown) += -1.0;
+            (*A)(global_idx_eqshns, global_idx_unknown) += -1.0;
             #else
             MXInc(global_idx_eqns, global_idx_unknown, -1.0);
             #endif
