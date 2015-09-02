@@ -9218,7 +9218,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         }
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR)
         {
-            // inlet end of the pipeline---------------------------------------
+            // inlet end of the distributor---------------------------------------
             for (i = 0; i < iterator->second->get_n_T_in(); i++)
             {
                 global_idx_unknown = iterator->second->get_T_in_global_index(i);
@@ -9232,16 +9232,16 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             }
             // end of the inlet part-------------------------------------------
 
-            // outlet end of the pipeline--------------------------------------
+            // outlet end of the distributor--------------------------------------
             for (i = 0; i < iterator->second->get_n_T_out(); i++)
             {
                 global_idx_unknown = iterator->second->get_T_out_global_index(i);
                 // operate on global LHS matrix
-                // inlet end give the inlet ratio
+                // outlet end give the outlet ratio
                 #ifdef NEW_EQS
-                (*A)(global_idx_eqns, global_idx_unknown) += iterator->second->get_outlet_ratio(i);
+                (*A)(global_idx_eqns, global_idx_unknown) += -1.0 * iterator->second->get_outlet_ratio(i);
                 #else
-                MXInc(global_idx_eqns, global_idx_unknown, iterator->second->get_outlet_ratio(i));
+                MXInc(global_idx_eqns, global_idx_unknown, -1.0 * iterator->second->get_outlet_ratio(i));
                 #endif
             }
             // end of the outlet part-------------------------------------------
