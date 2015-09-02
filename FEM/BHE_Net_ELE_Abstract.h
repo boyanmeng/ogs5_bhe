@@ -170,13 +170,25 @@ namespace BHE  // namespace of borehole heat exchanger
 
         double get_inlet_ratio(int idx = 0)
         {
-            _vec_inlet_ratio(idx);
+            return _vec_inlet_ratio(idx);
         }
 
         double get_outlet_ratio(int idx = 0)
         {
-            _vec_outlet_ratio(idx);
+            return _vec_outlet_ratio(idx);
         }
+
+    protected:
+        /**
+        * how the inlet flow rate is determined.
+        */
+        Eigen::VectorXd _vec_inlet_ratio;
+
+        /**
+        * how the outlet flow rate is determined.
+        */
+        Eigen::VectorXd _vec_outlet_ratio;
+
     private:
 
         /**
@@ -210,17 +222,7 @@ namespace BHE  // namespace of borehole heat exchanger
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_inlet; 
 
         std::vector<BHE_Net_ELE_Abstract*> _vec_ele_outlet;
-
-        /**
-        * how the inlet flow rate is determined.
-        */
-        Eigen::VectorXd _vec_inlet_ratio;
-
-        /**
-        * how the outlet flow rate is determined.
-        */
-        Eigen::VectorXd _vec_outlet_ratio;
-        
+       
     };
 
 

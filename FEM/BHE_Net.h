@@ -50,6 +50,11 @@ namespace BHE  // namespace of borehole heat exchanger
             return _bhe_net;
         }
 
+        long get_global_start_idx()
+        {
+            return _global_start_idx; 
+        }
+
     private:
 
         void count_n_unknowns();
@@ -64,6 +69,10 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         int n_unknowns; 
 
+        /**
+          * the starting index in the global linear equation system
+          */
+        long _global_start_idx; 
     };
 }
 

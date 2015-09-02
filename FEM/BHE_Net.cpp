@@ -19,6 +19,8 @@ void BHE_Net::add_bhe_net_elem(BHE_Net_ELE_Abstract* element)
         return;
     }
     std::cout << "BHE net element already exists!\n";
+
+    _global_start_idx = 0;
 }
 
 void BHE_Net::add_bhe_net_pipe(BHE_Net_ELE_Pipe* pipe,
@@ -109,7 +111,7 @@ void BHE_Net::set_network_elem_global_idx(long n_nodes, long n_dofs_BHE)
 {
     int i; 
     long idx = n_nodes + n_dofs_BHE; 
-
+    _global_start_idx = idx; 
     // loop over all elements in the map 
     typedef bhe_map::iterator it_type;
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
