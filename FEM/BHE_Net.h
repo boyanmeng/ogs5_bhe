@@ -43,9 +43,9 @@ namespace BHE  // namespace of borehole heat exchanger
         int get_n_elems(); 
 
         /**
-          * set the global indices for all elements in the network
+          * set the global and local indices for all elements in the network
           */
-        void set_network_elem_global_idx(long n_nodes, long n_dofs_BHE);
+        void set_network_elem_idx(long n_nodes, long n_dofs_BHE);
 
         bhe_map get_network()
         {

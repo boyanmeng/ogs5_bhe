@@ -39,19 +39,23 @@ namespace BHE  // namespace of borehole heat exchanger
             // initialize T_in
             T_in = new double[N_IN];
             global_idx_T_in = new long[N_IN];
+            local_idx_T_in = new int[N_IN];
             for (i = 0; i < N_IN; i++)
             {
                 T_in[i] = 0.0;
                 global_idx_T_in[i] = -1; // uninitialized index value
+                local_idx_T_in[i] = -1;
             }
 
             // initialize T_out
             T_out = new double[N_OUT];
             global_idx_T_out = new long[N_OUT];
+            local_idx_T_out = new int[N_OUT];
             for (i = 0; i < N_OUT; i++)
             {
                 T_out[i] = 0.0;
                 global_idx_T_out[i] = -1; // uninitialized index value
+                local_idx_T_out[i] = -1;
             }
         }
 
@@ -98,6 +102,20 @@ namespace BHE  // namespace of borehole heat exchanger
         }
 
         /**
+        * set the local index of T_in
+        */
+        void set_T_in_local_index(long new_idx, int idx_T_in = 0) {
+            local_idx_T_in[idx_T_in] = new_idx;
+        }
+
+        /**
+        * get the local index of T_out
+        */
+        int get_T_in_local_index(int idx_T_in = 0) {
+            return local_idx_T_in[idx_T_in];
+        }
+
+        /**
           * get outlet temperature
           */
         double get_T_out(int idx = 0) {
@@ -116,6 +134,20 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         long get_T_out_global_index(int idx_T_out = 0) {
             return global_idx_T_out[idx_T_out];
+        }
+
+        /**
+        * set the local index of T_out
+        */
+        void set_T_out_local_index(long new_idx, int idx_T_out = 0) {
+            local_idx_T_out[idx_T_out] = new_idx;
+        }
+
+        /**
+        * get the local index of T_out
+        */
+        int get_T_out_local_index(int idx_T_out = 0) {
+            return local_idx_T_out[idx_T_out];
         }
 
         /**
@@ -224,14 +256,24 @@ namespace BHE  // namespace of borehole heat exchanger
         double * T_out; 
 
         /**
-        * array of inlet temperature global index
-        */
+          * array of inlet temperature global index
+          */
         long * global_idx_T_in;
 
         /**
-        * array of outlet temperature global index
-        */
+          * array of outlet temperature global index
+          */
         long * global_idx_T_out;
+
+        /**
+          * array of inlet temperature local index
+          */
+        int * local_idx_T_in;
+
+        /**
+          * array of outlet temperature local index
+          */
+        int * local_idx_T_out;
 
         const int N_IN; 
 

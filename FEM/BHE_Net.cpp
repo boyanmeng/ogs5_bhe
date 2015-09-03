@@ -111,25 +111,44 @@ int BHE_Net::get_n_elems()
     return _bhe_net.size(); 
 }
 
-void BHE_Net::set_network_elem_global_idx(long n_nodes, long n_dofs_BHE)
+void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
 {
     int i;
     long idx = n_nodes + n_dofs_BHE;
+    int local_idx = 0; 
+
     _global_start_idx = idx;
+
     // loop over all elements in the map 
     typedef bhe_map::iterator it_type;
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
-        // not counting the BHE, not counting the pipe
+        // BHE
         if ( iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE )
         {
-            // no nothing, since it has already been assigned this before
+            // do nothing on the global side, 
+            // since it has already been assigned with global index before
+
+            // onlye the local index needs to be added
+            for (i = 0; i < iterator->second->get_n_T_in(); i++)
+            {
+                iterator->second->set_T_in_local_index(local_idx, i);
+                local_idx++;
+            }
+            for (i = 0; i < iterator->second->get_n_T_out(); i++)
+            {
+                iterator->second->set_T_out_local_index(local_idx, i);
+                local_idx++;
+            }
 
         }
+        // now DISTRIBUTOR or heat pump
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR || iterator->second->get_net_ele_type() == BHE::BHE_NET_HEATPUMP)
         {
             // assgin index to T_in
             for (i = 0; i < iterator->second->get_n_T_in(); i++)
             {
+                iterator->second->set_T_in_local_index(local_idx, i);
+                local_idx++; 
                 iterator->second->set_T_in_global_index(idx, i);
                 idx++; 
             }
@@ -137,30 +156,46 @@ void BHE_Net::set_network_elem_global_idx(long n_nodes, long n_dofs_BHE)
             // assgin index to T_out
             for (i = 0; i < iterator->second->get_n_T_out(); i++)
             {
+                iterator->second->set_T_out_local_index(local_idx, i);
+                local_idx++;
                 iterator->second->set_T_out_global_index(idx, i);
                 idx++;
             }
         }
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        else
+        {
+            continue; 
+        }
+    }
+
+    // second loop, only deal with the pipelines
+    for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) 
+    {
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
         {
             long pipe_global_index;
-            int connected_port; 
-            
+            int pipe_local_index;
+            int connected_port;
+
             // the pipeline T_in T_out index is obtained from BHE, heat pump and distributors
 
             // assgin index to T_in
             connected_port = iterator->second->get_inlet_connet_port();
             pipe_global_index = iterator->second->get_inlet_connect()->get_T_out_global_index(connected_port);
+            pipe_local_index = iterator->second->get_inlet_connect()->get_T_out_local_index(connected_port);
             iterator->second->set_T_in_global_index(pipe_global_index);
+            iterator->second->set_T_in_local_index(pipe_local_index);
 
             // assgin index to T_out
             connected_port = iterator->second->get_outlet_connet_port();
             pipe_global_index = iterator->second->get_outlet_connect()->get_T_in_global_index(connected_port);
-            iterator->second->set_T_out_global_index(pipe_global_index);            
+            pipe_local_index = iterator->second->get_outlet_connect()->get_T_in_local_index(connected_port);
+            iterator->second->set_T_out_global_index(pipe_global_index);
+            iterator->second->set_T_out_local_index(pipe_local_index);
         }
         else
         {
-            continue; 
+            continue;
         }
     }
 
