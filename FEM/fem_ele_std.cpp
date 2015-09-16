@@ -9347,6 +9347,12 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
                 MXInc(global_idx_eqn, global_idx_unknown, matLHS(i, j));
             #endif
         }
+        // assemble to global RHS vector
+        #ifdef NEW_EQS
+            pcs->eqs_new->b[global_idx_eqn] += vecRHS(i);
+        #else
+            pcs->eqs->b[global_idx_eqn] += vecRHS(i);
+        #endif
     }
 
 }
