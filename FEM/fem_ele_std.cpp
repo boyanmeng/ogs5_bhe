@@ -9180,7 +9180,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     int i,j;
     int n_local_eqns; 
     long global_idx_unknown; 
-    long global_idx_eqns; 
+    long global_idx_start; 
     long local_idx_unknown; 
     long local_idx_eqns; 
     Eigen::MatrixXd matLHS; 
@@ -9189,6 +9189,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
     // numer of local equations equal to the number of elements in the BHE network plus one
     n_local_eqns = m_BHE_map.size() + 1;
+    Eigen::VectorXi vec_global_idx = Eigen::VectorXi::Zero(n_local_eqns);
     // set index of local equations and unknown to zero
     local_idx_unknown = 0; 
     local_idx_eqns = 0; 
@@ -9196,7 +9197,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     matLHS = Eigen::MatrixXd::Zero(n_local_eqns, n_local_eqns);
     vecRHS = Eigen::VectorXd::Zero(n_local_eqns);
     // the global eqn index is set to the end of the BHE nodes
-    global_idx_eqns = bhe_net->get_global_start_idx();
+    global_idx_start = bhe_net->get_global_start_idx();
     // loop over all elements
     typedef BHE::bhe_map::iterator it_type;
     // first loop over, make sure the BHE equations are at the top
@@ -9222,6 +9223,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         {
             // inlet end of the pipeline---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index();
             // operate on local LHS matrix
             // inlet end give "+1"
             matLHS(local_idx_eqns, local_idx_unknown) += 1.0; 
@@ -9229,6 +9231,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
             // outlet end of the pipeline--------------------------------------
             local_idx_unknown = iterator->second->get_T_out_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index();
             // operate on local LHS matrix
             // outlet end give "-1"
             matLHS(local_idx_eqns, local_idx_unknown) += -1.0;
@@ -9249,10 +9252,12 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
                 {
                     // notice this is the same in
                     idx_unknown_local_in = iterator->second->get_T_in_local_index(0);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index(0);
                     // inlet end gives 1
                     matLHS(local_idx_eqns, idx_unknown_local_in) += 1.0;
                     // but different out
                     idx_unknown_local_out = iterator->second->get_T_out_local_index(i);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index(i);
                     // outlet end gives -1
                     matLHS(local_idx_eqns, idx_unknown_local_out) += -1.0;
 
@@ -9267,6 +9272,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
                 for (i = 0; i < iterator->second->get_n_T_in(); i++)
                 {
                     local_idx_unknown = iterator->second->get_T_in_local_index(i);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index(i);
                     // operate on local LHS matrix
                     // inlet end give the inlet ratio
                     matLHS(local_idx_eqns, local_idx_unknown) += iterator->second->get_inlet_ratio(i);
@@ -9275,6 +9281,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
                 // outlet end of the distributor--------------------------------------
                 local_idx_unknown = iterator->second->get_T_out_local_index(0);
+                vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index(0);
                 // operate on local LHS matrix
                 // outlet end give the outlet ratio
                 // notice because of the outlet, here is negative ratio. 
@@ -9289,6 +9296,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         {
             // inlet end of the heat pump---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_local_index();
             // operate on local LHS matrix
             // inlet end give "+1"
             matLHS(local_idx_eqns, local_idx_unknown) += 1.0;
@@ -9296,6 +9304,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
             // outlet end of the heat pump--------------------------------------
             local_idx_unknown = iterator->second->get_T_out_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index();
             // operate on local LHS matrix
             // outlet end give "-1"
             matLHS(local_idx_eqns, local_idx_unknown) += -1.0;
@@ -9315,15 +9324,27 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     }
 
     // local matrix finished. 
-    std::cout << "The LHS of the local BHE network matrix is: \n"; 
+#ifdef _DEBUG
+    std::cout << "The LHS matrix of the local BHE network equation sytem is: \n"; 
     std::cout << matLHS << std::endl; 
+    std::cout << "The RHS vector of the local BHE network equation sytem is: \n";
+    std::cout << vecRHS << std::endl;
+    std::cout << "The global index vector for local unknowns is: \n";
+    std::cout << vec_global_idx << std::endl;
+#endif
 
     // now assemble the local matrix to global one
     for (i = 0; i < matLHS.rows(); i++)
     {
         for (j = 0; j < matLHS.cols(); j++)
         {
-            // TODO
+            // obtain the global index for this local unknown
+            global_idx_unknown = (long) vec_global_idx(j);
+            #ifdef NEW_EQS
+                (*A)(global_idx_start + i, global_idx_unknown) += matLHS(i, j);
+            #else
+                MXInc(global_idx_start + i, global_idx_unknown, matLHS(i, j));
+            #endif
         }
     }
 
