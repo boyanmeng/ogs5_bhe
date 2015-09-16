@@ -9180,7 +9180,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     int i,j;
     int n_local_eqns; 
     long global_idx_unknown; 
-    long global_idx_start; 
+    long global_idx_eqn; 
     long local_idx_unknown; 
     long local_idx_eqns; 
     Eigen::MatrixXd matLHS; 
@@ -9197,7 +9197,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     matLHS = Eigen::MatrixXd::Zero(n_local_eqns, n_local_eqns);
     vecRHS = Eigen::VectorXd::Zero(n_local_eqns);
     // the global eqn index is set to the end of the BHE nodes
-    global_idx_start = bhe_net->get_global_start_idx();
+    global_idx_eqn = bhe_net->get_global_start_idx();
     // loop over all elements
     typedef BHE::bhe_map::iterator it_type;
     // first loop over, make sure the BHE equations are at the top
@@ -9336,14 +9336,15 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     // now assemble the local matrix to global one
     for (i = 0; i < matLHS.rows(); i++)
     {
+        global_idx_eqn = (long)vec_global_idx(i);
         for (j = 0; j < matLHS.cols(); j++)
         {
             // obtain the global index for this local unknown
             global_idx_unknown = (long) vec_global_idx(j);
             #ifdef NEW_EQS
-                (*A)(global_idx_start + i, global_idx_unknown) += matLHS(i, j);
+                (*A)(global_idx_eqn, global_idx_unknown) += matLHS(i, j);
             #else
-                MXInc(global_idx_start + i, global_idx_unknown, matLHS(i, j));
+                MXInc(global_idx_eqn, global_idx_unknown, matLHS(i, j));
             #endif
         }
     }
