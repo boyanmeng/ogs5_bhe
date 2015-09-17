@@ -3372,6 +3372,11 @@ void CRFProcess::ConfigBHEs()
         {
             // initialize the heat pump
             BHE::BHE_Net_ELE_HeatPump * m_heat_pump = new BHE::BHE_Net_ELE_HeatPump(mmp_vector[i]->heat_pump_name);
+            // read the delta_T value
+            m_heat_pump->set_delta_T_val(mmp_vector[i]->heat_pump_delta_T_val);
+            // set boundary type
+            m_heat_pump->set_heat_pump_BC_type(mmp_vector[i]->heat_pump_boundary_type);
+            // add to the network
             BHE_network.add_bhe_net_elem(m_heat_pump);
 
         } // end of if is_heat_pump

@@ -34,12 +34,20 @@ public:
     {
         return _delta_T_val;
     }
+
+    void set_heat_pump_BC_type(HEAT_PUMP_BOUNDARY_TYPE type)
+    {
+        _heat_pump_BC_type = type; 
+    }
+
 private:
 
     /**
       * T_in - T_out value
       */
     double _delta_T_val; 
+
+    HEAT_PUMP_BOUNDARY_TYPE _heat_pump_BC_type; 
 };
 
 }
