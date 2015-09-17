@@ -7,3 +7,13 @@ BHE_Net_ELE_HeatPump::BHE_Net_ELE_HeatPump(std::string & name)
 {
 
 }
+
+double BHE_Net_ELE_HeatPump::get_RHS_value()
+{
+    double rt_RHS_val = 0.0;
+
+    // TODO depending on the boundary condition, 
+    // calculate the RHS value
+
+    return rt_RHS_val;
+}

@@ -7,3 +7,8 @@ BHE_Net_ELE_Pipe::BHE_Net_ELE_Pipe(std::string & name)
 {
 
 }
+
+double BHE_Net_ELE_Pipe::get_RHS_value()
+{
+    return 0; 
+}

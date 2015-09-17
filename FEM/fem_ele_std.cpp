@@ -9312,7 +9312,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
             // if the heat pump is heating up the refrigerant or cooling it down
             // do something on the RHS of the local equation. 
-            // TODO TODO
+            vecRHS(local_idx_eqns) += iterator->second->get_RHS_value();
 
             // this equation finished, increment
             local_idx_eqns++;

@@ -444,6 +444,14 @@ namespace BHE  // namespace of borehole heat exchanger
 		*/
 		int flowrate_curve_idx;
 
+        /**
+          * for BHEs, the RHS value is zero 
+          */
+        double get_RHS_value()
+        {
+            return 0; 
+        }
+
 	private:
 
 		/**

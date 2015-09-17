@@ -232,6 +232,11 @@ namespace BHE  // namespace of borehole heat exchanger
             return _vec_outlet_ratio(idx);
         }
 
+        /**
+          * return the RHS value, needs to be implemented.
+          */
+        virtual double get_RHS_value() = 0;
+
     protected:
         /**
         * how the inlet flow rate is determined.
