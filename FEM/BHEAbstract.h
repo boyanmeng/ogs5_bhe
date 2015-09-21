@@ -86,6 +86,11 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         virtual std::size_t get_n_heat_exchange_terms() = 0;
 
+        /**
+          *
+          */
+        virtual void set_T_in_out_global_idx(std::size_t start_idx) = 0; 
+
 		/**
 		  * return the type of the BHE
 		  */
@@ -438,6 +443,14 @@ namespace BHE  // namespace of borehole heat exchanger
 		* refrigerant flow rate curve
 		*/
 		int flowrate_curve_idx;
+
+        /**
+          * for BHEs, the RHS value is zero 
+          */
+        double get_RHS_value()
+        {
+            return 0; 
+        }
 
 	private:
 

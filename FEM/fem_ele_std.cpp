@@ -53,6 +53,9 @@ extern double gravity_constant;                   // TEST, must be put in input 
 #define GAS_MASS_FORM
 
 using namespace std;
+using namespace BHE;
+#include "BHE_Net.h"
+
 #include "Eclipse.h"                              //BG 09/2009
 namespace FiniteElement
 {
@@ -9172,6 +9175,187 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation()
 	 */
 }
 
+void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
+{
+    int i,j;
+    int n_local_eqns; 
+    long global_idx_unknown; 
+    long global_idx_eqn; 
+    long local_idx_unknown; 
+    long local_idx_eqns; 
+    Eigen::MatrixXd matLHS; 
+    Eigen::VectorXd vecRHS; 
+    BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
+
+    // numer of local equations equal to the number of elements in the BHE network plus one
+    n_local_eqns = m_BHE_map.size() + 1;
+    Eigen::VectorXi vec_global_idx = Eigen::VectorXi::Zero(n_local_eqns);
+    // set index of local equations and unknown to zero
+    local_idx_unknown = 0; 
+    local_idx_eqns = 0; 
+    // initialize the local equation system
+    matLHS = Eigen::MatrixXd::Zero(n_local_eqns, n_local_eqns);
+    vecRHS = Eigen::VectorXd::Zero(n_local_eqns);
+    // the global eqn index is set to the end of the BHE nodes
+    global_idx_eqn = bhe_net->get_global_start_idx();
+    // loop over all elements
+    typedef BHE::bhe_map::iterator it_type;
+    // first loop over, make sure the BHE equations are at the top
+    for (it_type iterator = m_BHE_map.begin(); iterator != m_BHE_map.end(); iterator++) {
+        // if it is a BHE
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE)
+        {
+            // BHE equation is implicitly handled already, leave it blank
+            // DO NOTHING HERE. 
+            // index still needs to be incremented
+            local_idx_eqns++;
+        }
+        else
+            continue; 
+    }
+
+    // now second loop over, without considering the BHE governing equations
+    for (it_type iterator = m_BHE_map.begin(); iterator != m_BHE_map.end(); iterator++) {
+
+        // depending on different element types
+        // if it is a pipe
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        {
+            // inlet end of the pipeline---------------------------------------
+            local_idx_unknown = iterator->second->get_T_in_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index();
+            // operate on local LHS matrix
+            // inlet end give "+1"
+            matLHS(local_idx_eqns, local_idx_unknown) += 1.0; 
+            // end of the inlet part-------------------------------------------
+
+            // outlet end of the pipeline--------------------------------------
+            local_idx_unknown = iterator->second->get_T_out_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index();
+            // operate on local LHS matrix
+            // outlet end give "-1"
+            matLHS(local_idx_eqns, local_idx_unknown) += -1.0;
+            // end of the outlet part-------------------------------------------
+
+            // this equation finished, increment
+            local_idx_eqns++;
+        }
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR)
+        {
+            // TODO, make difference whether it is distributor or collector
+            // if distribute to multiple pipes
+            if ( iterator->second->get_n_T_in() == 1 && iterator->second->get_n_T_out() > 1 )
+            {
+                int idx_unknown_local_in, idx_unknown_local_out; 
+
+                for (i = 0; i < iterator->second->get_n_T_out(); i++)
+                {
+                    // notice this is the same in
+                    idx_unknown_local_in = iterator->second->get_T_in_local_index(0);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index(0);
+                    // inlet end gives 1
+                    matLHS(local_idx_eqns, idx_unknown_local_in) += 1.0;
+                    // but different out
+                    idx_unknown_local_out = iterator->second->get_T_out_local_index(i);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index(i);
+                    // outlet end gives -1
+                    matLHS(local_idx_eqns, idx_unknown_local_out) += -1.0;
+
+                    // this equation finished, increment
+                    local_idx_eqns++;
+                }
+            }
+            // if collecting from multiple pipes
+            else if (iterator->second->get_n_T_in() > 1 && iterator->second->get_n_T_out() == 1)
+            {
+                // inlet end of the distributor---------------------------------------
+                for (i = 0; i < iterator->second->get_n_T_in(); i++)
+                {
+                    local_idx_unknown = iterator->second->get_T_in_local_index(i);
+                    vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_global_index(i);
+                    // operate on local LHS matrix
+                    // inlet end give the inlet ratio
+                    matLHS(local_idx_eqns, local_idx_unknown) += iterator->second->get_inlet_ratio(i);
+                }
+                // end of the inlet part-------------------------------------------
+
+                // outlet end of the distributor--------------------------------------
+                local_idx_unknown = iterator->second->get_T_out_local_index(0);
+                vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index(0);
+                // operate on local LHS matrix
+                // outlet end give the outlet ratio
+                // notice because of the outlet, here is negative ratio. 
+                matLHS(local_idx_eqns, local_idx_unknown) += -1.0 * iterator->second->get_outlet_ratio(0);
+                // end of the outlet part-------------------------------------------
+                
+                // this equation finished, increment
+                local_idx_eqns++;
+            }
+        }
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_HEATPUMP)
+        {
+            // inlet end of the heat pump---------------------------------------
+            local_idx_unknown = iterator->second->get_T_in_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_in_local_index();
+            // operate on local LHS matrix
+            // inlet end give "+1"
+            matLHS(local_idx_eqns, local_idx_unknown) += 1.0;
+            // end of the inlet part-------------------------------------------
+
+            // outlet end of the heat pump--------------------------------------
+            local_idx_unknown = iterator->second->get_T_out_local_index();
+            vec_global_idx(local_idx_unknown) = iterator->second->get_T_out_global_index();
+            // operate on local LHS matrix
+            // outlet end give "-1"
+            matLHS(local_idx_eqns, local_idx_unknown) += -1.0;
+            // end of the outlet part-------------------------------------------
+
+            // if the heat pump is heating up the refrigerant or cooling it down
+            // do something on the RHS of the local equation. 
+            vecRHS(local_idx_eqns) += iterator->second->get_RHS_value();
+
+            // this equation finished, increment
+            local_idx_eqns++;
+        }
+        else
+        {
+            continue; 
+        }
+    }
+
+    // local matrix finished. 
+#ifdef _DEBUG
+    std::cout << "The LHS matrix of the local BHE network equation sytem is: \n"; 
+    std::cout << matLHS << std::endl; 
+    std::cout << "The RHS vector of the local BHE network equation sytem is: \n";
+    std::cout << vecRHS << std::endl;
+    std::cout << "The global index vector for local unknowns is: \n";
+    std::cout << vec_global_idx << std::endl;
+#endif
+
+    // now assemble the local matrix to global one
+    for (i = 0; i < matLHS.rows(); i++)
+    {
+        global_idx_eqn = (long)vec_global_idx(i);
+        for (j = 0; j < matLHS.cols(); j++)
+        {
+            // obtain the global index for this local unknown
+            global_idx_unknown = (long) vec_global_idx(j);
+            #ifdef NEW_EQS
+                (*A)(global_idx_eqn, global_idx_unknown) += matLHS(i, j);
+            #else
+                MXInc(global_idx_eqn, global_idx_unknown, matLHS(i, j));
+            #endif
+        }
+        // assemble to global RHS vector
+        #ifdef NEW_EQS
+            pcs->eqs_new->b[global_idx_eqn] += vecRHS(i);
+        #else
+            pcs->eqs->b[global_idx_eqn] += vecRHS(i);
+        #endif
+    }
+
+}
 
 /**************************************************************************
 FEMLib-Method:

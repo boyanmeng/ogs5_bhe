@@ -3372,6 +3372,11 @@ void CRFProcess::ConfigBHEs()
         {
             // initialize the heat pump
             BHE::BHE_Net_ELE_HeatPump * m_heat_pump = new BHE::BHE_Net_ELE_HeatPump(mmp_vector[i]->heat_pump_name);
+            // read the delta_T value
+            m_heat_pump->set_delta_T_val(mmp_vector[i]->heat_pump_delta_T_val);
+            // set boundary type
+            m_heat_pump->set_heat_pump_BC_type(mmp_vector[i]->heat_pump_boundary_type);
+            // add to the network
             BHE_network.add_bhe_net_elem(m_heat_pump);
 
         } // end of if is_heat_pump
@@ -3379,7 +3384,11 @@ void CRFProcess::ConfigBHEs()
         {
             // initialize the pipeline
             BHE::BHE_Net_ELE_Pipe * m_pipe = new BHE::BHE_Net_ELE_Pipe(mmp_vector[i]->pipe_name);
-            BHE_network.add_bhe_net_pipe(m_pipe, mmp_vector[i]->pipe_from, mmp_vector[i]->pipe_to);
+            BHE_network.add_bhe_net_pipe(m_pipe, 
+                                         mmp_vector[i]->pipe_from, 
+                                         mmp_vector[i]->pipe_from_port, 
+                                         mmp_vector[i]->pipe_to, 
+                                         mmp_vector[i]->pipe_to_port);
 
         } // end of if is_pipe
         
@@ -3407,14 +3416,16 @@ void CRFProcess::ConfigBHEs()
         vec_BHE_elems.push_back(vec_mesh_elems); 
         // counting the number of nodes on this BHE
         n_nodes_BHE += vec_mesh_nodes.size();
+        // setting the global index
+        vec_BHEs[i]->set_T_in_out_global_idx(this->m_msh->GetNodesNumber(false) + n_dofs_BHE);
         // counting dofs
         n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
     }
 
     // now counting the BHE net extra temperatures
-    if (BHE_network.get_n_elems() > 0)
+    if ( BHE_network.get_n_elems() > vec_BHEs.size() )
     {
-        BHE_network.set_network_elem_global_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
+        BHE_network.set_network_elem_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
         n_dofs_BHE += BHE_network.get_n_unknowns();         
     }
     
@@ -6092,6 +6103,11 @@ void CRFProcess::GlobalAssembly()
 
 		if (femFCTmode)     //NW
 			AddFCT_CorrectionVector();
+
+        // HS
+        // assemble the BHE_Net governing equations
+        if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && BHE_network.get_n_elems() > vec_BHEs.size())
+            fem->Assemble_LHS_BHE_Net(&BHE_network); 
 
 		// MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
         // std::cout << "Before the source terms: \n";

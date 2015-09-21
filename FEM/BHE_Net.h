@@ -15,6 +15,8 @@
 
 namespace BHE  // namespace of borehole heat exchanger
 {
+    typedef std::map<std::string, BHE_Net_ELE_Abstract*> bhe_map;
+
     class BHE_Net {
     public:
         /**
@@ -24,9 +26,11 @@ namespace BHE  // namespace of borehole heat exchanger
 
         void add_bhe_net_elem(BHE_Net_ELE_Abstract* element);
 
-        void add_bhe_net_pipe(BHE_Net_ELE_Pipe* pipe, 
+        void add_bhe_net_pipe(BHE_Net_ELE_Pipe* pipe,
                               std::string & from,
-                              std::string & to);
+                              int from_ele_which_port,
+                              std::string & to,
+                              int to_ele_which_port);
 
         /**
           * get the number of unknowns
@@ -39,15 +43,23 @@ namespace BHE  // namespace of borehole heat exchanger
         int get_n_elems(); 
 
         /**
-          * set the global indices for all elements in the network
+          * set the global and local indices for all elements in the network
           */
-        void set_network_elem_global_idx(long n_nodes, long n_dofs_BHE);
+        void set_network_elem_idx(long n_nodes, long n_dofs_BHE);
+
+        bhe_map get_network()
+        {
+            return _bhe_net;
+        }
+
+        long get_global_start_idx()
+        {
+            return _global_start_idx; 
+        }
 
     private:
 
         void count_n_unknowns();
-
-        typedef std::map<std::string, BHE_Net_ELE_Abstract*> bhe_map;
 
         /**
           * a map including all bhes, distributors, and pipelines
@@ -59,6 +71,10 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         int n_unknowns; 
 
+        /**
+          * the starting index in the global linear equation system
+          */
+        long _global_start_idx; 
     };
 }
 

@@ -42,6 +42,13 @@ double BHE_CXC::get_thermal_resistance(std::size_t idx = 0)
 	return 0.0;
 }
 
+void BHE_CXC::set_T_in_out_global_idx(std::size_t start_idx)
+{
+    // 
+    this->set_T_in_global_index(start_idx);
+    this->set_T_out_global_index(start_idx + 1);
+}
+
 /**
 * calculate thermal resistance
 */

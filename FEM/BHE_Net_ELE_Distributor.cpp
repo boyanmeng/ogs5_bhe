@@ -9,3 +9,8 @@ BHE_Net_ELE_Distributor::BHE_Net_ELE_Distributor(std::string & name, Eigen::Vect
     _vec_outlet_ratio = vec_Outlet_Ratio;
 
 }
+
+double BHE_Net_ELE_Distributor::get_RHS_value()
+{
+    return 0; 
+}

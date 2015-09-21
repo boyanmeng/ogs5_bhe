@@ -44,6 +44,18 @@ double BHE_2U::get_thermal_resistance(std::size_t idx = 0)
 	return 0.0; 
 }
 
+void BHE_2U::set_T_in_out_global_idx(std::size_t start_idx)
+{
+    // T_in_1
+    this->set_T_in_global_index(start_idx, 0);
+    // T_out_1
+    this->set_T_out_global_index(start_idx + 1, 0); // TO CHECK
+    // T_in_2
+    this->set_T_in_global_index(start_idx + 2, 1); // TO CHECK
+    // T_out_2
+    this->set_T_out_global_index(start_idx + 3, 1); // TO CHECK
+}
+
 /**
   * calculate thermal resistance
   */

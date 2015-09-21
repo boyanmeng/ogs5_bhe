@@ -129,6 +129,11 @@ namespace BHE  // namespace of borehole heat exchanger
         */
         std::size_t get_n_heat_exchange_terms() { return 4; }
 
+        /**
+          * set the global index of T_in and T_out
+          */
+        void set_T_in_out_global_idx(std::size_t start_idx);
+
 		/**
 		* return the thermal resistance for the inlet pipline
 		* idx is the index, when 2U case,
