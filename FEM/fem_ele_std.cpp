@@ -55,6 +55,8 @@ extern double gravity_constant;                   // TEST, must be put in input 
 using namespace std;
 using namespace BHE;
 #include "BHE_Net.h"
+#include <Eigen/Dense>
+using namespace Eigen;
 
 #include "Eclipse.h"                              //BG 09/2009
 namespace FiniteElement
@@ -9184,7 +9186,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     long local_idx_unknown; 
     long local_idx_eqns; 
     Eigen::MatrixXd matLHS; 
-    Eigen::VectorXd vecRHS; 
+    Eigen::VectorXd vecRHS;  
     BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
 
     // numer of local equations equal to the number of elements in the BHE network plus one
@@ -9193,9 +9195,11 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     // set index of local equations and unknown to zero
     local_idx_unknown = 0; 
     local_idx_eqns = 0; 
+
     // initialize the local equation system
     matLHS = Eigen::MatrixXd::Zero(n_local_eqns, n_local_eqns);
     vecRHS = Eigen::VectorXd::Zero(n_local_eqns);
+
     // the global eqn index is set to the end of the BHE nodes
     global_idx_eqn = bhe_net->get_global_start_idx();
     // loop over all elements
@@ -9371,10 +9375,33 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
 
 	// impose boundary condition on the local system
-	int idx_bc = 7; 
+	int idx_bc = 6; 
+	double bc_node_value = 10.0;
+	// b(i) -= A(i, ii)*u_bar
+	vecRHS = vecRHS - matLHS.col(idx_bc) * bc_node_value;
+	// A(ii, ii)->xii
+	double xii = matLHS(idx_bc, idx_bc);
+	// A(ii, j) = 0
+	matLHS.row(idx_bc).setZero();
+	// A(i, ii) = 0
+	matLHS.col(idx_bc).setZero();
+	// b(ii) = xii * u_bar
+	vecRHS(idx_bc) = xii * bc_node_value;
+	// A(ii, ii) <-xii
+	matLHS(idx_bc, idx_bc) = xii;
+	// end of imposing boundary values.
+
 	// solve the local system
-	
-	// write the result
+	Eigen::VectorXd u = matLHS.ldlt().solve(vecRHS);
+
+#ifdef _DEBUG
+	std::cout << "The solution of the local network equation system is: \n";
+	std::cout << u << std::endl;
+#endif
+
+	// store the result
+
+	// changing the boundary condition
 }
 
 /**************************************************************************
