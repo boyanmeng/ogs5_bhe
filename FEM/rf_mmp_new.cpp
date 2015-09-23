@@ -159,7 +159,8 @@ CMediumProperties::CMediumProperties() :
     bhe_delta_T_val = 0.0; 
     bhe_power_in_watt_curve_idx = -1; 
 	bhe_switch_off_threshold = 0.0;
-	bhe_cop_curve_idx = -1;
+	bhe_heating_cop_curve_idx = -1;
+	bhe_cooling_cop_curve_idx = -1;
 	// BHE Net parameters
 	is_heat_pump = false;
 	is_distributor = false;
@@ -2143,13 +2144,20 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
             in.clear();
             continue;
         }
-        if (line_string.find("BHE_HP_COP_CURVE_IDX") != std::string::npos) // 
+        if (line_string.find("BHE_HP_HEATING_COP_CURVE_IDX") != std::string::npos) // 
         {
             in.str(GetLineFromFile1(mmp_file));
-			in >> bhe_cop_curve_idx;
+			in >> bhe_heating_cop_curve_idx;
             in.clear();
             continue;
         }
+		if (line_string.find("BHE_HP_COOLING_COP_CURVE_IDX") != std::string::npos) // 
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_cooling_cop_curve_idx;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_DELTA_T_VALUE") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));
