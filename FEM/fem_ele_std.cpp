@@ -9205,8 +9205,19 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         // if it is a BHE
         if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE)
         {
-            // BHE equation is implicitly handled already, leave it blank
-            // DO NOTHING HERE. 
+            // BHE equation is implicitly handled already, 
+            // inlet is +1, 
+			local_idx_unknown = iterator->second->get_T_in_local_index();
+			matLHS(local_idx_eqns, local_idx_unknown) += 1.0;
+
+			// outlet is -1, 
+			local_idx_unknown = iterator->second->get_T_out_local_index();
+			matLHS(local_idx_eqns, local_idx_unknown) += -1.0;
+			
+			// right handside is the temperature difference 
+			// Tin - Tout from the solution of linear system. 
+			vecRHS(local_idx_eqns) += 1.5; // TODO
+
             // index still needs to be incremented
             local_idx_eqns++;
         }
@@ -9333,6 +9344,8 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     std::cout << vec_global_idx << std::endl;
 #endif
 
+	/* disable the assembly to global matrix */
+	/*
     // now assemble the local matrix to global one
     for (i = 0; i < matLHS.rows(); i++)
     {
@@ -9354,7 +9367,14 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             pcs->eqs->b[global_idx_eqn] += vecRHS(i);
         #endif
     }
+	*/
 
+
+	// impose boundary condition on the local system
+	int idx_bc = 7; 
+	// solve the local system
+	
+	// write the result
 }
 
 /**************************************************************************
