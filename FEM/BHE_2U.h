@@ -52,12 +52,13 @@ namespace BHE  // namespace of borehole heat exchanger
 			   double my_ext_Rgg1 = 0.0           /* external defined borehole thermal resistance */,
 			   double my_ext_Rgg2 = 0.0           /* external defined borehole thermal resistance */,
 			   double my_ext_Rgs = 0.0           /* external defined borehole thermal resistance */,
-			   int my_bhe_cop_curve_idx = -1      /* cop curve index */,
+			   int my_bhe_heating_cop_curve_idx = -1      /* heating cop curve index */,
+			   int my_bhe_cooling_cop_curve_idx = -1      /* cooling cop curve index */,
 			   bool if_flowrate_curve = false     /* whether flowrate curve is used*/,
 			   int my_flowrate_curve_idx = -1     /* flow rate curve index*/,
 			   double my_threshold = 0.0            /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/,
 			   BHE_DISCHARGE_TYPE type = BHE::BHE_DISCHARGE_TYPE_PARALLEL) 
-			   : BHEAbstract(BHE::BHE_TYPE_2U, name, bound_type, if_use_ext_Ra_Rb, user_defined_R_vals, my_bhe_cop_curve_idx),
+			   : BHEAbstract(BHE::BHE_TYPE_2U, name, bound_type, if_use_ext_Ra_Rb, user_defined_R_vals, my_bhe_heating_cop_curve_idx, my_bhe_cooling_cop_curve_idx),
 			_discharge_type(type)
 		{
 			_u = Eigen::Vector4d::Zero();
