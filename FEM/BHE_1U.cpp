@@ -546,10 +546,23 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 			Q_r_tmp = Q_r;
-		// calculate the dT value based on fixed flow rate
-		delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
-        // calcuate the new T_in 
-        T_in = T_out + delta_T_val;
+		if(fabs(building_power_tmp) < 0.1)
+		{
+			Q_r_tmp = 1.0e-12; // this has to be a small value to avoid division by zero
+							   // update all values dependent on the flow rate
+			update_flow_rate(Q_r_tmp);
+			// calculate the new T_in
+			T_in = T_out;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
+		}
+		else
+		{
+			// calculate the dT value based on fixed flow rate
+			delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
+			// calcuate the new T_in 
+			T_in = T_out + delta_T_val;
+		}
         break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE: 
         // get the power value in the curve
@@ -563,9 +576,23 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		else
 			Q_r_tmp = Q_r;
         // calculate the dT value based on fixed flow rate
-        delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r; 
-        // calcuate the new T_in 
-        T_in = T_out + delta_T_val;
+		if (fabs(power_tmp) < 0.1)
+		{
+			Q_r_tmp = 1.0e-12; // this has to be a small value to avoid division by zero
+							   // update all values dependent on the flow rate
+			update_flow_rate(Q_r_tmp);
+			// calculate the new T_in
+			T_in = T_out;
+			// print out updated flow rate
+			std::cout << "Qr: " << Q_r_tmp << std::endl;
+		}
+		else
+		{
+			// calculate the dT value based on fixed flow rate
+			delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
+			// calcuate the new T_in 
+			T_in = T_out + delta_T_val;
+		}
         break; 
     default:
         T_in = T_out; 
