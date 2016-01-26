@@ -44,6 +44,18 @@ double BHE_2U::get_thermal_resistance(std::size_t idx = 0)
 	return 0.0; 
 }
 
+void BHE_2U::set_T_in_out_global_idx(std::size_t start_idx)
+{
+    // T_in_1
+    this->set_T_in_global_index(start_idx, 0);
+    // T_out_1
+    this->set_T_out_global_index(start_idx + 1, 0); // TO CHECK
+    // T_in_2
+    this->set_T_in_global_index(start_idx + 2, 1); // TO CHECK
+    // T_out_2
+    this->set_T_out_global_index(start_idx + 3, 1); // TO CHECK
+}
+
 /**
   * calculate thermal resistance
   */
@@ -65,26 +77,68 @@ void BHE_2U::calc_thermal_resistances()
 	double chi;
 	double d0; // the average outer diameter of the pipes
 	double s; // diagonal distances of pipes
+    double R_adv, R_con; 
 	d0 = 2.0 * r_inner; 
 	s = omega * std::sqrt(2); 
 	chi = std::log(std::sqrt(D*D + 4 * d0*d0) / 2 / std::sqrt(2) / d0) / std::log(D / 2 / d0);
-	_R_g = acosh( (D*D + d0*d0 - s*s) / (2*D*d0) ) / (2 * PI * lambda_g * lambda_g) * (3.098 - 4.432 * s / D + 2.364 * s * s / D / D);
-	_R_con_b = chi * _R_g; 
     // Eq. 36
-    _R_con_a_i1 = _R_con_a_i2 = _R_con_a_o1 = _R_con_a_o2 = std::log(r_outer/r_inner) / (2.0 * PI * lambda_p);
+    _R_con_a_i1 = _R_con_a_i2 = _R_con_a_o1 = _R_con_a_o2 = std::log(r_outer / r_inner) / (2.0 * PI * lambda_p);
+
+    if (use_ext_therm_resis)
+    {
+        R_adv = 0.25 * (_R_adv_i1 + _R_adv_i2 + _R_adv_o1 + _R_adv_o2);
+        R_con = 0.25 * (_R_con_a_i1 + _R_con_a_i2 + _R_con_a_o1 + _R_con_a_o2);
+        _R_g = 4 * ext_Rb - R_adv - R_con;
+    }
+    else
+    {
+        _R_g = acosh((D*D + d0*d0 - s*s) / (2 * D*d0)) / (2 * PI * lambda_g * lambda_g) * (3.098 - 4.432 * s / D + 2.364 * s * s / D / D);
+    }
+	
+    _R_con_b = chi * _R_g; 
+
 	// Eq. 29 and 30
-    _R_fig = _R_adv_i1 + _R_adv_i2 + _R_con_a_i1 + _R_con_a_i2 + _R_con_b;
-	_R_fog = _R_adv_o1 + _R_adv_o2 + _R_con_a_o1 + _R_con_a_o2 + _R_con_b;
+	if (user_defined_therm_resis)
+	{
+		_R_fig = ext_Rfig;
+		_R_fog = ext_Rfog;
+	}
+	else
+	{
+		_R_fig = _R_adv_i1 + _R_adv_i2 + _R_con_a_i1 + _R_con_a_i2 + _R_con_b;
+		_R_fog = _R_adv_o1 + _R_adv_o2 + _R_con_a_o1 + _R_con_a_o2 + _R_con_b;
+	}
+
 
 	// thermal resistance due to grout-soil exchange
-	_R_gs = (1-chi)*_R_g; 	
+	if (user_defined_therm_resis)
+		_R_gs = ext_Rgs;
+	else
+		_R_gs = (1 - chi)*_R_g;
 
 	// thermal resistance due to inter-grout exchange
 	double R_ar_1, R_ar_2; 
-	R_ar_1 = acosh( (s*s - d0*d0) / d0 / d0 ) / (2.0 * PI * lambda_g ); 
-	R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g );
-	_R_gg_1 = 2.0 * _R_gs * ( R_ar_1 - 2.0 * chi * _R_g ) / ( 2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g ) ;
-	_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
+    if (use_ext_therm_resis)
+    {
+        R_ar_1 = (2.0 + std::sqrt(2.0)) * _R_g * (ext_Ra - R_adv - R_con) / (_R_g + ext_Ra - R_adv - R_con);
+        R_ar_2 = std::sqrt(2.0) * R_ar_1;
+    }
+    else
+    {
+        R_ar_1 = acosh((s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+        R_ar_2 = acosh((2.0*s*s - d0*d0) / d0 / d0) / (2.0 * PI * lambda_g);
+    }
+	if (user_defined_therm_resis)
+	{
+		_R_gg_1 = ext_Rgg1;
+		_R_gg_2 = ext_Rgg2;
+	}
+	else
+	{
+		_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
+		_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
+	}
+	
 
 	if (!std::isfinite(_R_gg_1) || !std::isfinite(_R_gg_2))
     {
@@ -92,6 +146,46 @@ void BHE_2U::calc_thermal_resistances()
         exit(1);
     }
 
+	// check if constraints regarding negative thermal resistances are violated
+	// apply correction procedure
+	// Section (1.5.5) in FEFLOW White Papers Vol V.
+	double constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2.0 * _R_gs)));
+	double constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2.0 * _R_gs)));
+	int count = 0;
+	while (constraint1 < 0.0 || constraint2 < 0.0)
+	{
+		if (user_defined_therm_resis || use_ext_therm_resis)
+		{
+			std::cout << "Error!!! Constraints on thermal resistances are violated! Correction procedure can't be applied due to user defined thermal resistances! The simulation will be stopped! \n";
+			exit(1);
+		}
+		if (count == 0)
+		{
+			chi *= 0.66;
+			_R_gs = (1 - chi)*_R_g;
+			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
+			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
+		}
+		if (count == 1)
+		{
+			chi *= 0.5;
+			_R_gs = (1 - chi)*_R_g;
+			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
+			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
+		}
+		if (count == 2)
+		{
+			chi = 0.0;
+			_R_gs = (1 - chi)*_R_g;
+			_R_gg_1 = 2.0 * _R_gs * (R_ar_1 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_1 + 2.0 * chi * _R_g);
+			_R_gg_2 = 2.0 * _R_gs * (R_ar_2 - 2.0 * chi * _R_g) / (2.0 * _R_gs - R_ar_2 + 2.0 * chi * _R_g);
+			break;
+		}
+		std::cout << "Warning! Correction procedure was applied due to negative thermal resistance! Correction step #" << count << "\n";
+		constraint1 = 1.0 / ((1.0 / _R_gg_1) + (1.0 / (2.0 * _R_gs)));
+		constraint2 = 1.0 / ((1.0 / _R_gg_2) + (1.0 / (2.0 * _R_gs)));
+		count++;
+	}
 }
 
 /**
@@ -205,16 +299,16 @@ double BHE_2U::get_mass_coeff(std::size_t idx_unknown)
         mass_coeff = rho_r * heat_cap_r * CSA_o;
         break;
     case 4:  // g1
-        mass_coeff = rho_g * heat_cap_g * CSA_g1;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
         break;
     case 5:  // g2
-        mass_coeff = rho_g * heat_cap_g * CSA_g1;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g1;
         break;
     case 6:  // g3
-        mass_coeff = rho_g * heat_cap_g * CSA_g2;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
         break;
     case 7:  // g4
-        mass_coeff = rho_g * heat_cap_g * CSA_g2;
+        mass_coeff = (1.0 - porosity_g) * rho_g * heat_cap_g * CSA_g2;
         break;
     default:
         break;
@@ -252,19 +346,19 @@ void BHE_2U::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_l
 		break;
 	case 4:
 		// pipe g1, Eq. 14
-        laplace_coeff = porosity_g * lambda_g * CSA_g1;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g1;
 		break;
 	case 5:
 		// pipe g2, Eq. 15
-        laplace_coeff = porosity_g * lambda_g * CSA_g1;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g1;
 		break;
 	case 6:
 		// pipe g3, Eq. 16
-        laplace_coeff = porosity_g * lambda_g * CSA_g2;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g2;
 		break;
 	case 7:
 		// pipe g4, Eq. 17
-        laplace_coeff = porosity_g * lambda_g * CSA_g2;
+        laplace_coeff = (1.0 - porosity_g) * lambda_g * CSA_g2;
 		break;
 	default:
 		std::cout << "Error !!! The index passed to get_laplace_coeff for BHE is not correct. \n";

@@ -22,6 +22,8 @@ namespace BHE  // namespace of borehole heat exchanger
 		*/
         BHE_CXA(const std::string name             /* name of the BHE */,
                 BHE::BHE_BOUNDARY_TYPE bound_type  /* type of BHE boundary */,
+				bool   if_use_ext_Ra_Rb            /* whether Ra and Rb values are used */,
+				bool user_defined_R_vals           /* when user defined R values are used*/,
                 double my_L = 100                  /* length/depth of the BHE */,
 			    double my_D = 0.013                /* diameter of the BHE */,
 				double my_Qr = 21.86 / 86400       /* total refrigerant flow discharge of BHE */,
@@ -41,8 +43,20 @@ namespace BHE  // namespace of borehole heat exchanger
 				double my_lambda_g = 2.3           /* thermal conductivity of the grout */, 
                 double my_power_in_watt = 0.0      /* injected or extracted power */, 
                 std::size_t my_power_curve_idx = -1/* index of the power curve*/,
-                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */)
-			: BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type)
+                double my_delta_T_val = 0.0        /* Temperature difference btw inflow and outflow temperature */,
+                double my_ext_Ra = 0.0             /* external defined borehole internal thermal resistance */,
+                double my_ext_Rb = 0.0             /* external defined borehole thermal resistance */,
+				double my_ext_Rfig = 0.0           /* external defined borehole thermal resistance */,
+				double my_ext_Rfog = 0.0           /* external defined borehole thermal resistance */,
+				double my_ext_Rgg1 = 0.0           /* external defined borehole thermal resistance */,
+				double my_ext_Rgg2 = 0.0           /* external defined borehole thermal resistance */,
+				double my_ext_Rgs = 0.0           /* external defined borehole thermal resistance */,
+				int my_bhe_heating_cop_curve_idx = -1      /* heating cop curve index */,
+				int my_bhe_cooling_cop_curve_idx = -1      /* cooling cop curve index */,
+				bool if_flowrate_curve = false     /* whether flowrate curve is used*/,
+				int my_flowrate_curve_idx = -1     /* flow rate curve index*/,
+				double my_threshold = 0.0)         /* Threshold Q value for switching off the BHE when using Q_Curve_fixed_dT B.C.*/
+				: BHEAbstract(BHE::BHE_TYPE_CXA, name, bound_type, if_use_ext_Ra_Rb, user_defined_R_vals, my_bhe_heating_cop_curve_idx, my_bhe_cooling_cop_curve_idx)
 		{
 			_u = Eigen::Vector2d::Zero();
 			_Nu = Eigen::Vector2d::Zero();
@@ -67,6 +81,27 @@ namespace BHE  // namespace of borehole heat exchanger
             power_in_watt_val = my_power_in_watt; 
             power_in_watt_curve_idx = my_power_curve_idx;
             delta_T_val = my_delta_T_val; 
+			threshold = my_threshold;
+            if (if_use_ext_Ra_Rb)
+            {
+                use_ext_therm_resis = true;
+                ext_Ra = my_ext_Ra;
+                ext_Rb = my_ext_Rb;
+            }
+			if (user_defined_R_vals)
+			{
+				user_defined_therm_resis = true;
+				ext_Rfig = my_ext_Rfig;
+				ext_Rfog = my_ext_Rfog;
+				ext_Rgg1 = my_ext_Rgg1;
+				ext_Rgg2 = my_ext_Rgg2;
+				ext_Rgs = my_ext_Rgs;
+			}
+			if (if_flowrate_curve)
+			{
+				use_flowrate_curve = true;
+				flowrate_curve_idx = my_flowrate_curve_idx;
+			}
 
 			// Table 1 in Diersch_2011_CG
 			S_i = PI * 2.0 * r_outer;
@@ -74,9 +109,9 @@ namespace BHE  // namespace of borehole heat exchanger
 			S_gs = PI * D;
 
             // cross section area calculation
-            CSA_i = PI * my_r_outer * my_r_outer - PI * r_inner * r_inner;
-            CSA_o = PI * r_inner * r_inner;
-            CSA_g = 0.25 * PI * D * D - CSA_i - CSA_o;
+			CSA_i = PI * r_inner * r_inner;
+			CSA_o = PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in));
+			CSA_g = PI * (0.25 * D * D - (r_outer + b_out) * (r_outer + b_out));
 
 			// initialization calculation
 			initialize();
@@ -92,6 +127,11 @@ namespace BHE  // namespace of borehole heat exchanger
         * abstract function, need to be realized.
         */
         std::size_t get_n_heat_exchange_terms() { return 3; }
+
+        /**
+          * set the global index of T_in and T_out
+          */
+        void set_T_in_out_global_idx(std::size_t start_idx);
 
 		/**
 		* return the thermal resistance for the inlet pipline

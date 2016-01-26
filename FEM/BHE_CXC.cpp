@@ -42,6 +42,13 @@ double BHE_CXC::get_thermal_resistance(std::size_t idx = 0)
 	return 0.0;
 }
 
+void BHE_CXC::set_T_in_out_global_idx(std::size_t start_idx)
+{
+    // 
+    this->set_T_in_global_index(start_idx);
+    this->set_T_out_global_index(start_idx + 1);
+}
+
 /**
 * calculate thermal resistance
 */
@@ -55,8 +62,8 @@ void BHE_CXC::calc_thermal_resistances()
 	Nu_in = _Nu(0);
 	Nu_out = _Nu(1);
 	d_o1 = 2.0 * r_outer;
-	d_i1 = 2.0 * r_inner;
-	d_h = 2.0 * r_outer - d_o1;
+	d_i1 = 2.0 * (r_inner + b_in);
+	d_h = d_o1 - d_i1;
 
 	// thermal resistance due to advective flow of refrigerant in the pipes
 	// Eq. 58, 59, and 60 in Diersch_2011_CG
@@ -70,19 +77,44 @@ void BHE_CXC::calc_thermal_resistances()
 	_R_con_o1 = std::log((r_outer + b_out) / r_outer) / (2.0 * PI * lambda_p);
 
 	// thermal resistance due to the grout transition
-	d_o1 = 2.0 * r_outer;
+	d_o1 = 2.0 * (r_outer + b_out);
 	// Eq. 68
 	chi = std::log(std::sqrt(D*D + d_o1*d_o1) / std::sqrt(2) / d_o1) / std::log(D / d_o1);
-	// Eq. 69
-	_R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
+    if (use_ext_therm_resis)
+    {
+        _R_g = ext_Rb - _R_adv_b_o1 - _R_con_o1;
+    }
+    else
+    {
+        // Eq. 69
+        _R_g = std::log(D / d_o1) / (2.0 * PI * lambda_g);
+    }
 	// Eq. 67
 	_R_con_b = chi * _R_g;
-	// Eq. 56 and 57
-	_R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
-	_R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
+    if (use_ext_therm_resis)
+    {
+        _R_ff = ext_Ra;
+    }
+	else if (user_defined_therm_resis)
+	{
+		_R_ff = ext_Rgg1; // Attention! Here ext_Rgg1 is treated as Rff for coaxial type
+	}
+	else
+    {
+        // Eq. 56 
+        _R_ff = _R_adv_i1 + _R_adv_a_o1 + _R_con_i1;
+    }
+	// Eq. 57
+	if (user_defined_therm_resis)
+		_R_fog = ext_Rfog;
+	else
+    _R_fog = _R_adv_b_o1 + _R_con_o1 + _R_con_b;
 
 	// thermal resistance due to grout-soil exchange
-	_R_gs = (1 - chi)*_R_g;
+	if (user_defined_therm_resis)
+		_R_gs = ext_Rgs;
+	else
+		_R_gs = (1 - chi)*_R_g;
 
 	if (!std::isfinite(_R_gs))
     {
@@ -104,7 +136,6 @@ void BHE_CXC::calc_Nu()
 
 	d_o1 = 2.0 * r_outer;
 	d_i1 = 2.0 * r_inner;
-	d_h = 2.0 * r_outer - d_o1;
 
 	// first calculating Nu_in
 	if (_Re_i1 < 2300.0)
@@ -126,6 +157,8 @@ void BHE_CXC::calc_Nu()
 	}
 
 	// then calculating Nu_out
+	d_i1 = 2.0 * (r_inner + b_in);
+	d_h = d_o1 - d_i1;
 	if (_Re_o1 < 2300.0)
 	{
 		Nu_out = 3.66;
@@ -158,7 +191,7 @@ void BHE_CXC::calc_Re()
 	double d_i1, d_h;
 
 	d_i1 = 2.0 * r_inner; // inner diameter of the pipeline
-	d_h = 2.0 * r_outer - d_i1;
+	d_h = 2.0 * (r_outer - (r_inner + b_in));
 
 	// _u(0) is u_in, and _u(1) is u_out
 	_Re_o1 = _u(1) * d_h / (mu_r / rho_r);
@@ -190,8 +223,8 @@ void BHE_CXC::calc_u()
 {
 	double u_in, u_out;
 
-	u_in = Q_r / (2.0 * PI * r_inner * r_inner);
-	u_out = Q_r / (2.0 * PI * (r_outer * r_outer - r_inner * r_inner));
+	u_in = Q_r / (PI * r_inner * r_inner);
+	u_out = Q_r / (PI * (r_outer * r_outer - (r_inner + b_in) * (r_inner + b_in)));
 	
 	_u(0) = u_in;
 	_u(1) = u_out;
@@ -334,6 +367,7 @@ double BHE_CXC::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     double T_in(0.0);
     double power_tmp(0.0);
     int flag_valid = true;
+	double Q_r_tmp(0.0);
 
     switch (this->get_bound_type())
     {
@@ -343,10 +377,29 @@ double BHE_CXC::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     case BHE_BOUND_FIXED_TEMP_DIFF:
         T_in = T_out + delta_T_val;
         break;
-    case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT:
-        // TODO
-        std::cout << "BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT feature has not been implemented yet. " << std::endl;
-        break;
+	case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT:
+		// get the power value in the curve
+		power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
+		// if power value exceeds threshold, calculate new values
+		if (fabs(power_tmp) > threshold)
+		{
+			// calculate the corresponding flow rate needed
+			// using the defined delta_T value
+			Q_r_tmp = power_tmp / delta_T_val / heat_cap_r / rho_r;
+			// update all values dependent on the flow rate
+			update_flow_rate(Q_r_tmp);
+			// calculate the new T_in
+			T_in = T_out + delta_T_val;
+		}
+		else
+		{
+			Q_r_tmp = 1.0e-06; // this has to be a small value to avoid division by zero
+			// update all values dependent on the flow rate
+			update_flow_rate(Q_r_tmp);
+			// calculate the new T_in
+			T_in = T_out;
+		}
+		break;
     case BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
         // get the power value in the curve
         power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);

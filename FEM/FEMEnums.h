@@ -192,6 +192,7 @@ const std::list<std::string> getAllPrimaryVariableNames();
 	DIRECT,
 	FUNCTION,
 	GRADIENT,                             // IC
+	VERTICAL_DISTRIBUTION,				  // IC
 	GREEN_AMPT,                           // ST
 	RESTART,                              // IC
 	LINEAR,                               // BC, ST

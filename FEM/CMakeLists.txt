@@ -10,6 +10,11 @@ set( SOURCES
 	BHE_2U.h
 	BHE_CXC.h
 	BHE_CXA.h
+	BHE_Net.h
+	BHE_Net_ELE_Abstract.h
+	BHE_Net_ELE_Distributor.h
+	BHE_Net_ELE_HeatPump.h
+	BHE_Net_ELE_Pipe.h
 	conversion_rate.h
 	display.h
 	eos.h
@@ -70,6 +75,10 @@ set( SOURCES
 	BHE_2U.cpp
 	BHE_CXC.cpp
 	BHE_CXA.cpp
+	BHE_Net.cpp
+	BHE_Net_ELE_Distributor.cpp
+	BHE_Net_ELE_HeatPump.cpp
+	BHE_Net_ELE_Pipe.cpp
 	conversion_rate.cpp
 	display.cpp
 	eos.cpp

@@ -26,6 +26,7 @@
 #include "FEMEnums.h"
 // #include "tools.h" // HS: needed for the function GetCurveValue() 
 #include <math.h>
+#include "BHE_Net_ELE_Abstract.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -44,6 +45,8 @@ namespace BHE  // namespace of borehole heat exchanger
         BHE_BOUND_FIXED_INFLOW_TEMP_CURVE,
         BHE_BOUND_POWER_IN_WATT,
         BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_DT,
+        BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT,
+        BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE,
         BHE_BOUND_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE,
         BHE_BOUND_FIXED_TEMP_DIFF,
     };
@@ -56,14 +59,14 @@ namespace BHE  // namespace of borehole heat exchanger
 		BHE_DISCHARGE_TYPE_SERIAL	   // serial discharge
 	};
 
-	class BHEAbstract
+    class BHEAbstract : public BHE_Net_ELE_Abstract
 	{
 	public:
 		/**
 		  * constructor
 		  */
-        BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP)
-            : type(my_type), _name(name), bound_type(my_bound_type)
+		BHEAbstract(BHE_TYPE my_type, const std::string name, BHE_BOUNDARY_TYPE my_bound_type = BHE_BOUND_FIXED_INFLOW_TEMP, bool if_use_ext_Ra_Rb = false, bool user_defined_R_vals = false, int bhe_heating_cop_curve_idx = -1, int bhe_cooling_cop_curve_idx = -1, bool if_flowrate_curve = false, int n_T_in = 1, int n_T_out = 1)
+			: BHE_Net_ELE_Abstract(name, BHE_NET_ELE::BHE_NET_BOREHOLE, n_T_in, n_T_out), type(my_type), _name(name), bound_type(my_bound_type), use_ext_therm_resis(if_use_ext_Ra_Rb), user_defined_therm_resis(user_defined_R_vals), _heating_cop_curve_idx(bhe_heating_cop_curve_idx), _cooling_cop_curve_idx(bhe_cooling_cop_curve_idx), use_flowrate_curve(if_flowrate_curve)
 		{};
 
 		/**
@@ -82,6 +85,11 @@ namespace BHE  // namespace of borehole heat exchanger
           * abstract function, need to be realized.
           */
         virtual std::size_t get_n_heat_exchange_terms() = 0;
+
+        /**
+          *
+          */
+        virtual void set_T_in_out_global_idx(std::size_t start_idx) = 0; 
 
 		/**
 		  * return the type of the BHE
@@ -369,6 +377,86 @@ namespace BHE  // namespace of borehole heat exchanger
           * outflow pipelines
           */
         double delta_T_val;
+
+		/**
+		  * threshold Q value for switching off the BHE
+		  * when using the Q_curve_fixed_dT B.C.
+		  */
+		double threshold;
+
+        /**
+          * whether or not using external given borehole thermal resistance values Ra, Rb
+          */
+        bool use_ext_therm_resis; 
+
+        /**
+          * external given borehole internal thermal resistance value
+          */
+        double ext_Ra; 
+
+        /**
+          * external given borehole thermal resistance value
+          */
+        double ext_Rb; 
+
+		/**
+		* whether or not using user defined borehole thermal resistance Rfig, Rfog, Rgg, Rgs
+		*/
+		bool user_defined_therm_resis;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rfig;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rfog;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgg1;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgg2;
+
+		/**
+		* external given borehole internal thermal resistance value
+		*/
+		double ext_Rgs;
+
+        /**
+        * heating COP curve index
+        */
+        const int _heating_cop_curve_idx;
+
+		/**
+		* cooling COP curve index
+		*/
+		const int _cooling_cop_curve_idx;
+
+		/**
+		* use refrigerant flow rate curve
+		*/
+		bool use_flowrate_curve;
+
+		/**
+		* refrigerant flow rate curve
+		*/
+		int flowrate_curve_idx;
+
+        /**
+          * for BHEs, the RHS value is zero 
+          */
+        double get_RHS_value()
+        {
+            return 0; 
+        }
+
 	private:
 
 		/**
@@ -395,7 +483,6 @@ namespace BHE  // namespace of borehole heat exchanger
           * epsilon value of the BHE polyline
           */
         double _ply_eps; 
-
 	};
 
 }  // end of namespace
