@@ -7148,6 +7148,17 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 								double Q_r_temp = GetCurveValue(idx, 0, aktuelle_zeit, &valid);
 								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
 							}
+							// switch off flag
+							if ((int)bc_value == -9999)
+							{
+								// set T_in equals T_out
+								eqs_index = bc_msh_node + shift + 1;
+								T_out = eqs->x[eqs_index];
+								bc_value = T_out;
+								// set flowrate to zero
+								double Q_r_temp = 1e-12;
+								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
+							}
 						}
                         else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF || 
