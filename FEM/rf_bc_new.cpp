@@ -349,6 +349,11 @@ std::ios::pos_type CBoundaryCondition::Read(std::ifstream* bc_file,
 			in.clear();
 		}
 
+		if (this->getProcessDistributionType() == FiniteElement::VERTICAL_DISTRIBUTION)
+		{
+			in >> vertical_dist_curve_idx; //PH
+		}
+
 		// Time dependent function
 		//..Time dependent curve ............................................
 		if (line_string.find("$TIM_TYPE") != std::string::npos)
@@ -1391,7 +1396,12 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
 															* (bc->gradient_ref_depth
 																			- m_msh->nod_vector[m_node_value->geo_node_number]->getData()[2])
 															+ bc->gradient_ref_depth_value;
-							} else {
+							}
+							else if (bc->getProcessDistributionType() == FiniteElement::VERTICAL_DISTRIBUTION) {// PH
+								int flag_valid = false;
+								m_node_value->node_value = GetCurveValue(bc->vertical_dist_curve_idx, 0, m_msh->nod_vector[m_node_value->geo_node_number]->getData()[2], &flag_valid);
+							}
+							else {
 							// 25.08.2011. WW
 								if (bc->getProcessDistributionType() == FiniteElement::FUNCTION) {
 							//                            a_node = m_msh->nod_vector[m_node_value->geo_node_number];

@@ -1,4 +1,4 @@
-/**
+﻿/**
 * \file BHE_1U.cpp
 * 2014/06/04 HS inital implementation
 * class of borehole heat exchanger with 1 U-tube
@@ -465,7 +465,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
         // get the building power value in the curve
         building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid); 
-		if (building_power_tmp < 0)
+		if (building_power_tmp <= 0.0)
 		{
 			// get COP value based on T_out in the curve
 			COP_tmp = GetCurveValue(_heating_cop_curve_idx, 0, T_out, &flag_valid);
@@ -477,7 +477,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 			fac_dT = -1.0;
 		}
-		if (building_power_tmp > 0)
+		else
 		{
 			// get COP value based on T_out in the curve
 			COP_tmp = GetCurveValue(_cooling_cop_curve_idx, 0, T_out, &flag_valid);
@@ -516,7 +516,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
     case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
         // get the building power value in the curve
         building_power_tmp = GetCurveValue(power_in_watt_curve_idx, 0, current_time, &flag_valid);
-		if (building_power_tmp < 0)
+		if (building_power_tmp <= 0)
 		{
 			// get COP value based on T_out in the curve
 			COP_tmp = GetCurveValue(_heating_cop_curve_idx, 0, T_out, &flag_valid);
@@ -527,7 +527,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// print the amount of power needed
 			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 		}
-		if (building_power_tmp > 0)
+		else
 		{
 			// get COP value based on T_out in the curve
 			COP_tmp = GetCurveValue(_cooling_cop_curve_idx, 0, T_out, &flag_valid);
@@ -546,7 +546,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 			Q_r_tmp = Q_r;
-		if(fabs(building_power_tmp) < 0.1)
+		if(fabs(power_tmp) < threshold)
 		{
 			Q_r_tmp = 1.0e-12; // this has to be a small value to avoid division by zero
 							   // update all values dependent on the flow rate
@@ -558,6 +558,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 		{
+			Q_r_tmp = Q_r;
+			update_flow_rate(Q_r_tmp);
 			// calculate the dT value based on fixed flow rate
 			delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
 			// calcuate the new T_in 
@@ -576,7 +578,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		else
 			Q_r_tmp = Q_r;
         // calculate the dT value based on fixed flow rate
-		if (fabs(power_tmp) < 0.1)
+		if (fabs(power_tmp) < threshold)
 		{
 			Q_r_tmp = 1.0e-12; // this has to be a small value to avoid division by zero
 							   // update all values dependent on the flow rate
@@ -588,6 +590,8 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 		}
 		else
 		{
+			Q_r_tmp = Q_r;
+			update_flow_rate(Q_r_tmp);
 			// calculate the dT value based on fixed flow rate
 			delta_T_val = power_tmp / Q_r_tmp / heat_cap_r / rho_r;
 			// calcuate the new T_in 
