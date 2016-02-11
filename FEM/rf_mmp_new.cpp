@@ -151,6 +151,7 @@ CMediumProperties::CMediumProperties() :
 	permeability_effstress_model = 0;
 
     // BHE parameters
+    bhe_2u_discharge_type = BHE::BHE_DISCHARGE_TYPE_PARALLEL;
     is_BHE = false; 
     bhe_use_flowrate_curve = false; 
     bhe_use_ext_therm_resis = false; 
