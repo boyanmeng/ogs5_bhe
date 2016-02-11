@@ -55,6 +55,8 @@ extern double gravity_constant;                   // TEST, must be put in input 
 using namespace std;
 using namespace BHE;
 #include "BHE_Net.h"
+#include <Eigen/Dense>
+using namespace Eigen;
 
 #include "Eclipse.h"                              //BG 09/2009
 namespace FiniteElement
@@ -9464,8 +9466,8 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         vec_T_soil_cur(j) = pcs->GetNodeValue(nodes_bhe[j], 1);  // current time step soil temperature
     }
 
-    //std::cout << "vec_T_pi_pre: \n";
-    //std::cout << vec_T_pi_pre << "\n";
+    // std::cout << "vec_T_pi_pre: \n";
+    // std::cout << vec_T_pi_pre << "\n";
 
     //----------------------------------------------------------------------
     // Calculate matrices
