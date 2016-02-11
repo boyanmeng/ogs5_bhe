@@ -845,7 +845,7 @@ void CInitialCondition::SetDomain(int nidx)
 					node_depth = m_msh->nod_vector[i]->getData()[1];
 				if (onZ == 2) //3D
 					node_depth = m_msh->nod_vector[i]->getData()[2];
-				node_val = GetCurveValue(vertical_dist_curve_idx, 0, node_depth, &flag_valid);;
+				node_val = GetCurveValue(vertical_dist_curve_idx, 0, node_depth, &flag_valid);
 				this->getProcess()->SetNodeValue(
 					m_msh->nod_vector[i]->GetIndex(), nidx, node_val);
 			}
