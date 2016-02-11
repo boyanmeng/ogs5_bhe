@@ -9205,7 +9205,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     // first loop over, make sure the BHE equations are at the top
     for (it_type iterator = m_BHE_map.begin(); iterator != m_BHE_map.end(); iterator++) {
         // if it is a BHE
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE)
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_BOREHOLE)
         {
             // BHE equation is implicitly handled already, leave it blank
             // DO NOTHING HERE. 
@@ -9221,7 +9221,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
         // depending on different element types
         // if it is a pipe
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE)
         {
             // inlet end of the pipeline---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
@@ -9242,7 +9242,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             // this equation finished, increment
             local_idx_eqns++;
         }
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR)
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_DISTRIBUTOR)
         {
             // TODO, make difference whether it is distributor or collector
             // if distribute to multiple pipes
@@ -9294,7 +9294,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
                 local_idx_eqns++;
             }
         }
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_HEATPUMP)
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_HEATPUMP)
         {
             // inlet end of the heat pump---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
