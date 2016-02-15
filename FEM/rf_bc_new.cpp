@@ -349,8 +349,9 @@ std::ios::pos_type CBoundaryCondition::Read(std::ifstream* bc_file,
 			in.clear();
 		}
 
-		if (this->getProcessDistributionType() == FiniteElement::VERTICAL_DISTRIBUTION)
+		if (line_string.find("VERTICAL_DISTRIBUTION") != std::string::npos)
 		{
+			this->setProcessDistributionType(FiniteElement::VERTICAL_DISTRIBUTION);
 			in >> vertical_dist_curve_idx; //PH
 		}
 
