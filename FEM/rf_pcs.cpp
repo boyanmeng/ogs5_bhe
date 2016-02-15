@@ -7153,7 +7153,11 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 							{
 								// set T_in equals T_out
 								eqs_index = bc_msh_node + shift + 1;
-								T_out = eqs->x[eqs_index];
+								#ifdef NEW_EQS
+									T_out = eqs_new->x[eqs_index];
+								#else
+									T_out = eqs->x[eqs_index];
+								#endif
 								bc_value = T_out;
 								// set flowrate to zero
 								double Q_r_temp = 1e-12;
