@@ -50,6 +50,7 @@ extern "C" int PARDISO (void*, int*, int*, int*, int*, int*,
 /* PARDISO prototype. */
 //#define PARDISO pardiso_
 extern int omp_get_max_threads();
+extern int PARDISOINIT(void*, int*, int*, int*, double*, int*);
 extern int PARDISO
         (int*, int*, int*, int*, int*, int*,
         double*, int*, int*, int*, int*, int*,
