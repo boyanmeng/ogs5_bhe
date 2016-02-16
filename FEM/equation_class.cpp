@@ -554,8 +554,8 @@ int Linear_EQS::Solver(CNumerics* num)
 		for(i = 0; i < nonzero; ++i)
 			index[i] = A->col_idx[i] + 1;
 
-		int mtype = 2;
-		//int mtype = 11;           /* Real unsymmetric matrix */
+		//int mtype = 2;
+		int mtype = 11;           /* Real unsymmetric matrix */
 		int nrhs = 1;             /* Number of right hand sides. */
 		/* Internal solver memory pointer pt, */
 		/* 32-bit: int pt[64]; 64-bit: long int pt[64] */
@@ -605,8 +605,7 @@ int Linear_EQS::Solver(CNumerics* num)
 #ifdef _WIN32
 		iparm[2] = omp_get_max_threads();
 #else
-		iparm[2] = omp_get_max_threads();
-		//iparm[2] = mkl_get_max_threads();
+		iparm[2] = mkl_get_max_threads();
 #endif
 		iparm[3] = 0;             /* No iterative-direct algorithm */
 		iparm[4] = 0;             /* No user fill-in reducing permutation */
