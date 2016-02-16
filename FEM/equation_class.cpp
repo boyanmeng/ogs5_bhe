@@ -50,6 +50,7 @@ extern "C" int PARDISO (void*, int*, int*, int*, int*, int*,
 /* PARDISO prototype. */
 //#define PARDISO pardiso_
 extern int omp_get_max_threads();
+extern int PARDISOINIT(void*, int*, int*, int*, double*, int*);
 extern int PARDISO
         (int*, int*, int*, int*, int*, int*,
         double*, int*, int*, int*, int*, int*,
@@ -570,12 +571,13 @@ int Linear_EQS::Solver(CNumerics* num)
 		double ddum;              /* Double dummy */
 		int idum;                 /* Integer dummy. */
 
+		PARDISOINIT(pt, &mtype, &solver, iparm, dparm, &error);
 #ifdef _WIN32
 		// Check the license and initialize the solver
 		{
 			//static bool done = false;
 			//if (!done) {
-			PARDISOINIT (pt,  &mtype, &solver, iparm, dparm, &error);
+			//PARDISOINIT (pt,  &mtype, &solver, iparm, dparm, &error);
 			if (error != 0)
 			{
 				if (error == -10 )
