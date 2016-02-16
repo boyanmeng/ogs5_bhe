@@ -605,7 +605,8 @@ int Linear_EQS::Solver(CNumerics* num)
 #ifdef _WIN32
 		iparm[2] = omp_get_max_threads();
 #else
-		iparm[2] = mkl_get_max_threads();
+		iparm[2] = omp_get_max_threads();
+		//iparm[2] = mkl_get_max_threads();
 #endif
 		iparm[3] = 0;             /* No iterative-direct algorithm */
 		iparm[4] = 0;             /* No user fill-in reducing permutation */
