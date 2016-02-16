@@ -554,8 +554,7 @@ int Linear_EQS::Solver(CNumerics* num)
 		for(i = 0; i < nonzero; ++i)
 			index[i] = A->col_idx[i] + 1;
 
-		int mtype = 2;            /* Real symmetric positive-definit matrix */
-		//int mtype = 11;           /* Real unsymmetric matrix */
+		int mtype = 11;           /* Real unsymmetric matrix */
 		int nrhs = 1;             /* Number of right hand sides. */
 		/* Internal solver memory pointer pt, */
 		/* 32-bit: int pt[64]; 64-bit: long int pt[64] */
@@ -570,13 +569,12 @@ int Linear_EQS::Solver(CNumerics* num)
 		double ddum;              /* Double dummy */
 		int idum;                 /* Integer dummy. */
 
-		PARDISOINIT(pt, &mtype, &solver, iparm, dparm, &error);
 #ifdef _WIN32
 		// Check the license and initialize the solver
 		{
 			//static bool done = false;
 			//if (!done) {
-			//PARDISOINIT (pt,  &mtype, &solver, iparm, dparm, &error);
+			PARDISOINIT (pt,  &mtype, &solver, iparm, dparm, &error);
 			if (error != 0)
 			{
 				if (error == -10 )
