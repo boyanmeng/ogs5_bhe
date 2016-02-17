@@ -629,7 +629,7 @@ int Linear_EQS::Solver(CNumerics* num)
 		maxfct = 1;               // Maximum number of numerical factorizations
 		mnum = 1;                 // Which factorization to use
 		*/
-		iparm[7] = 0;
+		iparm[26] = 1;			  // Check CRS arrays for consistency
 		msglvl = 1;               // Print statistical information in file
 		error = 0;                // Initialize error flag
 		
