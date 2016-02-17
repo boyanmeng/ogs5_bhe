@@ -9189,6 +9189,14 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     Eigen::VectorXd vecRHS; 
     BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
 
+	#if defined(NEW_EQS)
+		CSparseMatrix* A = NULL;              //WW
+	if (m_dom)
+		A = m_dom->eqs->A;
+	else
+		A = pcs->eqs_new->A;
+	#endif
+
     // numer of local equations equal to the number of elements in the BHE network plus one
     n_local_eqns = m_BHE_map.size() + 1;
     Eigen::VectorXi vec_global_idx = Eigen::VectorXi::Zero(n_local_eqns);
