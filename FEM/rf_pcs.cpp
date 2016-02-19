@@ -7193,7 +7193,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                     else // out flow pipe
                     {
 
-                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1
+                        if (m_bc_node->bhe_pv_index == 2) // TEMPERATURE_OUT_1
                         {
                             // get TEMPERATURE_IN_1 value
                             eqs_index = bc_msh_node + shift - 1;
