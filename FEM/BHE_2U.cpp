@@ -333,11 +333,11 @@ void BHE_2U::get_laplace_matrix(std::size_t idx_unknown, Eigen::MatrixXd & mat_l
         laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 1:
-		// pipe o1, Eq. 18
+		// pipe i2, Eq. 18
         laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_i;
 		break;
 	case 2:
-		// pipe i2,  Eq. 18
+		// pipe o1,  Eq. 18
         laplace_coeff = (lambda_r + rho_r * heat_cap_r * alpha_L * _u.norm()) * CSA_o;
 		break;
 	case 3:
@@ -385,16 +385,16 @@ void BHE_2U::get_advection_vector(std::size_t idx_unknown, Eigen::VectorXd & vec
         vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 1:
-		// pipe o1, Eq. 11
+		// pipe i2, Eq. 11
         advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_i;
         // z direction 
-        vec_advection(2) = advection_coeff;
+        vec_advection(2) = -1.0 * advection_coeff;
 		break;
 	case 2:
-		// pipe i2, Eq. 12
+		// pipe o1, Eq. 12
         advection_coeff = rho_r * heat_cap_r * _u(0) * CSA_o;
         // z direction 
-        vec_advection(2) = -1.0 * advection_coeff;
+        vec_advection(2) = advection_coeff;
 		break;
 	case 3:
 		// pipe o2, Eq. 13
