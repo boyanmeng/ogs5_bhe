@@ -7193,10 +7193,21 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                     else // out flow pipe
                     {
 
-                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1
+                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1 in the 1U/CXC/CXA setting
                         {
                             // get TEMPERATURE_IN_1 value
                             eqs_index = bc_msh_node + shift - 1;
+                        #ifdef NEW_EQS
+                            temp_val = eqs_new->x[eqs_index];
+                        #else
+                            temp_val = eqs->x[eqs_index];
+                        #endif
+                            bc_value = time_fac * fac * temp_val;
+                        }
+                        else if (m_bc_node->bhe_pv_index == 2) // TEMPERATURE_OUT_1 in the 2U setting
+                        {
+                            // get TEMPERATURE_IN_1 value
+                            eqs_index = bc_msh_node + shift - 2 ;
                         #ifdef NEW_EQS
                             temp_val = eqs_new->x[eqs_index];
                         #else

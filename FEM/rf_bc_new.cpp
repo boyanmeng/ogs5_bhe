@@ -1064,9 +1064,9 @@ void CBoundaryConditionsGroup::Set(CRFProcess* pcs, int ShiftInNodeVector,
                         if (vec_BHEs[BHE_index]->get_type() == BHE::BHE_TYPE_2U)
                         {
                             if (idx_pv == 0 || idx_pv == 1)
-                                m_node_value->bhe_pipe_flag = 0;
+                                m_node_value->bhe_pipe_flag = 0; // inflow pipe
                             else
-                                m_node_value->bhe_pipe_flag = 1;
+                                m_node_value->bhe_pipe_flag = 1; // outflow pipe
                         }
                         else if ( idx_pv == 0 )
                             m_node_value->bhe_pipe_flag = 0;
