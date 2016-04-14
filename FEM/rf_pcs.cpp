@@ -3448,12 +3448,14 @@ void CRFProcess::ConfigBHEs()
     }
 
     // now counting the BHE net extra temperatures
-    if ( BHE_network.get_n_elems() > vec_BHEs.size() )
+    if (BHE_network.get_n_elems() > vec_BHEs.size())
     {
         BHE_network.set_network_elem_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
-        n_dofs_BHE += BHE_network.get_n_unknowns(); 
+        n_dofs_BHE += BHE_network.get_n_unknowns();
+    } // end of if
     
 }
+
 
 
 /**************************************************************************

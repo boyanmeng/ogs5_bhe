@@ -9212,9 +9212,17 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             // fill in the global indices matrix
             global_i = iterator->second->get_T_in_global_index();  
             global_j = iterator->second->get_T_out_global_index(); 
-            
-            // fill in the local LHS matrix
-            p = iterator->second->get_penalty_factor(); 
+
+            // obtain the original values in the global matrix
+            // and fill them into the local LHS matrix
+            mat_LHS_penalty_value(0, 0) = MXGet(global_i, global_i);  // position (0,0)
+            mat_LHS_penalty_value(0, 1) = MXGet(global_i, global_j);  // position (0,1)
+            mat_LHS_penalty_value(1, 0) = MXGet(global_j, global_i);  // position (1,0)
+            mat_LHS_penalty_value(1, 1) = MXGet(global_j, global_j);  // position (1,1)
+
+            // now multiply with the penalty factor
+            p = iterator->second->get_penalty_factor() * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
+             
             mat_LHS_penalty_value(0, 0) =  1.0 * p;  // position (0,0)
             mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
             mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
@@ -9227,7 +9235,10 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 #endif
 
             // Assemble onto the global matrix
-            // TODO
+            MXInc(global_i, global_i, mat_LHS_penalty_value(0, 0)); // position (0,0)
+            MXInc(global_i, global_j, mat_LHS_penalty_value(0, 1)); // position (0,0)
+            MXInc(global_j, global_i, mat_LHS_penalty_value(1, 0)); // position (0,0)
+            MXInc(global_j, global_j, mat_LHS_penalty_value(1, 1)); // position (0,0)
 
         } // end of if BHE_NET_PIPE_INNER_1U
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_2U)
