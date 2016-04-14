@@ -21,7 +21,11 @@ namespace BHE  // namespace of borehole heat exchanger
     */
     namespace BHE_NET_ELE{
       enum type {
-        BHE_NET_PIPE,          // pipeline
+        BHE_NET_PIPE,          // pipeline, used to connect different BHEs
+        BHE_NET_PIPE_INNER_1U, // pipeline at the bottom of a 1U BHE
+        BHE_NET_PIPE_INNER_2U, // pipeline at the bottom of a 2U BHE
+        BHE_NET_PIPE_INNER_CXC,// pipeline at the bottom of a CXC BHE
+        BHE_NET_PIPE_INNER_CXA,// pipeline at the bottom of a CXA BHE
         BHE_NET_DISTRIBUTOR,   // distributor
         BHE_NET_HEATPUMP,      // heat pump
         BHE_NET_BOREHOLE	   // borehole
