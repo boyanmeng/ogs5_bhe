@@ -9185,9 +9185,8 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     long global_idx_eqn; 
     long local_idx_unknown; 
     long local_idx_eqns; 
-    Eigen::MatrixXd matLHS; 
-    Eigen::VectorXd vecRHS;  
-    BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
+    Eigen::MatrixXd mat_LHS_penalty_value; 
+    BHE::bhe_map m_BHE_network = bhe_net->get_network(); 
 
 	#if defined(NEW_EQS)
 		CSparseMatrix* A = NULL;              //WW
@@ -9197,6 +9196,59 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 		A = pcs->eqs_new->A;
 	#endif
 
+    // loop over all elements
+    typedef BHE::bhe_map::iterator it_type;
+    // first loop over, make sure the BHE equations are at the top
+    for (it_type iterator = m_BHE_network.begin(); iterator != m_BHE_network.end(); iterator++) {
+        // if it is a BHE
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_1U)
+        {
+            std::size_t global_i, global_j; 
+            double p; 
+
+            // initialize the memory of local LHS matrix
+            mat_LHS_penalty_value = Eigen::MatrixXd::Zero(2, 2); 
+
+            // fill in the global indices matrix
+            global_i = iterator->second->get_T_in_global_index();  
+            global_j = iterator->second->get_T_out_global_index(); 
+            
+            // fill in the local LHS matrix
+            p = iterator->second->get_penalty_factor(); 
+            mat_LHS_penalty_value(0, 0) =  1.0 * p;  // position (0,0)
+            mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
+            mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
+            mat_LHS_penalty_value(1, 1) =  1.0 * p;  // position (1,1)
+            
+            // local matrix finished. 
+#ifdef _DEBUG
+            std::cout << "The local LHS penalty value matrix of the BHE network equation sytem is: \n";
+            std::cout << mat_LHS_penalty_value << std::endl;
+#endif
+
+            // Assemble onto the global matrix
+            // TODO
+
+        } // end of if BHE_NET_PIPE_INNER_1U
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_2U)
+        {
+            // TODO
+        }
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC)
+        {
+            // TODO
+        }
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_CXA)
+        {
+            // TODO
+        }
+    } // end of for loop over all network element
+
+
+
+
+
+    /*
     // numer of local equations equal to the number of elements in the BHE network plus one
     n_local_eqns = m_BHE_map.size() + 1;
     Eigen::VectorXi vec_global_idx = Eigen::VectorXi::Zero(n_local_eqns);
@@ -9346,15 +9398,9 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         }
     }
 
-    // local matrix finished. 
-#ifdef _DEBUG
-    std::cout << "The LHS matrix of the local BHE network equation sytem is: \n"; 
-    std::cout << matLHS << std::endl; 
-    std::cout << "The RHS vector of the local BHE network equation sytem is: \n";
-    std::cout << vecRHS << std::endl;
-    std::cout << "The global index vector for local unknowns is: \n";
-    std::cout << vec_global_idx << std::endl;
-#endif
+    */
+
+
 
 	/* disable the assembly to global matrix */
 	/*
@@ -9381,7 +9427,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     }
 	*/
 
-
+    /*
 	// impose boundary condition on the local system
 	int idx_bc = 6; 
 	double bc_node_value = 10.0;
@@ -9406,6 +9452,9 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 	std::cout << "The solution of the local network equation system is: \n";
 	std::cout << u << std::endl;
 #endif
+    */
+
+
 
 	// store the result
 

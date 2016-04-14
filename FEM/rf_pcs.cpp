@@ -3452,8 +3452,6 @@ void CRFProcess::ConfigBHEs()
     {
         BHE_network.set_network_elem_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
         n_dofs_BHE += BHE_network.get_n_unknowns(); 
-        // something TODO
-    }
     
 }
 
@@ -6131,7 +6129,7 @@ void CRFProcess::GlobalAssembly()
 			AddFCT_CorrectionVector();
 
         // HS
-        // assemble the BHE_Net governing equations
+        // assemble the BHE_Net, by applying penalty method directly on the global linear equations
         if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && BHE_network.get_n_elems() > vec_BHEs.size())
             fem->Assemble_LHS_BHE_Net(&BHE_network); 
 
