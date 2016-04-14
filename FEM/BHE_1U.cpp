@@ -70,7 +70,7 @@ void BHE_1U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 /**
 * calculate thermal resistance
 */
-void BHE_1U::calc_thermal_resistances()
+void BHE::BHE_1U::calc_thermal_resistances()
 {
 	// thermal resistance due to thermal conductivity of the pip wall material
 	// Eq. 36 in Diersch_2011_CG

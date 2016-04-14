@@ -63,7 +63,7 @@ void BHE::BHE_2U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 
     // calculating
     start_idx = this->get_T_in_global_index();
-    global_idx_T_in_bottom = start_idx + dof_bhe - 7; // 2U BHE, the order is: T_in_1, T_out_1, T_in_2, T_out_2, T_g1, T_g2, T_g3, T_g4. 
+    global_idx_T_in_bottom = start_idx + dof_bhe - 8; // 2U BHE, the order is: T_in_1, T_out_1, T_in_2, T_out_2, T_g1, T_g2, T_g3, T_g4. 
 
     // T_in_1 at the bottom
     this->set_T_in_bottom_global_index(global_idx_T_in_bottom, 0);

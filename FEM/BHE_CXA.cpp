@@ -57,7 +57,7 @@ void BHE::BHE_CXA::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
 
     // calculating
     start_idx = this->get_T_in_global_index();
-    global_idx_T_in_bottom = start_idx + dof_bhe - 2; // CXA BHE, the order is: T_in, T_out, T_g. 
+    global_idx_T_in_bottom = start_idx + dof_bhe - 3; // CXA BHE, the order is: T_in, T_out, T_g. 
 
     // T_in at the bottom
     this->set_T_in_bottom_global_index(global_idx_T_in_bottom);
