@@ -8,7 +8,3 @@ BHE_Net_ELE_Pipe_Inner_1U::BHE_Net_ELE_Pipe_Inner_1U(std::string & name)
 
 }
 
-double BHE_Net_ELE_Pipe_Inner_1U::get_RHS_value()
-{
-    return 0;
-}

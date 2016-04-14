@@ -22,7 +22,7 @@ namespace BHE  // namespace of borehole heat exchanger
         */
         BHE_Net_ELE_Pipe_Inner_1U(std::string & name);
 
-        double get_RHS_value();
+
 
     };
 
