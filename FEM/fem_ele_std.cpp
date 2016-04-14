@@ -9189,6 +9189,14 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     Eigen::VectorXd vecRHS;  
     BHE::bhe_map m_BHE_map = bhe_net->get_network(); 
 
+	#if defined(NEW_EQS)
+		CSparseMatrix* A = NULL;              //WW
+	if (m_dom)
+		A = m_dom->eqs->A;
+	else
+		A = pcs->eqs_new->A;
+	#endif
+
     // numer of local equations equal to the number of elements in the BHE network plus one
     n_local_eqns = m_BHE_map.size() + 1;
     Eigen::VectorXi vec_global_idx = Eigen::VectorXi::Zero(n_local_eqns);
@@ -9207,7 +9215,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
     // first loop over, make sure the BHE equations are at the top
     for (it_type iterator = m_BHE_map.begin(); iterator != m_BHE_map.end(); iterator++) {
         // if it is a BHE
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE)
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_BOREHOLE)
         {
             // BHE equation is implicitly handled already, 
             // inlet is +1, 
@@ -9234,7 +9242,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
         // depending on different element types
         // if it is a pipe
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE)
         {
             // inlet end of the pipeline---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
@@ -9255,7 +9263,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             // this equation finished, increment
             local_idx_eqns++;
         }
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR)
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_DISTRIBUTOR)
         {
             // TODO, make difference whether it is distributor or collector
             // if distribute to multiple pipes
@@ -9307,7 +9315,7 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
                 local_idx_eqns++;
             }
         }
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_HEATPUMP)
+        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_HEATPUMP)
         {
             // inlet end of the heat pump---------------------------------------
             local_idx_unknown = iterator->second->get_T_in_local_index();
@@ -9511,8 +9519,8 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         vec_T_soil_cur(j) = pcs->GetNodeValue(nodes_bhe[j], 1);  // current time step soil temperature
     }
 
-    //std::cout << "vec_T_pi_pre: \n";
-    //std::cout << vec_T_pi_pre << "\n";
+    // std::cout << "vec_T_pi_pre: \n";
+    // std::cout << vec_T_pi_pre << "\n";
 
     //----------------------------------------------------------------------
     // Calculate matrices

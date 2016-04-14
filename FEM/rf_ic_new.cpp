@@ -28,6 +28,8 @@ using namespace std;
 #include "rf_node.h"
 #include "rf_pcs.h"
 #include "rfmat_cp.h"
+// tools
+#include "tools.h"
 
 #include "InitialCondition.h"
 
@@ -309,6 +311,10 @@ ios::pos_type CInitialCondition::Read(std::ifstream* ic_file,
 				in >> gradient_ref_depth; //CMCD
 				in >> gradient_ref_depth_value; //CMCD
 				in >> gradient_ref_depth_gradient; //CMCD
+			}
+			else if (this->getProcessDistributionType() == FiniteElement::VERTICAL_DISTRIBUTION)
+			{
+				in >> vertical_dist_curve_idx; //PH
 			}
 			else if (this->getProcessDistributionType() == FiniteElement::RESTART)
 				in >> rfr_file_name;
@@ -828,6 +834,22 @@ void CInitialCondition::SetDomain(int nidx)
 				        m_msh->nod_vector[i]->GetIndex(), nidx, node_val);
 			}
 		//if(dis_type_name.find("GRADIENT")!=string::npos)
+		//----------------------------------------------------------------------
+		if (this->getProcessDistributionType() == FiniteElement::VERTICAL_DISTRIBUTION)
+		{
+			//PH
+			int flag_valid = false;
+			for (i = 0; i < m_msh->GetNodesNumber(true); i++)
+			{
+				if (onZ == 1) //2D
+					node_depth = m_msh->nod_vector[i]->getData()[1];
+				if (onZ == 2) //3D
+					node_depth = m_msh->nod_vector[i]->getData()[2];
+				node_val = GetCurveValue(vertical_dist_curve_idx, 0, node_depth, &flag_valid);
+				this->getProcess()->SetNodeValue(
+					m_msh->nod_vector[i]->GetIndex(), nidx, node_val);
+			}
+		}	
 		//----------------------------------------------------------------------
 		if (this->getProcessDistributionType() == FiniteElement::RESTART)
 		{

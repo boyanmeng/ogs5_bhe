@@ -86,7 +86,7 @@ void BHE_Net::count_n_unknowns()
     typedef bhe_map::iterator it_type;
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
         // not counting the BHE, not counting the pipe
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE || iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_BOREHOLE || iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE)
             continue; 
         else
         {
@@ -123,7 +123,7 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
     typedef bhe_map::iterator it_type;
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
         // BHE
-        if ( iterator->second->get_net_ele_type() == BHE::BHE_NET_BOREHOLE )
+        if ( iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_BOREHOLE )
         {
             // do nothing on the global side, 
             // since it has already been assigned with global index before
@@ -142,7 +142,7 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
 
         }
         // now DISTRIBUTOR or heat pump
-        else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_DISTRIBUTOR || iterator->second->get_net_ele_type() == BHE::BHE_NET_HEATPUMP)
+        else if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_DISTRIBUTOR || iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_HEATPUMP)
         {
             // assgin index to T_in
             for (i = 0; i < iterator->second->get_n_T_in(); i++)
@@ -171,7 +171,7 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
     // second loop, only deal with the pipelines
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) 
     {
-        if (iterator->second->get_net_ele_type() == BHE::BHE_NET_PIPE)
+        if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE)
         {
             long pipe_global_index;
             int pipe_local_index;

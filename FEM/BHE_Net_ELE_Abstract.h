@@ -19,12 +19,14 @@ namespace BHE  // namespace of borehole heat exchanger
     /**
     * list the types of BHE net element
     */
-    enum BHE_NET_ELE {
+    namespace BHE_NET_ELE{
+      enum type {
         BHE_NET_PIPE,          // pipeline
         BHE_NET_DISTRIBUTOR,   // distributor
         BHE_NET_HEATPUMP,      // heat pump
         BHE_NET_BOREHOLE	   // borehole
-    };
+      };
+    }
 
     class BHE_Net_ELE_Abstract {
     
@@ -32,7 +34,7 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * constructor
           */
-        BHE_Net_ELE_Abstract(std::string name, BHE_NET_ELE type, int n_inlet = 1, int n_outlet = 1) 
+      BHE_Net_ELE_Abstract(std::string name, BHE_NET_ELE::type type, int n_inlet = 1, int n_outlet = 1)
             : N_IN(n_inlet), N_OUT(n_outlet), _name(name), _ele_type(type)
         {
             int i; 
@@ -70,7 +72,7 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * return the net element type
           */
-        BHE_NET_ELE get_net_ele_type()
+        BHE_NET_ELE::type get_net_ele_type()
         {
             return _ele_type; 
         }
@@ -284,7 +286,7 @@ namespace BHE  // namespace of borehole heat exchanger
 
         const int N_OUT;
 
-        const BHE_NET_ELE _ele_type; 
+        const BHE_NET_ELE::type _ele_type;
 
         std::string _name; 
 

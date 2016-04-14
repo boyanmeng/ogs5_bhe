@@ -164,6 +164,8 @@ private:
 	double gradient_ref_depth_value;
 	double gradient_ref_depth_gradient;
 
+	int vertical_dist_curve_idx;		  //PH, curve index for vertical distribution
+
 	double node_value_cond; //OK
 	double condition; //OK
 	double epsilon; //NW. temporally set here for surface interpolation

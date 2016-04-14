@@ -69,6 +69,7 @@ public:
 	double gradient_ref_depth;
 	double gradient_ref_depth_value;
 	double gradient_ref_depth_gradient;
+	int vertical_dist_curve_idx;		  //PH, curve index for vertical distribution
 	std::string rfr_file_name;            //OK
 	CInitialCondition();
 	CInitialCondition(const InitialCondition* ic);

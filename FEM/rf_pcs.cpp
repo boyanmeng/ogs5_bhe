@@ -7148,6 +7148,21 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 								double Q_r_temp = GetCurveValue(idx, 0, aktuelle_zeit, &valid);
 								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
 							}
+							// switch off flag
+							if ((int)bc_value == -9999)
+							{
+								// set T_in equals T_out
+								eqs_index = bc_msh_node + shift + 1;
+								#ifdef NEW_EQS
+									T_out = eqs_new->x[eqs_index];
+								#else
+									T_out = eqs->x[eqs_index];
+								#endif
+								bc_value = T_out;
+								// set flowrate to zero
+								double Q_r_temp = 1e-12;
+								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
+							}
 						}
                         else if (vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_POWER_IN_WATT ||
                                  vec_BHEs[m_bc_node->bhe_index]->get_bound_type() == BHE::BHE_BOUND_FIXED_TEMP_DIFF || 
@@ -7178,10 +7193,21 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                     else // out flow pipe
                     {
 
-                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1
+                        if (m_bc_node->bhe_pv_index == 1) // TEMPERATURE_OUT_1 in the 1U/CXC/CXA setting
                         {
                             // get TEMPERATURE_IN_1 value
                             eqs_index = bc_msh_node + shift - 1;
+                        #ifdef NEW_EQS
+                            temp_val = eqs_new->x[eqs_index];
+                        #else
+                            temp_val = eqs->x[eqs_index];
+                        #endif
+                            bc_value = time_fac * fac * temp_val;
+                        }
+                        else if (m_bc_node->bhe_pv_index == 2) // TEMPERATURE_OUT_1 in the 2U setting
+                        {
+                            // get TEMPERATURE_IN_1 value
+                            eqs_index = bc_msh_node + shift - 2 ;
                         #ifdef NEW_EQS
                             temp_val = eqs_new->x[eqs_index];
                         #else
