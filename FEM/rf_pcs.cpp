@@ -132,6 +132,7 @@ REACT_BRNS* m_vec_BRNS;
 #include "BHE_CXA.h"
 #include "BHE_CXC.h"
 #include "BHE_Net.h"
+
 #include "../GEO/geo_ply.h"
 
 using namespace std;
@@ -3304,6 +3305,12 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_1u);
                 BHE_network.add_bhe_net_elem(m_bhe_1u);
+
+                // now adding a pipeline connecting the bottom of this BHE
+                BHE::BHE_Net_ELE_Pipe_Inner_1U * m_bhe_pipe_1u; 
+                m_bhe_pipe_1u = new BHE::BHE_Net_ELE_Pipe_Inner_1U(m_bhe_1u->get_ele_name().append("_INNER_PIPE"));
+                BHE_network.add_bhe_net_elem(m_bhe_pipe_1u); 
+                
                 break;
             case BHE::BHE_TYPE_2U:
                 BHE::BHE_2U * m_bhe_2u;
@@ -3317,6 +3324,10 @@ void CRFProcess::ConfigBHEs()
 										   mmp_vector[i]->bhe_switch_off_threshold, mmp_vector[i]->bhe_2u_discharge_type);
                 vec_BHEs.push_back(m_bhe_2u);
                 BHE_network.add_bhe_net_elem(m_bhe_2u);
+
+                // now adding a pipeline connecting the bottom of this BHE
+                // TODO
+
                 break;
             case BHE::BHE_TYPE_CXC:
                 BHE::BHE_CXC * m_bhe_cxc;
@@ -3330,6 +3341,10 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxc);
                 BHE_network.add_bhe_net_elem(m_bhe_cxc);
+
+                // now adding a pipeline connecting the bottom of this BHE
+                // TODO
+
                 break;
             case BHE::BHE_TYPE_CXA:
                 BHE::BHE_CXA * m_bhe_cxa;
@@ -3343,6 +3358,10 @@ void CRFProcess::ConfigBHEs()
 											 mmp_vector[i]->bhe_switch_off_threshold);
                 vec_BHEs.push_back(m_bhe_cxa);
                 BHE_network.add_bhe_net_elem(m_bhe_cxa);
+
+                // now adding a pipeline connecting the bottom of this BHE
+                // TODO
+
                 break;
             default:
                 break;
