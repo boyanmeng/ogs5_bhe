@@ -91,6 +91,11 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         virtual void set_T_in_out_global_idx(std::size_t start_idx) = 0; 
 
+        /**
+          *
+          */
+        virtual void set_T_in_out_bottom_global_idx(std::size_t dof_BHE) = 0;
+
 		/**
 		  * return the type of the BHE
 		  */

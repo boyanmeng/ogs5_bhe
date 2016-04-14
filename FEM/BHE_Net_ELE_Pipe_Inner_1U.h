@@ -12,10 +12,11 @@
 
 #include "BHE_Net_ELE_Abstract.h"
 #include "BHEAbstract.h"
+#include "BHE_Net_ELE_Pipe.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
-    class BHE_Net_ELE_Pipe_Inner_1U : public BHE_Net_ELE_Abstract {
+    class BHE_Net_ELE_Pipe_Inner_1U : public BHE_Net_ELE_Pipe {
 
     public:
         /**

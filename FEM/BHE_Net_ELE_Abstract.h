@@ -45,22 +45,26 @@ namespace BHE  // namespace of borehole heat exchanger
             // initialize T_in
             T_in = new double[N_IN];
             global_idx_T_in = new long[N_IN];
+            global_idx_T_in_bottom = new long[N_IN];
             local_idx_T_in = new int[N_IN];
             for (i = 0; i < N_IN; i++)
             {
                 T_in[i] = 0.0;
                 global_idx_T_in[i] = -1; // uninitialized index value
+                global_idx_T_in_bottom[i] = -1; // uninitialized index value
                 local_idx_T_in[i] = -1;
             }
 
             // initialize T_out
             T_out = new double[N_OUT];
             global_idx_T_out = new long[N_OUT];
+            global_idx_T_out_bottom = new long[N_OUT];
             local_idx_T_out = new int[N_OUT];
             for (i = 0; i < N_OUT; i++)
             {
                 T_out[i] = 0.0;
                 global_idx_T_out[i] = -1; // uninitialized index value
+                global_idx_T_out_bottom[i] = -1; // uninitialized index value
                 local_idx_T_out[i] = -1;
             }
         }
@@ -117,8 +121,22 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
         * get the local index of T_out
         */
-        int get_T_in_local_index(int idx_T_in = 0) {
+        long get_T_in_local_index(int idx_T_in = 0) {
             return local_idx_T_in[idx_T_in];
+        }
+
+        /**
+        * set the global index of T_in at the bottom of BHE
+        */
+        void set_T_in_bottom_global_index(long new_idx, int idx_T_in = 0) {
+            global_idx_T_in_bottom[idx_T_in] = new_idx;
+        }
+
+        /**
+        * get the global index of T_in at the bottom of BHE
+        */
+        long get_T_in_bottom_global_index(int idx_T_in = 0) {
+            return global_idx_T_in_bottom[idx_T_in];
         }
 
         /**
@@ -140,6 +158,20 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         long get_T_out_global_index(int idx_T_out = 0) {
             return global_idx_T_out[idx_T_out];
+        }
+
+        /**
+        * set the global index of T_out at the bottom of BHE
+        */
+        void set_T_out_bottom_global_index(long new_idx, int idx_T_out = 0) {
+            global_idx_T_out_bottom[idx_T_out] = new_idx;
+        }
+
+        /**
+        * get the global index of T_out at the bottom of BHE
+        */
+        long get_T_out_bottom_global_index(int idx_T_out = 0) {
+            return global_idx_T_out_bottom[idx_T_out];
         }
 
         /**
@@ -241,7 +273,7 @@ namespace BHE  // namespace of borehole heat exchanger
         /**
           * return the RHS value, needs to be implemented.
           */
-        virtual double get_RHS_value() = 0;
+        // virtual double get_RHS_value() = 0;
 
     protected:
         /**
@@ -275,6 +307,16 @@ namespace BHE  // namespace of borehole heat exchanger
           * array of outlet temperature global index
           */
         long * global_idx_T_out;
+
+        /**
+        * array of inlet temperature global index at the bottom of the BHE
+        */
+        long * global_idx_T_in_bottom;
+
+        /**
+        * array of outlet temperature global index at the bottom of the BHE
+        */
+        long * global_idx_T_out_bottom;
 
         /**
           * array of inlet temperature local index

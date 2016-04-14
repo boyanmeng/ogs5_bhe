@@ -3308,8 +3308,12 @@ void CRFProcess::ConfigBHEs()
 
                 // now adding a pipeline connecting the bottom of this BHE
                 BHE::BHE_Net_ELE_Pipe_Inner_1U * m_bhe_pipe_1u; 
-                m_bhe_pipe_1u = new BHE::BHE_Net_ELE_Pipe_Inner_1U(m_bhe_1u->get_ele_name().append("_INNER_PIPE"));
-                BHE_network.add_bhe_net_elem(m_bhe_pipe_1u); 
+                m_bhe_pipe_1u = new BHE::BHE_Net_ELE_Pipe_Inner_1U(m_bhe_1u->get_ele_name().append("_INNER_PIPE"), m_bhe_1u);
+                BHE_network.add_bhe_net_pipe(m_bhe_pipe_1u, 
+                                             m_bhe_1u->get_ele_name(), 
+                                             0, 
+                                             m_bhe_1u->get_ele_name(), 
+                                             0);
                 
                 break;
             case BHE::BHE_TYPE_2U:
@@ -3439,13 +3443,16 @@ void CRFProcess::ConfigBHEs()
         vec_BHEs[i]->set_T_in_out_global_idx(this->m_msh->GetNodesNumber(false) + n_dofs_BHE);
         // counting dofs
         n_dofs_BHE += vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns(); 
+        // setting the global index at the bottom of the BHE
+        vec_BHEs[i]->set_T_in_out_bottom_global_idx(vec_mesh_nodes.size() * vec_BHEs[i]->get_n_unknowns());
     }
 
     // now counting the BHE net extra temperatures
     if ( BHE_network.get_n_elems() > vec_BHEs.size() )
     {
         BHE_network.set_network_elem_idx(this->m_msh->GetNodesNumber(false), n_dofs_BHE);
-        n_dofs_BHE += BHE_network.get_n_unknowns();         
+        n_dofs_BHE += BHE_network.get_n_unknowns(); 
+        // something TODO
     }
     
 }

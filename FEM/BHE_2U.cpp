@@ -56,6 +56,25 @@ void BHE_2U::set_T_in_out_global_idx(std::size_t start_idx)
     this->set_T_out_global_index(start_idx + 3, 1); // TO CHECK
 }
 
+void BHE::BHE_2U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
+{
+    std::size_t start_idx;
+    std::size_t global_idx_T_in_bottom;
+
+    // calculating
+    start_idx = this->get_T_in_global_index();
+    global_idx_T_in_bottom = start_idx + dof_bhe - 7; // 2U BHE, the order is: T_in_1, T_out_1, T_in_2, T_out_2, T_g1, T_g2, T_g3, T_g4. 
+
+    // T_in_1 at the bottom
+    this->set_T_in_bottom_global_index(global_idx_T_in_bottom, 0);
+    // T_out_1 at the bottom
+    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 1, 0);
+    // T_in_2 at the bottom
+    this->set_T_in_bottom_global_index(global_idx_T_in_bottom + 2, 1);
+    // T_out_2 at the bottom
+    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 3, 1);
+}
+
 /**
   * calculate thermal resistance
   */

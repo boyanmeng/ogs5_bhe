@@ -171,7 +171,7 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
     // second loop, only deal with the pipelines
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) 
     {
-        if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE)
+        if ( iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE )
         {
             long pipe_global_index;
             int pipe_local_index;
@@ -192,6 +192,40 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
             pipe_local_index = iterator->second->get_outlet_connect()->get_T_in_local_index(connected_port);
             iterator->second->set_T_out_global_index(pipe_global_index);
             iterator->second->set_T_out_local_index(pipe_local_index);
+        }
+        else if ( iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_1U )
+        {
+            // do not need the local index anymore
+
+            long pipe_global_index;
+            int connected_port;
+
+            // the pipeline T_in T_out index is obtained from BHE, heat pump and distributors
+
+            // assgin index to T_in
+            connected_port = iterator->second->get_inlet_connet_port();
+            // notice the inlet of this pipe is from the bottom of the BHE
+            pipe_global_index = iterator->second->get_inlet_connect()->get_T_in_bottom_global_index(connected_port);
+            iterator->second->set_T_in_global_index(pipe_global_index);
+
+            // assgin index to T_out
+            connected_port = iterator->second->get_outlet_connet_port();
+            // notice the outlet of this pipe is from the bottom of the BHE
+            pipe_global_index = iterator->second->get_outlet_connect()->get_T_out_bottom_global_index(connected_port);
+            iterator->second->set_T_out_global_index(pipe_global_index);
+            
+        }
+        else if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_2U)
+        {
+            // TODO
+        }
+        else if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC)
+        {
+            // TODO
+        }
+        else if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_CXA)
+        {
+            // TODO
         }
         else
         {

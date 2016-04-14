@@ -52,6 +52,21 @@ void BHE_1U::set_T_in_out_global_idx(std::size_t start_idx)
     this->set_T_out_global_index(start_idx + 1);
 }
 
+void BHE_1U::set_T_in_out_bottom_global_idx(std::size_t dof_bhe)
+{
+    std::size_t start_idx;
+    std::size_t global_idx_T_in_bottom; 
+
+    // calculating
+    start_idx = this->get_T_in_global_index(); 
+    global_idx_T_in_bottom = start_idx + dof_bhe - 3; // 1U BHE, the order is: T_in, T_out, T_g1, T_g2. 
+
+    // T_in at the bottom
+    this->set_T_in_bottom_global_index(global_idx_T_in_bottom);
+    // T_out at the bottom
+    this->set_T_out_bottom_global_index(global_idx_T_in_bottom + 1);
+}
+
 /**
 * calculate thermal resistance
 */
