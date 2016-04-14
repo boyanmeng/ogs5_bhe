@@ -67,6 +67,10 @@ namespace BHE  // namespace of borehole heat exchanger
                 global_idx_T_out_bottom[i] = -1; // uninitialized index value
                 local_idx_T_out[i] = -1;
             }
+
+            // initialize penalty factor
+            _penalty_factor = 0.0;
+
         }
 
         /**
@@ -270,6 +274,16 @@ namespace BHE  // namespace of borehole heat exchanger
             return _vec_outlet_ratio(idx);
         }
 
+        void set_penalty_factor(double val)
+        {
+            _penalty_factor = val; 
+        }
+
+        double get_penalty_factor()
+        {
+            return _penalty_factor;
+        }
+
         /**
           * return the RHS value, needs to be implemented.
           */
@@ -317,6 +331,11 @@ namespace BHE  // namespace of borehole heat exchanger
         * array of outlet temperature global index at the bottom of the BHE
         */
         long * global_idx_T_out_bottom;
+
+        /**
+          * array of penalty factor
+          */
+        double _penalty_factor; 
 
         /**
           * array of inlet temperature local index

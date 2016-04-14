@@ -4,10 +4,11 @@ using namespace BHE;
 
 BHE_Net_ELE_Pipe_Inner_1U::BHE_Net_ELE_Pipe_Inner_1U(std::string & name, BHE::BHEAbstract * m_BHE)
     : BHE_Net_ELE_Pipe(name, BHE_NET_ELE::BHE_NET_PIPE_INNER_1U),
-    _penalty_factor(1.0e4), _m_BHE(m_BHE)
+    _m_BHE(m_BHE)
 {
 
-    // TODO configure the global indices
+    // configure the penalty factor
+    this->set_penalty_factor(1.0e4);
 
 }
 

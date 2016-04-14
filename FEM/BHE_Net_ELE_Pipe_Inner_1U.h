@@ -47,11 +47,6 @@ namespace BHE  // namespace of borehole heat exchanger
         std::size_t _global_idx_out;
 
         /**
-          * penalty factor
-          */
-        const double _penalty_factor; 
-
-        /**
           * the BHE which this pipeline is applied on
           */
         const BHE::BHEAbstract * _m_BHE; 
