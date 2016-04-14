@@ -86,7 +86,12 @@ void BHE_Net::count_n_unknowns()
     typedef bhe_map::iterator it_type;
     for (it_type iterator = _bhe_net.begin(); iterator != _bhe_net.end(); iterator++) {
         // not counting the BHE, not counting the pipe
-        if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_BOREHOLE || iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE)
+        if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_BOREHOLE       || 
+            iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE           || 
+            iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_1U  ||
+            iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_2U  || 
+            iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC ||
+            iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_PIPE_INNER_CXA )
             continue; 
         else
         {
