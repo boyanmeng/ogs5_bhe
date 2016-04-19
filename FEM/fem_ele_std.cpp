@@ -9222,10 +9222,9 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
             mat_LHS_penalty_value(1, 1) = MXGet(global_j, global_j);  // position (1,1)
 			
 
-            // now multiply with the penalty factor
-            p = iterator->second->get_penalty_factor() * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
-			//p = iterator->second->get_penalty_factor(); // taking the absolute penalty value here
-
+			// now multiply with the penalty factor
+			p = iterator->second->get_penalty_factor() * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
+			
             mat_LHS_penalty_value(0, 0) =  1.0 * p;  // position (0,0)
             mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
             mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
@@ -9279,7 +9278,6 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
 
 			// now multiply with the penalty factor
 			p = iterator->second->get_penalty_factor() * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
-			//p = iterator->second->get_penalty_factor(); // taking the absolute penalty value here
 
 			mat_LHS_penalty_value(0, 0) = 1.0 * p;  // position (0,0)
 			mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)

@@ -139,6 +139,11 @@ namespace BHE  // namespace of borehole heat exchanger
           */
         void set_T_in_out_global_idx(std::size_t start_idx);
 
+		double set_BC(double T_in, double current_time)
+		{
+			return 0;
+		}
+
         /**
           * set the global index of T_in and T_out at the bottom of the BHE
           */

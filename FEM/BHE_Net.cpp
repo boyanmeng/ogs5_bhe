@@ -149,13 +149,17 @@ void BHE_Net::set_network_elem_idx(long n_nodes, long n_dofs_BHE)
         // now DISTRIBUTOR or heat pump
         else if (iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_DISTRIBUTOR || iterator->second->get_net_ele_type() == BHE_NET_ELE::BHE_NET_HEATPUMP)
         {
-            // assgin index to T_in
+			long pipe_global_index;
+			int pipe_local_index;
+			int connected_port;
+
+			// assgin index to T_in
             for (i = 0; i < iterator->second->get_n_T_in(); i++)
             {
                 iterator->second->set_T_in_local_index(local_idx, i);
                 local_idx++; 
                 iterator->second->set_T_in_global_index(idx, i);
-                idx++; 
+                idx++;
             }
 
             // assgin index to T_out

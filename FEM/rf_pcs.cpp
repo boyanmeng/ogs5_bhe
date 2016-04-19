@@ -73,6 +73,7 @@
 #include "BHE_Net_ELE_Distributor.h"
 #include "BHE_Net_ELE_HeatPump.h"
 #include "BHE_Net_ELE_Pipe.h"
+#include "BHE_Net.h"
 
 /*-----------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------*/
@@ -3399,6 +3400,12 @@ void CRFProcess::ConfigBHEs()
             m_heat_pump->set_delta_T_val(mmp_vector[i]->heat_pump_delta_T_val);
             // set boundary type
             m_heat_pump->set_heat_pump_BC_type(mmp_vector[i]->heat_pump_boundary_type);
+			m_heat_pump->set_cop_curve_idx(mmp_vector[i]->heat_pump_COP_curve_idx);
+			m_heat_pump->set_flowrate(mmp_vector[i]->heat_pump_flowrate);
+			m_heat_pump->set_fluid_density(mmp_vector[i]->heat_pump_refrigerant_density);
+			m_heat_pump->set_fluid_heat_capacity(mmp_vector[i]->heat_pump_refrigerant_heat_capacity);
+			m_heat_pump->set_power_curve_idx(mmp_vector[i]->heat_pump_power_curve_idx);
+			m_heat_pump->set_power_val(mmp_vector[i]->heat_pump_power_val);
             // add to the network
             BHE_network.add_bhe_net_elem(m_heat_pump);
 
@@ -6132,13 +6139,20 @@ void CRFProcess::GlobalAssembly()
 
         // HS
         // assemble the BHE_Net, by applying penalty method directly on the global linear equations
-        if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && BHE_network.get_n_elems() > vec_BHEs.size())
-            fem->Assemble_LHS_BHE_Net(&BHE_network); 
+		if (getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && BHE_network.get_n_elems() > vec_BHEs.size())
+		{
+			fem->Assemble_LHS_BHE_Net(&BHE_network);
+			//MXDumpGLS("penalty.txt", 0, eqs->b, eqs->x);
+		}
+			
+
+         
 
 		// MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
         // std::cout << "Before the source terms: \n";
         // eqs_new->Write();
 		IncorporateSourceTerms();
+		
 
 		//MXDumpGLS("rf_pcs1.txt",1,eqs->b,eqs->x); //abort();
 
@@ -6165,6 +6179,7 @@ void CRFProcess::GlobalAssembly()
         // std::cout << "Before the boundary conditions: \n";
         // eqs_new->Write();
         IncorporateBoundaryConditions();
+		MXDumpGLS("bc.txt", 0, eqs->b, eqs->x);
 
 		//ofstream Dum("rf_pcs.txt", ios::out); // WW
 		// eqs_new->Write(Dum);   Dum.close();
@@ -7175,7 +7190,7 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 								vec_BHEs[m_bc_node->bhe_index]->update_flow_rate(Q_r_temp);
 							}
 							// switch off flag
-							if ((int)bc_value == -9999)
+							if ((int)m_bc_node->node_value == -9999)
 							{
 								// set T_in equals T_out
 								eqs_index = bc_msh_node + shift + 1;
@@ -7213,8 +7228,53 @@ void CRFProcess::DDCAssembleGlobalMatrix()
                             // notice that the time_fac will bring the curve value. We do not need it. 
                             bc_value = fac * vec_BHEs[m_bc_node->bhe_index]->get_Tin_by_Tout(T_out, aktuelle_zeit /*this is current time*/);
                         }
+						// ------------------------------------------------------------------------------------------
+						// dirty implementation of setting the heat pump output boundary condition
+						if ((int)m_bc_node->node_value == -1111)
+						{
+							int idx_T_in = 0;
+							int cnt_inputs = 0;
+							double T_in_val = 0.0;
 
+							// get BHE map
+							typedef BHE::bhe_map::iterator it_type;
+							BHE::bhe_map m_bhe_net = BHE_network.get_network();
+							// iterate over BHE net elements
+							for (it_type iterator = m_bhe_net.begin(); iterator != m_bhe_net.end(); iterator++)
+							{
+								// find heat pumps
+								if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_HEATPUMP)
+								{
+									string hp_name = iterator->second->get_ele_name();
+									std::cout << "Found heat pump: " << hp_name << std::endl;
 
+									// find pipes connected to heat pump input, get the outlet temperatures of the BHEs connected
+									for (it_type another_it = m_bhe_net.begin(); another_it != m_bhe_net.end(); another_it++)
+									{
+										if (another_it->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE && another_it->second->get_outlet_connect()->get_ele_name() == hp_name)
+										{
+											idx_T_in = another_it->second->get_T_in_global_index();
+											T_in_val += eqs->x[idx_T_in];
+											cnt_inputs++;
+
+											// print to screen
+											std::cout << "Connected pipe: "<< another_it->second->get_ele_name() << " global index of pipe input: " << idx_T_in << std::endl;
+										}
+									}
+									// compute average
+									T_in_val /= cnt_inputs;
+
+									std::cout << "# of connected pipes: " << cnt_inputs << std::endl;
+									std::cout << "heat pump input temperature: " << T_in_val << std::endl;
+
+									// compute heat pump output and assign
+									double T_out_val = iterator->second->set_BC(T_in_val, aktuelle_zeit);
+									bc_value = T_out_val;
+									bc_msh_node = iterator->second->get_T_out_global_index();
+								}
+							}
+						}
+						// end of heat pump B.C.
                     }
                     else // out flow pipe
                     {
@@ -7272,6 +7332,8 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 				//----------------------------------------------------------------
 				if(rank > -1)
 					bc_eqs_index = bc_msh_node;
+				else if (this->getProcessType() == FiniteElement::HEAT_TRANSPORT_BHE && m_bc_node->pcs_pv_name.compare("TEMPERATURE_SOIL") != 0 && m_bc_node->bhe_pipe_flag == 0 && (int)m_bc_node->node_value == -1111)
+					bc_eqs_index = bc_msh_node - shift; // this is a dirty trick to maintain the correct position in the LES for the heat pump B.C. to be added, because the heat pump DOF doesn't correspond to a mesh node
 				else
 					//WW#
 					bc_eqs_index =

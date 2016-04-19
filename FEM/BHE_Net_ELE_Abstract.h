@@ -284,6 +284,15 @@ namespace BHE  // namespace of borehole heat exchanger
             return _penalty_factor;
         }
 
+		/*
+		double set_BC(double T_in, double current_time)
+		{
+			return 0;
+		}
+		*/
+		virtual double set_BC(double T_in, double current_time) = 0;
+
+
         /**
           * return the RHS value, needs to be implemented.
           */
