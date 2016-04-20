@@ -6179,7 +6179,7 @@ void CRFProcess::GlobalAssembly()
         // std::cout << "Before the boundary conditions: \n";
         // eqs_new->Write();
         IncorporateBoundaryConditions();
-		MXDumpGLS("bc.txt", 0, eqs->b, eqs->x);
+		//MXDumpGLS("bc.txt", 0, eqs->b, eqs->x);
 
 		//ofstream Dum("rf_pcs.txt", ios::out); // WW
 		// eqs_new->Write(Dum);   Dum.close();
@@ -7246,7 +7246,9 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 								if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_HEATPUMP)
 								{
 									string hp_name = iterator->second->get_ele_name();
+#ifdef _DEBUG
 									std::cout << "Found heat pump: " << hp_name << std::endl;
+#endif
 
 									// find pipes connected to heat pump input, get the outlet temperatures of the BHEs connected
 									for (it_type another_it = m_bhe_net.begin(); another_it != m_bhe_net.end(); another_it++)
@@ -7256,16 +7258,19 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 											idx_T_in = another_it->second->get_T_in_global_index();
 											T_in_val += eqs->x[idx_T_in];
 											cnt_inputs++;
-
+#ifdef _DEBUG
 											// print to screen
 											std::cout << "Connected pipe: "<< another_it->second->get_ele_name() << " global index of pipe input: " << idx_T_in << std::endl;
+#endif
 										}
 									}
 									// compute average
 									T_in_val /= cnt_inputs;
 
+#ifdef _DEBUG
 									std::cout << "# of connected pipes: " << cnt_inputs << std::endl;
 									std::cout << "heat pump input temperature: " << T_in_val << std::endl;
+#endif
 
 									// compute heat pump output and assign
 									double T_out_val = iterator->second->set_BC(T_in_val, aktuelle_zeit);

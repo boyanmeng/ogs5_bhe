@@ -24,6 +24,11 @@ public:
     BHE_Net_ELE_HeatPump(std::string & name);
 
 	double set_BC(double T_in, double current_time);
+
+	double get_flowrate()
+	{
+		return _flowrate;
+	}
                     
     double get_RHS_value();
 

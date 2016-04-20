@@ -34,16 +34,13 @@ double BHE_Net_ELE_HeatPump::set_BC(double T_in, double current_time)
 		power_bhe = power_hp * (COP - 1.0) / COP;
 		// also how much power from electricity
 		power_el = power_hp - power_bhe;
-		// print to screen
-		std::cout << "heat pump: " << get_ele_name() << ", T_in: " << T_in << ", T_out: " << T_out << std::endl;
-		std::cout << "COP: " << COP << ", Q_bhe: " << power_bhe << ", Q_elect: " << power_el << std::endl;
 		if (fabs(power_hp) < 0.1)
 		{
 			T_out = T_in;
 		}
 		else
 		{
-			delta_T = -power_bhe / rho_cp_u;;
+			delta_T = -power_bhe / rho_cp_u;
 			T_out = T_in - delta_T;
 		}
 		std::cout << "heat pump: " << this->get_ele_name() << ", T_in: " << T_in << ", T_out: " << T_out << std::endl;

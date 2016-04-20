@@ -10,6 +10,7 @@
 
 #include "BHEAbstract.h"
 #include "makros.h"
+#include "tools.h"
 
 namespace BHE  // namespace of borehole heat exchanger
 {
@@ -144,6 +145,21 @@ namespace BHE  // namespace of borehole heat exchanger
 		{
 			return 0;
 		}
+
+		double get_flowrate()
+		{
+			return Q_r;
+		}
+
+		void update_flowrate_from_curve(double current_time)
+		{
+			if (use_flowrate_curve)
+			{
+				int flag_valid = false;
+				double Q_r_tmp = GetCurveValue(flowrate_curve_idx, 0, current_time, &flag_valid);
+				update_flow_rate(Q_r_tmp);
+			}
+		};
 
 		/**
 		* return the thermal resistance for the inlet pipline

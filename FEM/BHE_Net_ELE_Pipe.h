@@ -28,6 +28,11 @@ namespace BHE  // namespace of borehole heat exchanger
 			return 0;
 		}
 
+		double get_flowrate()
+		{
+			return 0;
+		}
+
     };
 
 }
