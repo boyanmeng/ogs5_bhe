@@ -180,12 +180,12 @@ void BHE::BHE_1U::calc_thermal_resistances()
 	}
 
 	// print R and phi values
-	std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
+	//std::cout << "Rfig =" << _R_fig << " Rfog =" << _R_fog << " Rgg =" << _R_gg << " Rgs =" << _R_gs << "\n";
 	double phi_fig = 1.0 / (_R_fig * S_i);
 	double phi_fog = 1.0 / (_R_fog * S_o);
 	double phi_gg = 1.0 / (_R_gg * S_g1);
 	double phi_gs = 1.0 / (_R_gs * S_gs);
-	std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
+	//std::cout << "phi_fig =" << phi_fig << " phi_fog =" << phi_fog << " phi_gg =" << phi_gg << " phi_gs =" << phi_gs << "\n";
 }
 
 /**
@@ -465,7 +465,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// calculate the new T_in
 			T_in = T_out + (fac_dT*delta_T_val);
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
 		else
 		{
@@ -475,7 +475,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// calculate the new T_in
 			T_in = T_out;
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
         break; 
     case BHE::BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_DT: 
@@ -490,7 +490,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// also how much power from electricity
 			power_elect_tmp = building_power_tmp - power_tmp;
 			// print the amount of power needed
-			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+			//std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 			fac_dT = -1.0;
 		}
 		else
@@ -502,7 +502,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// also how much power from electricity
 			power_elect_tmp = -building_power_tmp + power_tmp;
 			// print the amount of power needed
-			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+			//std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 			fac_dT = 1.0;
 		}
         // if power value exceeds threshold, calculate new values
@@ -516,7 +516,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // calculate the new T_in
             T_in = T_out + (fac_dT*delta_T_val);
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
         else
         {
@@ -526,7 +526,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
             // calculate the new T_in
             T_in = T_out;
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
         }
         break;
     case BHE_BOUND_BUILDING_POWER_IN_WATT_CURVE_FIXED_FLOW_RATE:
@@ -541,7 +541,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// also how much power from electricity
 			power_elect_tmp = building_power_tmp - power_tmp;
 			// print the amount of power needed
-			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+			//std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 		}
 		else
 		{
@@ -552,7 +552,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// also how much power from electricity
 			power_elect_tmp = -building_power_tmp + power_tmp;
 			// print the amount of power needed
-			std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
+			//std::cout << "COP: " << COP_tmp << ", Q_bhe: " << power_tmp << ", Q_elect: " << power_elect_tmp << std::endl;
 		}
 		// Assign Qr whether from curve or fixed value
 		if (use_flowrate_curve)
@@ -570,7 +570,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// calculate the new T_in
 			T_in = T_out;
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
 		else
 		{
@@ -602,7 +602,7 @@ double BHE_1U::get_Tin_by_Tout(double T_out, double current_time = -1.0)
 			// calculate the new T_in
 			T_in = T_out;
 			// print out updated flow rate
-			std::cout << "Qr: " << Q_r_tmp << std::endl;
+			//std::cout << "Qr: " << Q_r_tmp << std::endl;
 		}
 		else
 		{
