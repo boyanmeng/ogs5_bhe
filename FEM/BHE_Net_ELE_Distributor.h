@@ -20,6 +20,16 @@ namespace BHE  // namespace of borehole heat exchanger
 
             double get_RHS_value(); 
 
+			double set_BC(double T_in, double current_time)
+			{
+				return 0;
+			}
+
+			double get_flowrate()
+			{
+				return 0;
+			}
+
         private:
 
 

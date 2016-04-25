@@ -8,7 +8,7 @@ BHE_Net_ELE_Pipe_Inner_1U::BHE_Net_ELE_Pipe_Inner_1U(std::string & name, BHE::BH
 {
 
     // configure the penalty factor
-    this->set_penalty_factor(1.0e4);
+    this->set_penalty_factor(1.0e6);
 
 }
 

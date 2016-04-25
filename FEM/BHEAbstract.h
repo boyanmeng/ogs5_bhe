@@ -24,7 +24,7 @@
 #include "Eigen/Eigen"
 #include "../GEO/Polyline.h"
 #include "FEMEnums.h"
-// #include "tools.h" // HS: needed for the function GetCurveValue() 
+//#include "tools.h" // HS: needed for the function GetCurveValue() 
 #include <math.h>
 #include "BHE_Net_ELE_Abstract.h"
 
@@ -162,6 +162,8 @@ namespace BHE  // namespace of borehole heat exchanger
             calc_thermal_resistances();
             calc_heat_transfer_coefficients();
         };
+
+		virtual void update_flowrate_from_curve(double current_time) = 0;
 
 		/**
 		  * thermal resistance calculation, 
