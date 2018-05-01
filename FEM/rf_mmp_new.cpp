@@ -2245,13 +2245,27 @@ std::ios::pos_type CMediumProperties::Read(std::ifstream* mmp_file)
 			in.clear();
 			continue;
 		}
-        if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
-        {
-            in.str(GetLineFromFile1(mmp_file));
-            in >> bhe_therm_conductivity_pipe_wall;
-            in.clear();
-            continue;
+		if (line_string.find("BHE_THERMAL_CONDUCTIVITY_PIPE_WALL") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_therm_conductivity_pipe_wall;
+			in.clear();
+			continue;
+		}
+		if (line_string.find("BHE_THERMAL_CONDUCTIVITY_INNER_PIPE_WALL") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_therm_conductivity_inner_pipe_wall;
+			in.clear();
+			continue;
         }
+		if (line_string.find("BHE_THERMAL_CONDUCTIVITY_OUTER_PIPE_WALL") != std::string::npos)
+		{
+			in.str(GetLineFromFile1(mmp_file));
+			in >> bhe_therm_conductivity_outer_pipe_wall;
+			in.clear();
+			continue;
+		}
         if (line_string.find("BHE_THERMAL_CONDUCTIVITY_GROUT") != std::string::npos)
         {
             in.str(GetLineFromFile1(mmp_file));

@@ -317,7 +317,7 @@ public:
     double bhe_delta_T_val; 
     double bhe_length, bhe_diameter, bhe_refrigerant_flow_rate, bhe_inner_radius_pipe;
     double bhe_outer_radius_pipe, bhe_pipe_in_wall_thickness, bhe_pipe_out_wall_thickness;
-    double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
+    double bhe_therm_conductivity_pipe_wall, bhe_therm_conductivity_inner_pipe_wall, bhe_therm_conductivity_outer_pipe_wall, bhe_therm_conductivity_grout, bhe_pipe_distance;
     std::size_t bhe_fluid_type_idx;
     std::size_t bhe_power_in_watt_curve_idx; 
     int bhe_heating_cop_curve_idx; // Heating COP curve index

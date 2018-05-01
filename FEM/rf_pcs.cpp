@@ -3357,7 +3357,7 @@ void CRFProcess::ConfigBHEs()
                                              mmp_vector[i]->bhe_inner_radius_pipe, mmp_vector[i]->bhe_outer_radius_pipe, mmp_vector[i]->bhe_pipe_in_wall_thickness,
 											 mmp_vector[i]->bhe_pipe_out_wall_thickness, mmp_vector[i]->bhe_refrigerant_viscosity, mmp_vector[i]->bhe_refrigerant_density, mmp_vector[i]->bhe_refrigerant_alpha_L,
 											 mmp_vector[i]->bhe_refrigerant_heat_capacity, mmp_vector[i]->bhe_grout_density, mmp_vector[i]->bhe_grout_porosity, mmp_vector[i]->bhe_grout_heat_capacity,
-                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout, 
+                                             mmp_vector[i]->bhe_regrigerant_heat_conductivity, mmp_vector[i]->bhe_therm_conductivity_inner_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_outer_pipe_wall, mmp_vector[i]->bhe_therm_conductivity_grout,
                                              mmp_vector[i]->bhe_power_in_watt_val, mmp_vector[i]->bhe_power_in_watt_curve_idx, mmp_vector[i]->bhe_delta_T_val, mmp_vector[i]->bhe_intern_resistance, mmp_vector[i]->bhe_therm_resistance,
 											 mmp_vector[i]->bhe_R_fig, mmp_vector[i]->bhe_R_fog, mmp_vector[i]->bhe_R_gg1, mmp_vector[i]->bhe_R_gg2, mmp_vector[i]->bhe_R_gs, mmp_vector[i]->bhe_heating_cop_curve_idx, mmp_vector[i]->bhe_cooling_cop_curve_idx, mmp_vector[i]->bhe_use_flowrate_curve, mmp_vector[i]->bhe_flowrate_curve_idx,
 											 mmp_vector[i]->bhe_switch_off_threshold);

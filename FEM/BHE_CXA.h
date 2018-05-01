@@ -40,7 +40,8 @@ namespace BHE  // namespace of borehole heat exchanger
 				double my_porosity_g = 0.5         /* porosity of the grout */,
                 double my_heat_cap_g = 1000        /* specific heat capacity of the grout */,
 				double my_lambda_r = 0.6405        /* thermal conductivity of the refrigerant */,
-				double my_lambda_p = 0.38          /* thermal conductivity of the pipe wall */,
+				double my_lambda_p_i = 0.38          /* thermal conductivity of the inner pipe wall */,
+		     	double my_lambda_p_o = 0.38          /* thermal conductivity of the outer pipe wall */,
 				double my_lambda_g = 2.3           /* thermal conductivity of the grout */, 
                 double my_power_in_watt = 0.0      /* injected or extracted power */, 
                 std::size_t my_power_curve_idx = -1/* index of the power curve*/,
@@ -77,7 +78,8 @@ namespace BHE  // namespace of borehole heat exchanger
             heat_cap_g = my_heat_cap_g;
 			porosity_g = my_porosity_g;
 			lambda_r = my_lambda_r;
-			lambda_p = my_lambda_p;
+			lambda_p_i = my_lambda_p_i;
+			lambda_p_o = my_lambda_p_o;
 			lambda_g = my_lambda_g;
             power_in_watt_val = my_power_in_watt; 
             power_in_watt_curve_idx = my_power_curve_idx;
