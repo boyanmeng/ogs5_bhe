@@ -16,6 +16,9 @@ set( SOURCES
 	BHE_Net_ELE_HeatPump.h
 	BHE_Net_ELE_Pipe.h
 	BHE_Net_ELE_Pipe_Inner_1U.h
+	BHE_Net_ELE_Pipe_Inner_2U.h
+	BHE_Net_ELE_Pipe_Inner_CXA.h
+	BHE_Net_ELE_Pipe_Inner_CXC.h
 	conversion_rate.h
 	display.h
 	eos.h
@@ -81,6 +84,9 @@ set( SOURCES
 	BHE_Net_ELE_HeatPump.cpp
 	BHE_Net_ELE_Pipe.cpp
 	BHE_Net_ELE_Pipe_Inner_1U.cpp
+    BHE_Net_ELE_Pipe_Inner_2U.cpp
+	BHE_Net_ELE_Pipe_Inner_CXA.cpp
+	BHE_Net_ELE_Pipe_Inner_CXC.cpp
 	conversion_rate.cpp
 	display.cpp
 	eos.cpp

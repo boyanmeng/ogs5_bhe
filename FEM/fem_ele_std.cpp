@@ -9245,15 +9245,126 @@ void CFiniteElementStd::Assemble_LHS_BHE_Net(BHE::BHE_Net * bhe_net)
         } // end of if BHE_NET_PIPE_INNER_1U
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_2U)
         {
-            // TODO
+			std::size_t global_i, global_j;
+			double p;
+
+			// initialize the memory of local LHS matrix
+			mat_LHS_penalty_value = Eigen::MatrixXd::Zero(2, 2);
+
+			// fill in the global indices matrix
+			global_i = iterator->second->get_T_in_global_index();
+			global_j = iterator->second->get_T_out_global_index();
+
+			// obtain the original values in the global matrix
+			// and fill them into the local LHS matrix
+
+			mat_LHS_penalty_value(0, 0) = MXGet(global_i, global_i);  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = MXGet(global_i, global_j);  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = MXGet(global_j, global_i);  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = MXGet(global_j, global_j);  // position (1,1)
+
+
+																	  // now multiply with the penalty factor
+			p = iterator->second->get_penalty_factor();// * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
+
+			mat_LHS_penalty_value(0, 0) = 1.0 * p;  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = 1.0 * p;  // position (1,1)
+
+													// local matrix finished. 
+#ifdef _DEBUG
+			std::cout << "The local LHS penalty value matrix of the BHE network equation sytem is: \n";
+			std::cout << mat_LHS_penalty_value << std::endl;
+#endif
+
+			// Assemble onto the global matrix
+			MXInc(global_i, global_i, mat_LHS_penalty_value(0, 0)); // position (0,0)
+			MXInc(global_i, global_j, mat_LHS_penalty_value(0, 1)); // position (0,0)
+			MXInc(global_j, global_i, mat_LHS_penalty_value(1, 0)); // position (0,0)
+			MXInc(global_j, global_j, mat_LHS_penalty_value(1, 1)); // position (0,0)
         }
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_CXC)
         {
-            // TODO
+			std::size_t global_i, global_j;
+			double p;
+
+			// initialize the memory of local LHS matrix
+			mat_LHS_penalty_value = Eigen::MatrixXd::Zero(2, 2);
+
+			// fill in the global indices matrix
+			global_i = iterator->second->get_T_in_global_index();
+			global_j = iterator->second->get_T_out_global_index();
+
+			// obtain the original values in the global matrix
+			// and fill them into the local LHS matrix
+
+			mat_LHS_penalty_value(0, 0) = MXGet(global_i, global_i);  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = MXGet(global_i, global_j);  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = MXGet(global_j, global_i);  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = MXGet(global_j, global_j);  // position (1,1)
+
+
+																	  // now multiply with the penalty factor
+			p = iterator->second->get_penalty_factor();// * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
+
+			mat_LHS_penalty_value(0, 0) = 1.0 * p;  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = 1.0 * p;  // position (1,1)
+
+													// local matrix finished. 
+#ifdef _DEBUG
+			std::cout << "The local LHS penalty value matrix of the BHE network equation sytem is: \n";
+			std::cout << mat_LHS_penalty_value << std::endl;
+#endif
+
+			// Assemble onto the global matrix
+			MXInc(global_i, global_i, mat_LHS_penalty_value(0, 0)); // position (0,0)
+			MXInc(global_i, global_j, mat_LHS_penalty_value(0, 1)); // position (0,0)
+			MXInc(global_j, global_i, mat_LHS_penalty_value(1, 0)); // position (0,0)
+			MXInc(global_j, global_j, mat_LHS_penalty_value(1, 1)); // position (0,0)
         }
         else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE_INNER_CXA)
         {
-            // TODO
+			std::size_t global_i, global_j;
+			double p;
+
+			// initialize the memory of local LHS matrix
+			mat_LHS_penalty_value = Eigen::MatrixXd::Zero(2, 2);
+
+			// fill in the global indices matrix
+			global_i = iterator->second->get_T_in_global_index();
+			global_j = iterator->second->get_T_out_global_index();
+
+			// obtain the original values in the global matrix
+			// and fill them into the local LHS matrix
+
+			mat_LHS_penalty_value(0, 0) = MXGet(global_i, global_i);  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = MXGet(global_i, global_j);  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = MXGet(global_j, global_i);  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = MXGet(global_j, global_j);  // position (1,1)
+
+
+																	  // now multiply with the penalty factor
+			p = iterator->second->get_penalty_factor();// * mat_LHS_penalty_value.cwiseAbs().maxCoeff(); // this part may need a bit of double-check.
+
+			mat_LHS_penalty_value(0, 0) = 1.0 * p;  // position (0,0)
+			mat_LHS_penalty_value(0, 1) = -1.0 * p;  // position (0,1)
+			mat_LHS_penalty_value(1, 0) = -1.0 * p;  // position (1,0)
+			mat_LHS_penalty_value(1, 1) = 1.0 * p;  // position (1,1)
+
+													// local matrix finished. 
+#ifdef _DEBUG
+			std::cout << "The local LHS penalty value matrix of the BHE network equation sytem is: \n";
+			std::cout << mat_LHS_penalty_value << std::endl;
+#endif
+
+			// Assemble onto the global matrix
+			MXInc(global_i, global_i, mat_LHS_penalty_value(0, 0)); // position (0,0)
+			MXInc(global_i, global_j, mat_LHS_penalty_value(0, 1)); // position (0,0)
+			MXInc(global_j, global_i, mat_LHS_penalty_value(1, 0)); // position (0,0)
+			MXInc(global_j, global_j, mat_LHS_penalty_value(1, 1)); // position (0,0)
         }
 		else if (iterator->second->get_net_ele_type() == BHE::BHE_NET_ELE::BHE_NET_PIPE)
 		{
@@ -9641,8 +9752,8 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
         // else
         CalcMass_BHE(m_bhe, matBHE_P);
     }
-    //std::cout << "matBHE_P: \n";
-    //std::cout << matBHE_P << "\n";
+    // std::cout << "matBHE_P: \n";
+    // std::cout << matBHE_P << "\n";
 
     // Laplace matrix for BHE.......................................................
     CalcLaplace_BHE(m_bhe, matBHE_L);
@@ -9664,15 +9775,15 @@ void CFiniteElementStd::AssembleMixedHyperbolicParabolicEquation_BHE()
     // matBHE_L.setZero();  // test, later should be removed. 
     matBHE_L += matBHE_R; 
 
-    //// debugging................................
-    //std::cout << "matBHE_P: \n";
-    //std::cout << matBHE_P << "\n";
-    //std::cout << "matBHE_L: \n"; 
-    //std::cout << matBHE_L << "\n";
-    //std::cout << "matBHE_R: \n";
-    //std::cout << matBHE_R << "\n";
-    //std::cout << "matBHE_R_pi_s: \n";
-    //std::cout << matBHE_R_pi_s << "\n";
+    // debugging................................
+    // std::cout << "matBHE_P: \n";
+    // std::cout << matBHE_P << "\n";
+    // std::cout << "matBHE_L: \n"; 
+    // std::cout << matBHE_L << "\n";
+    // std::cout << "matBHE_R: \n";
+    // std::cout << matBHE_R << "\n";
+    // std::cout << "matBHE_R_pi_s: \n";
+    // std::cout << matBHE_R_pi_s << "\n";
     //// exit(1); 
     //// end of debugging.........................
 

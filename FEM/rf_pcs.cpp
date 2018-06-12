@@ -3365,7 +3365,13 @@ void CRFProcess::ConfigBHEs()
                 BHE_network.add_bhe_net_elem(m_bhe_cxa);
 
                 // now adding a pipeline connecting the bottom of this BHE
-                // TODO
+				BHE::BHE_Net_ELE_Pipe_Inner_CXA * m_bhe_pipe_cxa;
+				m_bhe_pipe_cxa = new BHE::BHE_Net_ELE_Pipe_Inner_CXA(m_bhe_cxa->get_ele_name().append("_INNER_PIPE"), m_bhe_cxa);
+				BHE_network.add_bhe_net_pipe(m_bhe_pipe_cxa,
+					                         m_bhe_cxa->get_ele_name(), 
+					                         0, 
+					                         m_bhe_cxa->get_ele_name(), 
+					                         0);
 
                 break;
             default:
