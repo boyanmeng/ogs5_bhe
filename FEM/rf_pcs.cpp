@@ -3331,7 +3331,13 @@ void CRFProcess::ConfigBHEs()
                 BHE_network.add_bhe_net_elem(m_bhe_2u);
 
                 // now adding a pipeline connecting the bottom of this BHE
-                // TODO
+				BHE::BHE_Net_ELE_Pipe_Inner_2U * m_bhe_pipe_2u;
+				m_bhe_pipe_2u = new BHE::BHE_Net_ELE_Pipe_Inner_2U(m_bhe_2u->get_ele_name().append("_INNER_PIPE"), m_bhe_2u);
+				BHE_network.add_bhe_net_pipe(m_bhe_pipe_2u,
+					m_bhe_2u->get_ele_name(),
+					0,
+					m_bhe_2u->get_ele_name(),
+					0);
 
                 break;
             case BHE::BHE_TYPE_CXC:
@@ -3348,7 +3354,13 @@ void CRFProcess::ConfigBHEs()
                 BHE_network.add_bhe_net_elem(m_bhe_cxc);
 
                 // now adding a pipeline connecting the bottom of this BHE
-                // TODO
+				BHE::BHE_Net_ELE_Pipe_Inner_CXC * m_bhe_pipe_cxc;
+				m_bhe_pipe_cxc = new BHE::BHE_Net_ELE_Pipe_Inner_CXC(m_bhe_cxc->get_ele_name().append("_INNER_PIPE"), m_bhe_cxc);
+				BHE_network.add_bhe_net_pipe(m_bhe_pipe_cxc,
+					m_bhe_cxc->get_ele_name(),
+					0,
+					m_bhe_cxc->get_ele_name(),
+					0);
 
                 break;
             case BHE::BHE_TYPE_CXA:
