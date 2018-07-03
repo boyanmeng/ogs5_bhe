@@ -590,7 +590,6 @@ public:
 	std::vector<double*> nod_val_vector;  //OK
 	                                      //OK
 	std::vector<std::string> nod_val_name_vector;
-    std::vector<std::string> pcs_secondary_function_name_vector;
 	void SetNodeValue(long,int,double);   //OK
     double GetNodeValue(size_t,int);        //OK
          double *getNodeValue_per_Variable(const int entry_id) const //WW
