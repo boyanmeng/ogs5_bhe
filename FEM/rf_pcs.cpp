@@ -13284,7 +13284,7 @@ CRFProcess* PCSGetMass(size_t component_number)
             phi[idx_bhe_unknowns] = m_bhe->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
         }
 
-        int ndxT_i, ndxT_o, ndxT_g, ndxT_s, ndxHeatflux_i_1, ndxHeatflux_o_1, ndxHeatflux_g_1;
+        int ndxT_i, ndxT_o, ndxT_g, ndxT_s, ndxHeatflux_i_1, ndxHeatflux_o_1, ndxHeatflux_g_1, global_ndxT_s;
 
         double Heatflux_i_1, Heatflux_o_1, Heatflux_g_1, PHI_fig, PHI_ff, PHI_gs, T_i, T_o, T_g, T_s;
         // calculating heat transfer coefficients;
@@ -13295,7 +13295,7 @@ CRFProcess* PCSGetMass(size_t component_number)
         ndxT_i = m_pcs->GetNodeValueIndex("TEMPERATURE_IN_1_ply_BHE0");
         ndxT_o = m_pcs->GetNodeValueIndex("TEMPERATURE_OUT_1_ply_BHE0");
         ndxT_g = m_pcs->GetNodeValueIndex("TEMPERATURE_G_1_ply_BHE0");
-        ndxT_s = m_pcs->GetNodeValueIndex("TEMPERATURE_SOIL");
+        ndxT_s = m_pcs->GetNodeValueIndex("TEMPERATURE_SOIL") + 1;
         ndxHeatflux_i_1 = m_pcs->GetNodeValueIndex("Heatflux_i_1_ply_BHE0");
         ndxHeatflux_o_1 = m_pcs->GetNodeValueIndex("Heatflux_o_1_ply_BHE0");
         ndxHeatflux_g_1 = m_pcs->GetNodeValueIndex("Heatflux_g_1_ply_BHE0");
@@ -13303,10 +13303,11 @@ CRFProcess* PCSGetMass(size_t component_number)
         const size_t n_nodes_BHE (m_pcs->n_nodes_BHE);
         for(size_t nn = 0; nn < n_nodes_BHE; nn++)
         {
+            global_ndxT_s = vec_BHE_nodes[0][nn];
             T_i = m_pcs->GetNodeValue(nn, ndxT_i);
             T_o = m_pcs->GetNodeValue(nn, ndxT_o);
             T_g = m_pcs->GetNodeValue(nn, ndxT_g);
-            T_s = m_pcs->GetNodeValue(nn, ndxT_s);
+            T_s = m_pcs->GetNodeValue(global_ndxT_s, ndxT_s);
 
             Heatflux_i_1 = - PHI_fig * (T_g - T_i) - PHI_ff * (T_o - T_i);
             Heatflux_o_1 = - PHI_ff * (T_i - T_o);
