@@ -258,7 +258,7 @@ namespace BHE  // namespace of borehole heat exchanger
         */
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-	private:
+    private:
 		/**
 		* thermal resistances
 		*/

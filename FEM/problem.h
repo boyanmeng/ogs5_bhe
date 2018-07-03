@@ -131,7 +131,7 @@ class Problem
 	void LOPExecuteRegionalRichardsFlow(CRFProcess* m_pcs_global, int loop_process_number);
 	void LOPCalcELEResultants();
 	inline void ASMCalcNodeWDepth(CRFProcess* m_pcs);
-	void PCSCalcSecondaryVariables();
+    void PCSCalcSecondaryVariables();
 	bool Check();                     //OK
 	void TestOutputEclipse(CRFProcess* m_pcs);	//BG
 	void TestOutputDuMux(CRFProcess* m_pcs);	//BG

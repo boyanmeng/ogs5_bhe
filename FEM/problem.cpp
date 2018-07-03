@@ -3024,6 +3024,9 @@ inline double Problem::HeatTransport_BHE()
     if (REACTINT_vec[0]->heatpump_2DhTO2Dv)
         REACTINT_vec[0]->Heatpump_2DhTO2Dv_Mapping(true); // Map Heat plume CL to 2D vertical
 
+    if(m_pcs->TimeStepAccept())
+        PCSCalcSecondaryVariables();
+
     return error;
 }
 
@@ -3996,8 +3999,8 @@ void Problem::PCSCalcSecondaryVariables()
 				break;
 			case 2:       /* Mass transport process */
 				break;
-			case 3:       /* Heat transport */
-				// do nothing
+            case 3:       /* Heat transport */
+                MMPCalcSecondaryVariablesBHE(m_pcs);
 				break;
 			case 4:       /* Deformation */
 				// do nothing

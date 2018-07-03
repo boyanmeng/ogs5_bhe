@@ -1137,6 +1137,23 @@ void CRFProcess::Create()
                     tmp_name_str.append(vec_BHEs[i]->get_name());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
                     nod_val_name_vector.push_back(tmp_name_str.c_str());
+
+
+                    tmp_name_str = std::string(pcs_secondary_function_name[0]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = std::string(pcs_secondary_function_name[2]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    tmp_name_str = std::string(pcs_secondary_function_name[4]);
+                    tmp_name_str.append("_");
+                    tmp_name_str.append(vec_BHEs[i]->get_name());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
+                    nod_val_name_vector.push_back(tmp_name_str.c_str());
                 break;
             }
         } // end of for BHE vector
@@ -3265,7 +3282,23 @@ void CRFProcess::ConfigHeatTransport_BHE()
 	pcs_primary_function_name[8] = "TEMPERATURE_G_4";
 	pcs_primary_function_unit[8] = "dC";
 
-    pcs_number_of_secondary_nvals = 0;
+    pcs_number_of_secondary_nvals = 8;
+    pcs_secondary_function_name[0] = "Heatflux_i_1";
+    pcs_secondary_function_unit[0] = "J/m^2";
+    pcs_secondary_function_name[1] = "Heatflux_i_2";
+    pcs_secondary_function_unit[1] = "J/m^2";
+    pcs_secondary_function_name[2] = "Heatflux_o_1";
+    pcs_secondary_function_unit[2] = "J/m^2";
+    pcs_secondary_function_name[3] = "Heatflux_o_2";
+    pcs_secondary_function_unit[3] = "J/m^2";
+    pcs_secondary_function_name[4] = "Heatflux_g_1";
+    pcs_secondary_function_unit[4] = "J/m^2";
+    pcs_secondary_function_name[5] = "Heatflux_g_2";
+    pcs_secondary_function_unit[5] = "J/m^2";
+    pcs_secondary_function_name[6] = "Heatflux_g_3";
+    pcs_secondary_function_unit[6] = "J/m^2";
+    pcs_secondary_function_name[7] = "Heatflux_g_4";
+    pcs_secondary_function_unit[7] = "J/m^2";
 
     // initialize the BHE data structure
     ConfigBHEs(); 
@@ -8988,6 +9021,9 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 		case FiniteElement::PS_GLOBAL:
 			CalcSecondaryVariablesPSGLOBAL(); //WW
 			break;
+       /* case FiniteElement::HEAT_TRANSPORT_BHE:
+            CalcSecondaryVariablesBHE();
+        */
 		default:
 			if (type == 1212)
 				//WW
@@ -9465,7 +9501,6 @@ void CRFProcess::DDCAssembleGlobalMatrix()
 		//
 		return -2;
 	}
-
 /**************************************************************************
    FEMLib-Method:
    Task:
@@ -10820,7 +10855,7 @@ double CRFProcess::CalcIterationNODError(FiniteElement::ErrorMethod method, bool
 				if(pcs_var_name.compare(var_name) == 0)
 					return m_pcs;
 			}
-			for(size_t j = 0; j < m_pcs->GetSecondaryVNumber(); j++)
+            for(size_t j = 0; j < m_pcs->GetSecondaryVNumber(); j++)
 			{
 				pcs_var_name = m_pcs->pcs_secondary_function_name[j];
 				if(pcs_var_name.compare(var_name) == 0)
@@ -13228,6 +13263,63 @@ CRFProcess* PCSGetMass(size_t component_number)
 		m_mfp->mode = 0;
 		//----------------------------------------------------------------------
 	}
+
+/**************************************************************************
+   PCSLib-Method:
+   based on MMPCalcSecondaryVariables
+   06/2018 CC Implementation
+**************************************************************************/
+
+    void MMPCalcSecondaryVariablesBHE(CRFProcess* m_pcs)
+    {
+        BHE::BHEAbstract* m_bhe;
+        for (std::size_t idx = 0; idx < vec_BHEs.size(); idx++)
+        {
+            m_bhe = vec_BHEs[idx];
+        }
+
+        Eigen::Vector3d phi;
+        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_bhe->get_n_heat_exchange_terms(); idx_bhe_unknowns++)
+        {
+            phi[idx_bhe_unknowns] = m_bhe->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
+        }
+
+        int ndxT_i, ndxT_o, ndxT_g, ndxT_s, ndxHeatflux_i_1, ndxHeatflux_o_1, ndxHeatflux_g_1;
+
+        double Heatflux_i_1, Heatflux_o_1, Heatflux_g_1, PHI_fig, PHI_ff, PHI_gs, T_i, T_o, T_g, T_s;
+        // calculating heat transfer coefficients;
+        PHI_fig = phi(0);
+        PHI_ff = phi(1);
+        PHI_gs = phi(2);
+
+        ndxT_i = m_pcs->GetNodeValueIndex("TEMPERATURE_IN_1_ply_BHE0");
+        ndxT_o = m_pcs->GetNodeValueIndex("TEMPERATURE_OUT_1_ply_BHE0");
+        ndxT_g = m_pcs->GetNodeValueIndex("TEMPERATURE_G_1_ply_BHE0");
+        ndxT_s = m_pcs->GetNodeValueIndex("TEMPERATURE_SOIL");
+        ndxHeatflux_i_1 = m_pcs->GetNodeValueIndex("Heatflux_i_1_ply_BHE0");
+        ndxHeatflux_o_1 = m_pcs->GetNodeValueIndex("Heatflux_o_1_ply_BHE0");
+        ndxHeatflux_g_1 = m_pcs->GetNodeValueIndex("Heatflux_g_1_ply_BHE0");
+
+        const size_t n_nodes_BHE (m_pcs->n_nodes_BHE);
+        for(size_t nn = 0; nn < n_nodes_BHE; nn++)
+        {
+            T_i = m_pcs->GetNodeValue(nn, ndxT_i);
+            T_o = m_pcs->GetNodeValue(nn, ndxT_o);
+            T_g = m_pcs->GetNodeValue(nn, ndxT_g);
+            T_s = m_pcs->GetNodeValue(nn, ndxT_s);
+
+            Heatflux_i_1 = - PHI_fig * (T_g - T_i) - PHI_ff * (T_o - T_i);
+            Heatflux_o_1 = - PHI_ff * (T_i - T_o);
+            Heatflux_g_1 = - PHI_gs * (T_s - T_g) - PHI_fig * (T_i - T_g);
+
+            m_pcs->SetNodeValue(nn, ndxHeatflux_i_1, Heatflux_i_1);
+            m_pcs->SetNodeValue(nn, ndxHeatflux_o_1, Heatflux_o_1);
+            m_pcs->SetNodeValue(nn, ndxHeatflux_g_1, Heatflux_g_1);
+        }
+
+        printf("Heat fluxes have been calculated. \n");
+
+    }
 
 /**************************************************************************
    PCSLib-Method:

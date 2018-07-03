@@ -590,8 +590,9 @@ public:
 	std::vector<double*> nod_val_vector;  //OK
 	                                      //OK
 	std::vector<std::string> nod_val_name_vector;
+    std::vector<std::string> pcs_secondary_function_name_vector;
 	void SetNodeValue(long,int,double);   //OK
-	double GetNodeValue(size_t,int);        //OK
+    double GetNodeValue(size_t,int);        //OK
          double *getNodeValue_per_Variable(const int entry_id) const //WW
 	{
             return nod_val_vector[entry_id];
@@ -809,9 +810,10 @@ public:
 	//WW Reomve int timelevel, bool update
 	//WW
 
-	  void CalcSecondaryVariablesTNEQ();      //HS
+    void CalcSecondaryVariablesTNEQ();      //HS
 	void CalcSecondaryVariablesUnsaturatedFlow(bool initial = false);
 	void CalcSecondaryVariablesPSGLOBAL(); // PCH
+    void CalcSecondaryVariablesBHE();
     void CalcSecondaryVariablesLiquidFlow();                                                  // PCH
 	double GetCapillaryPressureOnNodeByNeighobringElementPatches(int nodeIdx,
 	                                                             int meanOption,
@@ -1057,6 +1059,7 @@ extern bool pcs_created;
 extern std::vector<LINEAR_SOLVER*> PCS_Solver;    //WW
                                                   //OK
 extern void MMPCalcSecondaryVariablesNew(CRFProcess* m_pcs, bool NAPLdiss);
+extern void MMPCalcSecondaryVariablesBHE(CRFProcess* m_pcs);
 extern void SetFlowProcessType();                 //CB 01/08
 extern void CopyTimestepNODValuesSVTPhF();        //CB 13/08
 #if !defined(USE_PETSC) && !defined(NEW_EQS) // && defined(other parallel libs)//03~04.3012. WW
