@@ -1623,7 +1623,7 @@ double COutput::NODWritePLYDataTEC(int number)
 
 
 		tec_file << " VARIABLES = \"DIST\" ";
-		for (size_t k = 0; k < no_variables; k++)
+        for (size_t k = 0; k < no_variables; k++)
 		{
 			tec_file << "\"" << _nod_value_vector[k] << "\" ";
 			//-------------------------------------WW

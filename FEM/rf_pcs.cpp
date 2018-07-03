@@ -13313,8 +13313,11 @@ CRFProcess* PCSGetMass(size_t component_number)
             Heatflux_g_1 = - PHI_gs * (T_s - T_g) - PHI_fig * (T_i - T_g);
 
             m_pcs->SetNodeValue(nn, ndxHeatflux_i_1, Heatflux_i_1);
+            m_pcs->SetNodeValue(nn, ndxHeatflux_i_1 + 1, Heatflux_i_1);
             m_pcs->SetNodeValue(nn, ndxHeatflux_o_1, Heatflux_o_1);
+            m_pcs->SetNodeValue(nn, ndxHeatflux_o_1 + 1, Heatflux_o_1);
             m_pcs->SetNodeValue(nn, ndxHeatflux_g_1, Heatflux_g_1);
+            m_pcs->SetNodeValue(nn, ndxHeatflux_g_1 + 1, Heatflux_g_1);
         }
 
         printf("Heat fluxes have been calculated. \n");
