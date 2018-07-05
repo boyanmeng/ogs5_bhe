@@ -13278,8 +13278,9 @@ CRFProcess* PCSGetMass(size_t component_number)
             m_bhe = vec_BHEs[idx];
         }
 
-        Eigen::Vector3d phi;
-        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < m_bhe->get_n_heat_exchange_terms(); idx_bhe_unknowns++)
+		const std::size_t n_phi = m_bhe->get_n_heat_exchange_terms();
+		Eigen::VectorXd phi = Eigen::VectorXd::Zero();
+        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < n_phi; idx_bhe_unknowns++)
         {
             phi[idx_bhe_unknowns] = m_bhe->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
         }
