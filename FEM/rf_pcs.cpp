@@ -13278,51 +13278,56 @@ CRFProcess* PCSGetMass(size_t component_number)
             m_bhe = vec_BHEs[idx];
         }
 
-		const std::size_t n_phi = m_bhe->get_n_heat_exchange_terms();
-		Eigen::VectorXd phi = Eigen::VectorXd::Zero();
-        for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < n_phi; idx_bhe_unknowns++)
-        {
-            phi[idx_bhe_unknowns] = m_bhe->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
-        }
+		switch (vec_BHEs[0]->get_type())
+		{
+		case BHE::BHE_TYPE_CXA:		
+			const std::size_t n_phi = m_bhe->get_n_heat_exchange_terms();		
+			Eigen::Vector3d phi;
+			for (std::size_t idx_bhe_unknowns = 0; idx_bhe_unknowns < n_phi; idx_bhe_unknowns++)
+			{
+				phi[idx_bhe_unknowns] = m_bhe->get_boundary_heat_exchange_coeff(idx_bhe_unknowns);
+			}
 
-        int ndxT_i, ndxT_o, ndxT_g, ndxT_s, ndxHeatflux_i_1, ndxHeatflux_o_1, ndxHeatflux_g_1, global_ndxT_s;
+			int ndxT_i, ndxT_o, ndxT_g, ndxT_s, ndxHeatflux_i_1, ndxHeatflux_o_1, ndxHeatflux_g_1, global_ndxT_s;
 
-        double Heatflux_i_1, Heatflux_o_1, Heatflux_g_1, PHI_fig, PHI_ff, PHI_gs, T_i, T_o, T_g, T_s;
-        // calculating heat transfer coefficients;
-        PHI_fig = phi(0);
-        PHI_ff = phi(1);
-        PHI_gs = phi(2);
+			double Heatflux_i_1, Heatflux_o_1, Heatflux_g_1, PHI_fig, PHI_ff, PHI_gs, T_i, T_o, T_g, T_s;
+			// calculating heat transfer coefficients;
+			PHI_fig = phi(0);
+			PHI_ff = phi(1);
+			PHI_gs = phi(2);
 
-        ndxT_i = m_pcs->GetNodeValueIndex("TEMPERATURE_IN_1_ply_BHE0");
-        ndxT_o = m_pcs->GetNodeValueIndex("TEMPERATURE_OUT_1_ply_BHE0");
-        ndxT_g = m_pcs->GetNodeValueIndex("TEMPERATURE_G_1_ply_BHE0");
-        ndxT_s = m_pcs->GetNodeValueIndex("TEMPERATURE_SOIL") + 1;
-        ndxHeatflux_i_1 = m_pcs->GetNodeValueIndex("Heatflux_i_1_ply_BHE0");
-        ndxHeatflux_o_1 = m_pcs->GetNodeValueIndex("Heatflux_o_1_ply_BHE0");
-        ndxHeatflux_g_1 = m_pcs->GetNodeValueIndex("Heatflux_g_1_ply_BHE0");
+			ndxT_i = m_pcs->GetNodeValueIndex("TEMPERATURE_IN_1_ply_BHE0");
+			ndxT_o = m_pcs->GetNodeValueIndex("TEMPERATURE_OUT_1_ply_BHE0");
+			ndxT_g = m_pcs->GetNodeValueIndex("TEMPERATURE_G_1_ply_BHE0");
+			ndxT_s = m_pcs->GetNodeValueIndex("TEMPERATURE_SOIL") + 1;
+			ndxHeatflux_i_1 = m_pcs->GetNodeValueIndex("Heatflux_i_1_ply_BHE0");
+			ndxHeatflux_o_1 = m_pcs->GetNodeValueIndex("Heatflux_o_1_ply_BHE0");
+			ndxHeatflux_g_1 = m_pcs->GetNodeValueIndex("Heatflux_g_1_ply_BHE0");
 
-        const size_t n_nodes_BHE (m_pcs->n_nodes_BHE);
-        for(size_t nn = 0; nn < n_nodes_BHE; nn++)
-        {
-            global_ndxT_s = vec_BHE_nodes[0][nn];
-            T_i = m_pcs->GetNodeValue(nn, ndxT_i);
-            T_o = m_pcs->GetNodeValue(nn, ndxT_o);
-            T_g = m_pcs->GetNodeValue(nn, ndxT_g);
-            T_s = m_pcs->GetNodeValue(global_ndxT_s, ndxT_s);
+			const size_t n_nodes_BHE(m_pcs->n_nodes_BHE);
+			for (size_t nn = 0; nn < n_nodes_BHE; nn++)
+			{
+				global_ndxT_s = vec_BHE_nodes[0][nn];
+				T_i = m_pcs->GetNodeValue(nn, ndxT_i);
+				T_o = m_pcs->GetNodeValue(nn, ndxT_o);
+				T_g = m_pcs->GetNodeValue(nn, ndxT_g);
+				T_s = m_pcs->GetNodeValue(global_ndxT_s, ndxT_s);
 
-            Heatflux_i_1 = - PHI_fig * (T_g - T_i) - PHI_ff * (T_o - T_i);
-            Heatflux_o_1 = - PHI_ff * (T_i - T_o);
-            Heatflux_g_1 = - PHI_gs * (T_s - T_g) - PHI_fig * (T_i - T_g);
+				Heatflux_i_1 = -PHI_fig * (T_g - T_i) - PHI_ff * (T_o - T_i);
+				Heatflux_o_1 = -PHI_ff * (T_i - T_o);
+				Heatflux_g_1 = -PHI_gs * (T_s - T_g) - PHI_fig * (T_i - T_g);
 
-            m_pcs->SetNodeValue(nn, ndxHeatflux_i_1, Heatflux_i_1);
-            m_pcs->SetNodeValue(nn, ndxHeatflux_i_1 + 1, Heatflux_i_1);
-            m_pcs->SetNodeValue(nn, ndxHeatflux_o_1, Heatflux_o_1);
-            m_pcs->SetNodeValue(nn, ndxHeatflux_o_1 + 1, Heatflux_o_1);
-            m_pcs->SetNodeValue(nn, ndxHeatflux_g_1, Heatflux_g_1);
-            m_pcs->SetNodeValue(nn, ndxHeatflux_g_1 + 1, Heatflux_g_1);
-        }
+				m_pcs->SetNodeValue(nn, ndxHeatflux_i_1, Heatflux_i_1);
+				m_pcs->SetNodeValue(nn, ndxHeatflux_i_1 + 1, Heatflux_i_1);
+				m_pcs->SetNodeValue(nn, ndxHeatflux_o_1, Heatflux_o_1);
+				m_pcs->SetNodeValue(nn, ndxHeatflux_o_1 + 1, Heatflux_o_1);
+				m_pcs->SetNodeValue(nn, ndxHeatflux_g_1, Heatflux_g_1);
+				m_pcs->SetNodeValue(nn, ndxHeatflux_g_1 + 1, Heatflux_g_1);
+			}
+        printf("Heat fluxes of CXA have been calculated. \n");
+		}
 
-        printf("Heat fluxes have been calculated. \n");
+        
 
     }
 
